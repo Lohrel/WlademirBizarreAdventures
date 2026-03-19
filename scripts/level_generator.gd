@@ -2,7 +2,7 @@ extends Node2D
 
 @export var room_scene: PackedScene # Onde vamos arrastar o Room.tscn no Inspector
 @export var player_scene: PackedScene # Onde vamos arrastar o Player.tscn
-const ROOM_SIZE = Vector2(200, 200) # O tamanho/espaçamento entre as salas
+const ROOM_SIZE = Vector2(400, 400) # O tamanho/espaçamento entre as salas
 
 var map_data = {} 
 var max_rooms = 15 

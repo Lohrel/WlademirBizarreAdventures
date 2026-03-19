@@ -10,6 +10,11 @@ script = ExtResource("1_eyghq")
 room_scene = ExtResource("2_ss8ix")
 player_scene = ExtResource("3_player")
 
+[node name="Darkness" type="CanvasModulate" parent="."]
+color = Color(0.15, 0.15, 0.2, 1)
+
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1646985618]
+
+zoom = Vector2(1, 1)
 script = ExtResource("4_camera")
 

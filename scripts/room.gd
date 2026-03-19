@@ -38,10 +38,10 @@ func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool
 		spawn_procedural_objects(is_open)
 
 func spawn_procedural_objects(is_sunlight_room: bool):
-	# Tenta spawnar entre 1 e 3 pilastras em cantos aleatórios
+	# Tenta spawnar entre 1 e 3 pilastras em cantos aleatórios (Dobrados para 140)
 	var corner_positions = [
-		Vector2(-60, -60), Vector2(60, -60),
-		Vector2(-60, 60), Vector2(60, 60)
+		Vector2(-140, -140), Vector2(140, -140),
+		Vector2(-140, 140), Vector2(140, 140)
 	]
 	corner_positions.shuffle()
 	
@@ -50,13 +50,13 @@ func spawn_procedural_objects(is_sunlight_room: bool):
 		p.position = corner_positions[i]
 		add_child(p)
 	
-	# Tenta spawnar caixas em posições aleatórias (mas não no centro se tiver sol)
-	for i in range(randi_range(2, 5)):
+	# Tenta spawnar caixas em posições aleatórias (área maior de 160)
+	for i in range(randi_range(3, 8)):
 		var b = box_scene.instantiate()
-		var random_pos = Vector2(randf_range(-70, 70), randf_range(-70, 70))
+		var random_pos = Vector2(randf_range(-160, 160), randf_range(-160, 160))
 		
 		# Se a sala tem sol, evita colocar caixas no meio (onde o sol bate)
-		if is_sunlight_room and random_pos.length() < 50:
+		if is_sunlight_room and random_pos.length() < 80:
 			continue
 			
 		b.position = random_pos
@@ -66,24 +66,24 @@ func setup_doors(has_north, has_south, has_east, has_west):
 	setup_room(has_north, has_south, has_east, has_west, false)
 
 func _process(_delta):
-	# Se a sala NÃO tem teto aberto, não fazemos nada
 	if not has_open_ceiling:
 		return
 		
-	# Pega o tempo do sol no LevelGenerator (pai)
 	var generator = get_parent()
 	if generator and "sun_time" in generator:
 		var st = generator.sun_time
 		
-		# Cálculo da ELIPSE (60 pixels de largura, 40 de altura)
-		var tx = cos(st) * 60.0
-		var ty = sin(st) * 40.0
+		# Movimento em LINHA RETA (Oeste para Leste)
+		# O sinal '-' inverte para começar na esquerda
+		# O valor '100' mantém o sol longe das paredes
+		var tx = -cos(st) * 100.0 
+		var ty = 0.0 # Linha reta no centro da sala
 		
-		# Posiciona o nó de luz
 		sunlight.position = Vector2(tx, ty)
 		
-		# Noite (se o Y for muito negativo, o sol "some")
-		if ty < -30:
-			sunlight.modulate.a = lerp(sunlight.modulate.a, 0.0, 0.05)
-		else:
-			sunlight.modulate.a = lerp(sunlight.modulate.a, 1.0, 0.05)
+		# Intensidade baseada no Seno (brilha no meio, some nas pontas)
+		var intensity = max(0, sin(st)) 
+		sunlight.energy = intensity * 2.0
+		
+		# Visibilidade (Noite)
+		sunlight.visible = intensity > 0.05

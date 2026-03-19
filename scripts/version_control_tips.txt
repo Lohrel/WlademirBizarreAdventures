@@ -1,0 +1,37 @@
+# 🧛‍♂️ GUIA DE EMERGÊNCIA - WLADEMIR BIZARRE ADVENTURES
+
+Este guia contém os comandos essenciais para você e seu artista manterem o projeto seguro.
+
+---
+
+## 🆘 SOCORRO! ALGO QUEBROU!
+
+1. **"Fiz uma bobagem no código e quero desfazer antes de salvar":**
+   `git checkout -- .` 
+   (Isso apaga todas as mudanças não salvas e volta o código para o último "save").
+
+2. **"O artista subiu algo que quebrou o jogo e quero voltar para a versão de ontem":**
+   `git log --oneline` (Para ver a lista de IDs dos saves)
+   `git revert ID_DO_SAVE`
+   (Isso cria um novo save que desfaz exatamente o que o save problemático fez).
+
+3. **"Meus arquivos sumiram do computador, mas estão no GitHub":**
+   `git pull origin main`
+   (Isso baixa tudo o que está na nuvem para o seu PC).
+
+---
+
+## 🔄 RITUAL DIÁRIO (PARA NÃO TER CONFLITOS)
+
+1. **Sempre comece o dia com:**
+   `git pull origin main` (Para pegar as artes novas do artista).
+
+2. **Sempre termine o dia com:**
+   `git add .`
+   `git commit -m "Explicação curta do que você fez"`
+   `git push origin main`
+
+---
+
+## 🎨 DICA PARA O ARTISTA
+Se o artista deletar um arquivo por engano na pasta dele, ele não precisa entrar em pânico. O Git guarda a cópia original. Ele só precisa rodar o `git pull` ou `git checkout` para o arquivo reaparecer.
