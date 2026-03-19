@@ -1,0 +1,18 @@
+# Godot-specific ignores
+.godot/
+*.uid
+
+# Windows-specific ignores
+Thumbs.db
+desktop.ini
+
+# Export folders (if you create them)
+export/
+build/
+
+# Mobile specific
+android/
+ios/
+
+# Personal editor settings
+.external_editor_settings
