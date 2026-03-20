@@ -1,20 +1,26 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://dlpqkjfo2mir2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(18, 18)
 
-[node name="Box" type="RigidBody2D"]
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_on5l8"]
+polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
+
+[node name="Box" type="RigidBody2D" unique_id=719875325]
 mass = 3.5
 gravity_scale = 0.0
 lock_rotation = true
 linear_damp = 14.0
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="ColorRect" type="ColorRect" parent="." unique_id=359627989]
 offset_left = -9.0
 offset_top = -9.0
 offset_right = 9.0
 offset_bottom = 9.0
 color = Color(0.380392, 0.231373, 0.101961, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=734505952]
 shape = SubResource("RectangleShape2D_1")
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="." unique_id=1191848653]
+occluder = SubResource("OccluderPolygon2D_on5l8")
