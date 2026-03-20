@@ -17,121 +17,112 @@ var box_scene = preload("res://scenes/box.tscn")
 var has_open_ceiling = false
 
 func _ready():
-	# Força a luz dos vagalumes a ser circular e suave (conserta o bug do quadrado)
+	# Criamos texturas de alta definição (512px)
+	# O fill_to em (1.0, 0.5) garante que o circulo ocupe a imagem toda sem cortar
+	sunlight.texture = create_safe_radial_texture(512)
+	moonlight.texture = create_radial_blue_texture(512) # Lua tem seu próprio gradiente
+	firefly_light.texture = create_safe_radial_texture(64)
+	
+	# ESCALA REDUZIDA: Garante que a luz não passe para as salas vizinhas
+	sunlight.texture_scale = 1.2
+	moonlight.texture_scale = 1.0
+	firefly_light.texture_scale = 2.0
+
+func create_safe_radial_texture(size: int) -> GradientTexture2D:
 	var grad = Gradient.new()
 	grad.offsets = [0.0, 0.8]
 	grad.colors = [Color(1,1,1,1), Color(1,1,1,0)]
-	
 	var tex = GradientTexture2D.new()
 	tex.gradient = grad
 	tex.fill = GradientTexture2D.FILL_RADIAL
 	tex.fill_from = Vector2(0.5, 0.5)
-	tex.fill_to = Vector2(1.0, 1.0)
-	tex.width = 64
-	tex.height = 64
-	
-	firefly_light.texture = tex
+	tex.fill_to = Vector2(1.0, 0.5) 
+	tex.width = size
+	tex.height = size
+	return tex
+
+func create_radial_blue_texture(size: int) -> GradientTexture2D:
+	var grad = Gradient.new()
+	grad.offsets = [0.0, 0.8]
+	grad.colors = [Color(0.5, 0.7, 1, 1), Color(0.5, 0.7, 1, 0)]
+	var tex = GradientTexture2D.new()
+	tex.gradient = grad
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5) 
+	tex.width = size
+	tex.height = size
+	return tex
 
 func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool, is_open: bool):
-	# Salva se a sala tem teto aberto
 	has_open_ceiling = is_open
-	
-	# Se tem vizinho (has_north = true), a porta fica INVISÍVEL e SEM COLISÃO (aberta)
-	# Se não tem vizinho, a porta fica VISÍVEL e COM COLISÃO (parede fechada)
 	door_north.visible = !has_north
 	door_north.get_node("CollisionShape2D").disabled = has_north
-	
 	door_south.visible = !has_south
 	door_south.get_node("CollisionShape2D").disabled = has_south
-	
 	door_east.visible = !has_east
 	door_east.get_node("CollisionShape2D").disabled = has_east
-	
 	door_west.visible = !has_west
 	door_west.get_node("CollisionShape2D").disabled = has_west
 	
 	sunlight.visible = is_open
 	moonlight.visible = is_open
 	
-	# Posiciona os vagalumes em um lugar central da sala (longe das paredes)
 	fireflies.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
-	fireflies.emitting = false # Começam desligados
+	fireflies.emitting = false 
 	
-	# Só gera objetos se a sala NÃO for a inicial (0,0) para não prender o player
 	if global_position != Vector2.ZERO:
 		spawn_procedural_objects(is_open)
 
 func spawn_procedural_objects(is_sunlight_room: bool):
-	# Tenta spawnar entre 1 e 3 pilastras em cantos aleatórios (Dobrados para 140)
-	var corner_positions = [
-		Vector2(-140, -140), Vector2(140, -140),
-		Vector2(-140, 140), Vector2(140, 140)
-	]
-	corner_positions.shuffle()
-	
+	var corners = [Vector2(-140, -140), Vector2(140, -140), Vector2(-140, 140), Vector2(140, 140)]
+	corners.shuffle()
 	for i in range(randi_range(1, 3)):
-		var pos = corner_positions[i]
+		var pos = corners[i]
 		var p = pillar_scene.instantiate()
 		p.position = pos
 		add_child(p)
-		
-		# Sorteia se o pilar tem uma tocha acesa (40% de chance)
 		if randf() < 0.4:
-			# Se o Y for negativo, o pilar está na parte superior da sala
-			var is_on_top = pos.y < 0
-			p.setup_torch(is_on_top)
+			p.setup_torch(pos.y < 0)
 	
-	# Tenta spawnar caixas em posições aleatórias (área maior de 160)
 	for i in range(randi_range(3, 8)):
 		var b = box_scene.instantiate()
-		var random_pos = Vector2(randf_range(-160, 160), randf_range(-160, 160))
-		
-		# Se a sala tem sol, evita colocar caixas no meio (onde o sol bate)
-		if is_sunlight_room and random_pos.length() < 80:
-			continue
-			
-		b.position = random_pos
+		var rpos = Vector2(randf_range(-160, 160), randf_range(-160, 160))
+		if is_sunlight_room and rpos.length() < 80: continue
+		b.position = rpos
 		add_child(b)
 
 func setup_doors(has_north, has_south, has_east, has_west):
 	setup_room(has_north, has_south, has_east, has_west, false)
 
 func _process(_delta):
-	if not has_open_ceiling:
-		return
+	if not has_open_ceiling: return
+	var gen = get_parent()
+	if gen and "sun_time" in gen:
+		var st = fmod(gen.sun_time, TAU)
 		
-	var generator = get_parent()
-	if generator and "sun_time" in generator:
-		# O st vai de 0 até 2*PI (aprox 6.28)
-		# Vamos usar o fmod para garantir que o tempo resete corretamente
-		var st = fmod(generator.sun_time, TAU) 
-		
-		# --- CICLO DO SOL (Brilha entre 0.5 e 2.6) ---
-		var sun_val = sin(st)
-		if sun_val > 0.3: # Só liga se o sol estiver "alto"
+		# --- SOL ---
+		var s_val = sin(st)
+		if s_val > 0.3:
 			sunlight.visible = true
 			sunlight.position.x = -cos(st) * 120.0
-			sunlight.energy = (sun_val - 0.3) * 3.0
+			sunlight.color = Color(1, 0.98, 0.85) # Cor mais branca/pálida
+			sunlight.energy = (s_val - 0.3) * 2.0 # Energia reduzida de 3.0 para 2.0
 		else:
 			sunlight.visible = false
-		
-		# --- CICLO DA LUA (Brilha entre 3.6 e 5.8) ---
-		# A lua é o oposto (st + PI)
-		var moon_st = fmod(st + PI, TAU)
-		var moon_val = sin(moon_st)
-		
-		if moon_val > 0.4: # Só liga se a lua estiver "alta"
-			moonlight.visible = true
-			moonlight.position.x = -cos(moon_st) * 120.0
-			moonlight.energy = (moon_val - 0.4) * 1.8
-			fireflies.emitting = true
 			
-			# --- MÁSCARA DE LUZ ---
-			# Verifica a distância entre os vagalumes e a posição da LUA
-			var dist = abs(fireflies.position.x - moonlight.position.x)
-			if dist < 80: # Se estiver dentro do feixe (largura aproximada de 80px)
+		# --- LUA E VAGALUMES ---
+		var m_st = fmod(st + PI, TAU)
+		var m_val = sin(m_st)
+		if m_val > 0.4:
+			moonlight.visible = true
+			moonlight.position.x = -cos(m_st) * 120.0
+			moonlight.energy = (m_val - 0.4) * 1.5 
+			fireflies.emitting = true
+			var d = abs(fireflies.position.x - moonlight.position.x)
+			if d < 100:
 				firefly_light.visible = true
-				firefly_light.energy = (0.3 + randf() * 0.3) * (1.0 - dist/80.0)
+				firefly_light.energy = (0.2 + randf() * 0.2) * (1.0 - d/100.0)
 			else:
 				firefly_light.visible = false
 		else:

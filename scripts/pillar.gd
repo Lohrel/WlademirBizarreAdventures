@@ -9,28 +9,29 @@ func setup_torch(is_on_top: bool):
 	if is_on_top:
 		# Tocha embaixo do pilar (Sul)
 		torch.position = Vector2(0, 18)
-		torch_particles.position = Vector2(0, 5) # Faíscas nascem abaixo da tocha
 	else:
 		# Tocha em cima do pilar (Norte)
 		torch.position = Vector2(0, -18)
-		torch_particles.position = Vector2(0, -5) # Faíscas nascem acima da tocha
+	
+	# Partículas nascem exatamente na posição da tocha
+	torch_particles.position = Vector2.ZERO
 
 func _ready():
-	# Força a luz da tocha a ser circular e suave (usando a mesma lógica dos vagalumes)
+	# Força a luz da tocha a ser circular e suave
+	# Aumentamos o tamanho da textura para 256 para evitar cortes nas bordas
 	var grad = Gradient.new()
-	grad.offsets = [0.0, 0.8]
-	grad.colors = [Color(1,1,1,1), Color(1,1,1,0)]
+	grad.offsets = [0.0, 0.7] # Termina de sumir no ponto 0.7 (longe da borda 1.0)
+	grad.colors = [Color(1, 0.6, 0.2, 1), Color(1, 0.6, 0.2, 0)]
 	
 	var tex = GradientTexture2D.new()
 	tex.gradient = grad
 	tex.fill = GradientTexture2D.FILL_RADIAL
 	tex.fill_from = Vector2(0.5, 0.5)
-	tex.fill_to = Vector2(1.0, 1.0)
-	tex.width = 128
-	tex.height = 128
+	tex.fill_to = Vector2(0.9, 0.9) # Puxamos o fim do raio para dentro
+	tex.width = 256
+	tex.height = 256
 	
 	torch_light.texture = tex
-	# Ativa as sombras para a luz respeitar paredes e pilastras
 	torch_light.shadow_enabled = true
 	torch_light.shadow_filter = 1
 	torch_light.shadow_filter_smooth = 2.0

@@ -1,6 +1,6 @@
-[gd_scene load_steps=10 format=3 uid="uid://dq7vkqodlkx7a"]
+[gd_scene format=3 uid="uid://dq7vkqodlkx7a"]
 
-[ext_resource type="Script" path="res://scripts/room.gd" id="1_gw2vq"]
+[ext_resource type="Script" uid="uid://bgb2hj1pa4iei" path="res://scripts/room.gd" id="1_gw2vq"]
 
 [sub_resource type="Gradient" id="Gradient_1"]
 offsets = PackedFloat32Array(0, 0.4, 0.8, 1)
@@ -12,18 +12,6 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 1)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_Wall"]
-size = Vector2(160, 20)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_Door"]
-size = Vector2(80, 20)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_WallHoriz"]
-polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_DoorHoriz"]
-polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
-
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_Firefly"]
 blend_mode = 1
 light_mode = 2
@@ -34,18 +22,30 @@ fill = 1
 fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 1)
 
-[node name="Room" type="Node2D"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Wall"]
+size = Vector2(160, 20)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_WallHoriz"]
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Door"]
+size = Vector2(80, 20)
+
+[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_DoorHoriz"]
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
+[node name="Room" type="Node2D" unique_id=1302318825]
 script = ExtResource("1_gw2vq")
 
-[node name="Floor" type="ColorRect" parent="."]
+[node name="Floor" type="ColorRect" parent="." unique_id=1139661807]
 z_index = -1
 offset_left = -200.0
 offset_top = -200.0
 offset_right = 200.0
 offset_bottom = 200.0
-color = Color(0.180392, 0.133333, 0.0823529, 1)
+color = Color(0.6368613, 0.49854672, 0.34870586, 1)
 
-[node name="Sunlight" type="PointLight2D" parent="."]
+[node name="Sunlight" type="PointLight2D" parent="." unique_id=1108759850]
 color = Color(1, 0.901961, 0.470588, 1)
 energy = 2.0
 range_item_cull_mask = 3
@@ -53,7 +53,7 @@ shadow_enabled = true
 texture = SubResource("GradientTexture2D_Light")
 texture_scale = 6.0
 
-[node name="DustParticles" type="CPUParticles2D" parent="Sunlight"]
+[node name="DustParticles" type="CPUParticles2D" parent="Sunlight" unique_id=680272634]
 amount = 80
 lifetime = 3.0
 preprocess = 2.0
@@ -72,7 +72,7 @@ scale_amount_min = 0.5
 scale_amount_max = 2.0
 color = Color(1, 0.941176, 0.705882, 0.392157)
 
-[node name="Moonlight" type="PointLight2D" parent="."]
+[node name="Moonlight" type="PointLight2D" parent="." unique_id=750367326]
 color = Color(0.2, 0.4, 1, 1)
 energy = 0.0
 range_item_cull_mask = 3
@@ -80,7 +80,7 @@ shadow_enabled = true
 texture = SubResource("GradientTexture2D_Light")
 texture_scale = 5.0
 
-[node name="MoonDustParticles" type="CPUParticles2D" parent="Moonlight"]
+[node name="MoonDustParticles" type="CPUParticles2D" parent="Moonlight" unique_id=1091671991]
 amount = 50
 lifetime = 4.0
 preprocess = 2.0
@@ -95,16 +95,16 @@ scale_amount_min = 0.3
 scale_amount_max = 1.2
 color = Color(0.7, 0.8, 1, 0.3)
 
-[node name="Fireflies" type="CPUParticles2D" parent="."]
-material = SubResource("CanvasItemMaterial_Firefly")
+[node name="Fireflies" type="CPUParticles2D" parent="." unique_id=675539510]
 z_index = 4
+material = SubResource("CanvasItemMaterial_Firefly")
 amount = 12
 lifetime = 4.0
 preprocess = 5.0
 speed_scale = 0.4
 randomness = 1.0
 emission_shape = 3
-emission_rect_extents = Vector2(40, 40)
+emission_rect_extents = Vector2(30, 30)
 spread = 180.0
 gravity = Vector2(0, 0)
 initial_velocity_min = 30.0
@@ -117,172 +117,208 @@ color = Color(0.4, 1, 0.2, 1)
 hue_variation_min = -0.05
 hue_variation_max = 0.05
 
-[node name="FireflyLight" type="PointLight2D" parent="Fireflies"]
+[node name="FireflyLight" type="PointLight2D" parent="Fireflies" unique_id=2094227757]
 color = Color(0.4, 1, 0.2, 1)
 energy = 0.0
 texture = SubResource("GradientTexture2D_Firefly")
 texture_scale = 2.0
 
-[node name="Walls" type="Node2D" parent="."]
+[node name="Walls" type="Node2D" parent="." unique_id=260623342]
 
-[node name="WallNorthLeft" type="StaticBody2D" parent="Walls"]
+[node name="WallNorthLeft" type="StaticBody2D" parent="Walls" unique_id=2067134689]
 position = Vector2(-120, -190)
-[node name="ColorRect" type="ColorRect" parent="Walls/WallNorthLeft"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallNorthLeft" unique_id=1398325033]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallNorthLeft"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallNorthLeft" unique_id=1381305813]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallNorthLeft"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallNorthLeft" unique_id=529855929]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallNorthRight" type="StaticBody2D" parent="Walls"]
+[node name="WallNorthRight" type="StaticBody2D" parent="Walls" unique_id=982135275]
 position = Vector2(120, -190)
-[node name="ColorRect" type="ColorRect" parent="Walls/WallNorthRight"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallNorthRight" unique_id=848145623]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallNorthRight"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallNorthRight" unique_id=1971750981]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallNorthRight"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallNorthRight" unique_id=200404260]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallSouthLeft" type="StaticBody2D" parent="Walls"]
+[node name="WallSouthLeft" type="StaticBody2D" parent="Walls" unique_id=1606292879]
 position = Vector2(-120, 190)
-[node name="ColorRect" type="ColorRect" parent="Walls/WallSouthLeft"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallSouthLeft" unique_id=1957334027]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallSouthLeft"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallSouthLeft" unique_id=2124685517]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallSouthLeft"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallSouthLeft" unique_id=1179827004]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallSouthRight" type="StaticBody2D" parent="Walls"]
+[node name="WallSouthRight" type="StaticBody2D" parent="Walls" unique_id=586173586]
 position = Vector2(120, 190)
-[node name="ColorRect" type="ColorRect" parent="Walls/WallSouthRight"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallSouthRight" unique_id=1940919457]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallSouthRight"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallSouthRight" unique_id=958300618]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallSouthRight"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallSouthRight" unique_id=1838881584]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallEastTop" type="StaticBody2D" parent="Walls"]
+[node name="WallEastTop" type="StaticBody2D" parent="Walls" unique_id=1029205819]
 position = Vector2(190, -120)
 rotation = 1.5708
-[node name="ColorRect" type="ColorRect" parent="Walls/WallEastTop"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallEastTop" unique_id=27402575]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallEastTop"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallEastTop" unique_id=756419829]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallEastTop"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallEastTop" unique_id=614356745]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallEastBottom" type="StaticBody2D" parent="Walls"]
+[node name="WallEastBottom" type="StaticBody2D" parent="Walls" unique_id=1189131567]
 position = Vector2(190, 120)
 rotation = 1.5708
-[node name="ColorRect" type="ColorRect" parent="Walls/WallEastBottom"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallEastBottom" unique_id=558456222]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallEastBottom"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallEastBottom" unique_id=1330425134]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallEastBottom"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallEastBottom" unique_id=1356894123]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallWestTop" type="StaticBody2D" parent="Walls"]
+[node name="WallWestTop" type="StaticBody2D" parent="Walls" unique_id=2061758492]
 position = Vector2(-190, -120)
 rotation = 1.5708
-[node name="ColorRect" type="ColorRect" parent="Walls/WallWestTop"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallWestTop" unique_id=55149260]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallWestTop"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallWestTop" unique_id=561452326]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallWestTop"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallWestTop" unique_id=1675209777]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="WallWestBottom" type="StaticBody2D" parent="Walls"]
+[node name="WallWestBottom" type="StaticBody2D" parent="Walls" unique_id=534819973]
 position = Vector2(-190, 120)
 rotation = 1.5708
-[node name="ColorRect" type="ColorRect" parent="Walls/WallWestBottom"]
+
+[node name="ColorRect" type="ColorRect" parent="Walls/WallWestBottom" unique_id=769134297]
 offset_left = -80.0
 offset_top = -10.0
 offset_right = 80.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallWestBottom"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallWestBottom" unique_id=296593806]
 shape = SubResource("RectangleShape2D_Wall")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallWestBottom"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="Walls/WallWestBottom" unique_id=1356475882]
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
-[node name="DoorNorth" type="StaticBody2D" parent="."]
+[node name="DoorNorth" type="StaticBody2D" parent="." unique_id=1909234650]
 position = Vector2(0, -190)
-[node name="ColorRect" type="ColorRect" parent="DoorNorth"]
+
+[node name="ColorRect" type="ColorRect" parent="DoorNorth" unique_id=760639742]
 offset_left = -40.0
 offset_top = -10.0
 offset_right = 40.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorNorth"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorNorth" unique_id=1314792308]
 shape = SubResource("RectangleShape2D_Door")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorNorth"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorNorth" unique_id=1770473471]
 occluder = SubResource("OccluderPolygon2D_DoorHoriz")
 
-[node name="DoorSouth" type="StaticBody2D" parent="."]
+[node name="DoorSouth" type="StaticBody2D" parent="." unique_id=1180434902]
 position = Vector2(0, 190)
-[node name="ColorRect" type="ColorRect" parent="DoorSouth"]
+
+[node name="ColorRect" type="ColorRect" parent="DoorSouth" unique_id=225430984]
 offset_left = -40.0
 offset_top = -10.0
 offset_right = 40.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorSouth"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorSouth" unique_id=1465146958]
 shape = SubResource("RectangleShape2D_Door")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorSouth"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorSouth" unique_id=1325323953]
 occluder = SubResource("OccluderPolygon2D_DoorHoriz")
 
-[node name="DoorEast" type="StaticBody2D" parent="."]
+[node name="DoorEast" type="StaticBody2D" parent="." unique_id=1646932253]
 position = Vector2(190, 0)
 rotation = 1.5708
-[node name="ColorRect" type="ColorRect" parent="DoorEast"]
+
+[node name="ColorRect" type="ColorRect" parent="DoorEast" unique_id=991657053]
 offset_left = -40.0
 offset_top = -10.0
 offset_right = 40.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorEast"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorEast" unique_id=1496176516]
 shape = SubResource("RectangleShape2D_Door")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorEast"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorEast" unique_id=209254422]
 occluder = SubResource("OccluderPolygon2D_DoorHoriz")
 
-[node name="DoorWest" type="StaticBody2D" parent="."]
+[node name="DoorWest" type="StaticBody2D" parent="." unique_id=1492745992]
 position = Vector2(-190, 0)
 rotation = 1.5708
-[node name="ColorRect" type="ColorRect" parent="DoorWest"]
+
+[node name="ColorRect" type="ColorRect" parent="DoorWest" unique_id=679023419]
 offset_left = -40.0
 offset_top = -10.0
 offset_right = 40.0
 offset_bottom = 10.0
 color = Color(0.28, 0.22, 0.15, 1)
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorWest"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorWest" unique_id=919347353]
 shape = SubResource("RectangleShape2D_Door")
-[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorWest"]
+
+[node name="LightOccluder2D" type="LightOccluder2D" parent="DoorWest" unique_id=623641146]
 occluder = SubResource("OccluderPolygon2D_DoorHoriz")
