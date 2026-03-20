@@ -1,4 +1,6 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3 uid="uid://dlaraiyv6lv1o"]
+
+[ext_resource type="Script" uid="uid://c1pebuj8y4cfr" path="res://scripts/pillar.gd" id="1_pillar_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(24, 24)
@@ -6,17 +8,55 @@ size = Vector2(24, 24)
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_1"]
 polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
 
-[node name="Pillar" type="StaticBody2D"]
+[sub_resource type="Gradient" id="Gradient_Torch"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 0.6, 0.2, 1, 1, 0.3, 0, 0.5, 1, 0, 0, 0)
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_Torch"]
+gradient = SubResource("Gradient_Torch")
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 1)
+
+[node name="Pillar" type="StaticBody2D" unique_id=152120375]
+script = ExtResource("1_pillar_script")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1487927485]
 offset_left = -12.0
 offset_top = -12.0
 offset_right = 12.0
 offset_bottom = 12.0
 color = Color(0.439216, 0.439216, 0.439216, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=322754201]
 shape = SubResource("RectangleShape2D_1")
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="." unique_id=878978298]
 occluder = SubResource("OccluderPolygon2D_1")
+
+[node name="Torch" type="Node2D" parent="." unique_id=1181808691]
+visible = false
+position = Vector2(0, -15)
+
+[node name="TorchLight" type="PointLight2D" parent="Torch" unique_id=219980786]
+color = Color(1, 0.54902, 0, 1)
+energy = 0.8
+texture = SubResource("GradientTexture2D_Torch")
+texture_scale = 2.5
+
+[node name="TorchParticles" type="CPUParticles2D" parent="Torch" unique_id=2032323945]
+position = Vector2(0, -10)
+amount = 15
+lifetime = 0.8
+preprocess = 1.0
+speed_scale = 0.8
+randomness = 1.0
+emission_shape = 1
+emission_sphere_radius = 2.0
+direction = Vector2(0, 0)
+spread = 20.0
+gravity = Vector2(0, -20)
+initial_velocity_min = 10.0
+initial_velocity_max = 20.0
+scale_amount_max = 2.5
+color = Color(1, 0.4, 0, 1)

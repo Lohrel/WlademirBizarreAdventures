@@ -70,9 +70,16 @@ func spawn_procedural_objects(is_sunlight_room: bool):
 	corner_positions.shuffle()
 	
 	for i in range(randi_range(1, 3)):
+		var pos = corner_positions[i]
 		var p = pillar_scene.instantiate()
-		p.position = corner_positions[i]
+		p.position = pos
 		add_child(p)
+		
+		# Sorteia se o pilar tem uma tocha acesa (40% de chance)
+		if randf() < 0.4:
+			# Se o Y for negativo, o pilar está na parte superior da sala
+			var is_on_top = pos.y < 0
+			p.setup_torch(is_on_top)
 	
 	# Tenta spawnar caixas em posições aleatórias (área maior de 160)
 	for i in range(randi_range(3, 8)):
