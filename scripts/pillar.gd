@@ -3,9 +3,13 @@ extends StaticBody2D
 @onready var torch = $Torch
 @onready var torch_light = $Torch/TorchLight
 @onready var torch_particles = $Torch/TorchParticles
+@onready var torch_audio = $Torch/AudioStreamPlayer2D
 
 func setup_torch(is_on_top: bool):
 	torch.visible = true
+	if torch_audio:
+		torch_audio.play() # Som apenas se houver tocha
+		
 	if is_on_top:
 		# Tocha embaixo do pilar (Sul)
 		torch.position = Vector2(0, 18)
@@ -17,6 +21,10 @@ func setup_torch(is_on_top: bool):
 	torch_particles.position = Vector2.ZERO
 
 func _ready():
+	# Garante que o som comece desligado (será ligado no setup_torch se necessário)
+	if torch_audio:
+		torch_audio.stop()
+		
 	# Força a luz da tocha a ser circular e suave
 	# Aumentamos o tamanho da textura para 256 para evitar cortes nas bordas
 	var grad = Gradient.new()

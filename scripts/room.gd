@@ -5,7 +5,9 @@ extends Node2D
 @onready var door_east = $DoorEast
 @onready var door_west = $DoorWest
 @onready var sunlight = $Sunlight
+@onready var sun_audio = $Sunlight/SunlightAudio
 @onready var moonlight = $Moonlight
+@onready var moon_audio = $Moonlight/MoonlightAudio
 @onready var fireflies = $Fireflies
 @onready var firefly_light = $Fireflies/FireflyLight
 
@@ -18,15 +20,14 @@ var has_open_ceiling = false
 
 func _ready():
 	# Criamos texturas de alta definição (512px)
-	# O fill_to em (1.0, 0.5) garante que o circulo ocupe a imagem toda sem cortar
 	sunlight.texture = create_safe_radial_texture(512)
-	moonlight.texture = create_radial_blue_texture(512) # Lua tem seu próprio gradiente
+	moonlight.texture = create_radial_blue_texture(512)
 	firefly_light.texture = create_safe_radial_texture(64)
 	
-	# ESCALA REDUZIDA: Garante que a luz não passe para as salas vizinhas
+	# Ajusta os tamanhos visuais
 	sunlight.texture_scale = 1.2
 	moonlight.texture_scale = 1.0
-	firefly_light.texture_scale = 2.0
+	firefly_light.texture_scale = 1.0
 
 func create_safe_radial_texture(size: int) -> GradientTexture2D:
 	var grad = Gradient.new()
@@ -106,10 +107,12 @@ func _process(_delta):
 		if s_val > 0.3:
 			sunlight.visible = true
 			sunlight.position.x = -cos(st) * 120.0
-			sunlight.color = Color(1, 0.98, 0.85) # Cor mais branca/pálida
-			sunlight.energy = (s_val - 0.3) * 2.0 # Energia reduzida de 3.0 para 2.0
+			sunlight.color = Color(1, 0.98, 0.85)
+			sunlight.energy = (s_val - 0.3) * 2.0 
+			if not sun_audio.playing: sun_audio.play()
 		else:
 			sunlight.visible = false
+			if sun_audio.playing: sun_audio.stop()
 			
 		# --- LUA E VAGALUMES ---
 		var m_st = fmod(st + PI, TAU)
@@ -119,6 +122,8 @@ func _process(_delta):
 			moonlight.position.x = -cos(m_st) * 120.0
 			moonlight.energy = (m_val - 0.4) * 1.5 
 			fireflies.emitting = true
+			if not moon_audio.playing: moon_audio.play()
+			
 			var d = abs(fireflies.position.x - moonlight.position.x)
 			if d < 100:
 				firefly_light.visible = true
@@ -129,3 +134,4 @@ func _process(_delta):
 			moonlight.visible = false
 			fireflies.emitting = false
 			firefly_light.visible = false
+			if moon_audio.playing: moon_audio.stop()
