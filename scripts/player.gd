@@ -1,9 +1,34 @@
 extends CharacterBody2D
 
-@export var speed = 120.0
+# =========================
+# CONFIG / REFERÊNCIAS
+# =========================
+
+@export var _animation_tree: AnimationTree
+@export var _attack_timer : Timer = null				
+
+var _state_machine
+var _move_speed: float = 120.0
+var _is_attacking: bool = false
+
+# última direção horizontal (esquerda/direita)
+var _last_direction := Vector2.RIGHT
+
+
+# =========================
+# READY
+# =========================
+
+func _ready() -> void:
+	_state_machine = _animation_tree["parameters/playback"]
+
+
+# =========================
+# INPUT (fullscreen + reset)
+# =========================
 
 func _input(event):
-	# Alternar Fullscreen com F11 (Apenas um clique por vez)
+	# F11 → fullscreen
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F11:
 		var mode = DisplayServer.window_get_mode()
 		if mode != DisplayServer.WINDOW_MODE_FULLSCREEN:
@@ -11,16 +36,32 @@ func _input(event):
 		else:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 			
-	# Resetar o Level com F5 (Apenas um clique por vez)
+	# F5 → reset
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F5:
 		get_tree().reload_current_scene()
 
+
+
+# LOOP PRINCIPAL
+
 func _physics_process(_delta):
-	# Captura a direção (Setas + WASD)
-	var x_input = Input.get_axis("ui_left", "ui_right")
-	var y_input = Input.get_axis("ui_up", "ui_down")
+	_move()
+	_attack()
+	_animate()
+	move_and_slide()
+	_push_objects()
+
+
+
+# MOVIMENTO
+
+
+func _move() -> void:
+	# Input principal (actions)
+	var x_input = Input.get_axis("move_left", "move_right")
+	var y_input = Input.get_axis("move_up", "move_down")
 	
-	# Se as setas não estão sendo usadas, tenta o WASD manualmente
+	# fallback WASD manual
 	if x_input == 0:
 		if Input.is_key_pressed(KEY_A): x_input = -1
 		elif Input.is_key_pressed(KEY_D): x_input = 1
@@ -28,18 +69,54 @@ func _physics_process(_delta):
 		if Input.is_key_pressed(KEY_W): y_input = -1
 		elif Input.is_key_pressed(KEY_S): y_input = 1
 	
-	var direction = Vector2(x_input, y_input).normalized()
+	var _direction: Vector2 = Vector2(x_input, y_input)
+
+	# Atualiza direção horizontal para animação
+	if _direction != Vector2.ZERO:
+		if _direction.x != 0:
+			_last_direction = Vector2(sign(_direction.x), 0)
+
+		_animation_tree["parameters/walk/blend_position"] = _last_direction
+		_animation_tree["parameters/idle/blend_position"] = _last_direction
+		_animation_tree["parameters/attack/blend_position"] = _last_direction
 	
-	# Aplica a velocidade
-	velocity = direction * speed
+	# Movimento
+	velocity = _direction.normalized() * _move_speed
+
+# ATAQUE
+
+func _attack() -> void:
+	if Input.is_action_just_pressed("attack") and _is_attacking == false:
+		set_physics_process(false)  # trava o player
+		_attack_timer.start()
+		_is_attacking = true
+
+# ANIMAÇÃO
+
+func _animate() -> void:
+	if _is_attacking:
+		_state_machine.travel("attack")
+		return
+		
+	if velocity.length() > 1:
+		_state_machine.travel("walk")
+		return
 	
-	# Move o personagem
-	move_and_slide()
-	
-	# Lógica para empurrar caixas (objetos RigidBody2D)
+	_state_machine.travel("idle")
+
+
+# EMPURRAR OBJETOS
+
+func _push_objects():
 	for i in get_slide_collision_count():
 		var collision = get_slide_collision(i)
 		var collider = collision.get_collider()
 		
 		if collider is RigidBody2D:
 			collider.apply_central_impulse(collision.get_normal() * -10.0)
+
+# FIM DO ATAQUE
+
+func _on_attack_timer_timeout() -> void:
+	set_physics_process(true)
+	_is_attacking = false
