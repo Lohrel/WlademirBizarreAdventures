@@ -1,31 +1,22 @@
 extends CharacterBody2D
 
-# =========================
-# CONFIG / REFERÊNCIAS
-# =========================
-
 @export var _animation_tree: AnimationTree
 @export var _attack_timer : Timer = null				
+@export var _dash_timer : Timer = null
+@export var _dash_speed: float = 200.0
 
 var _state_machine
 var _move_speed: float = 120.0
 var _is_attacking: bool = false
-
-# última direção horizontal (esquerda/direita)
 var _last_direction := Vector2.RIGHT
-
-
-# =========================
-# READY
-# =========================
+var _dash_direction := Vector2.ZERO
+var _is_dashing: bool = false
 
 func _ready() -> void:
 	_state_machine = _animation_tree["parameters/playback"]
 
 
-# =========================
 # INPUT (fullscreen + reset)
-# =========================
 
 func _input(event):
 	# F11 → fullscreen
@@ -45,18 +36,25 @@ func _input(event):
 # LOOP PRINCIPAL
 
 func _physics_process(_delta):
-	_move()
+	_dash() 
+	if _is_dashing:
+		velocity = _dash_direction * _dash_speed
+	else:
+		_move()
+		
 	_attack()
 	_animate()
 	move_and_slide()
 	_push_objects()
-
+	
 
 
 # MOVIMENTO
 
 
 func _move() -> void:
+	if _is_dashing:
+		return
 	# Input principal (actions)
 	var x_input = Input.get_axis("move_left", "move_right")
 	var y_input = Input.get_axis("move_up", "move_down")
@@ -86,8 +84,10 @@ func _move() -> void:
 # ATAQUE
 
 func _attack() -> void:
+	if _is_dashing:
+		return
 	if Input.is_action_just_pressed("attack") and _is_attacking == false:
-		set_physics_process(false)  # trava o player
+		#set_physics_process(false)  # trava o player
 		_attack_timer.start()
 		_is_attacking = true
 
@@ -104,7 +104,13 @@ func _animate() -> void:
 	
 	_state_machine.travel("idle")
 
+# FIM DO ATAQUE
 
+func _on_attack_timer_timeout() -> void:
+	#set_physics_process(true) #destrava o player
+	_is_attacking = false
+	
+	
 # EMPURRAR OBJETOS
 
 func _push_objects():
@@ -115,8 +121,22 @@ func _push_objects():
 		if collider is RigidBody2D:
 			collider.apply_central_impulse(collision.get_normal() * -10.0)
 
-# FIM DO ATAQUE
+# DASH
 
-func _on_attack_timer_timeout() -> void:
-	set_physics_process(true)
-	_is_attacking = false
+func _dash() -> void:
+	if Input.is_action_just_pressed("dash") and _is_dashing == false:
+		
+		var x_input = Input.get_axis("move_left", "move_right")
+		var y_input = Input.get_axis("move_up", "move_down")
+	
+		var direction = Vector2(x_input, y_input)
+	
+		if direction == Vector2.ZERO:
+			direction = _last_direction
+		_dash_direction = direction.normalized()
+		_dash_timer.start()
+		_is_dashing = true
+
+func _on_dash_timer_timeout() -> void:
+	
+	_is_dashing = false

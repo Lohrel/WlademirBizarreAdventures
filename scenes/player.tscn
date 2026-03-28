@@ -1,6 +1,6 @@
-[gd_scene load_steps=19 format=3 uid="uid://bls2nwi65cm7k"]
+[gd_scene format=3 uid="uid://bls2nwi65cm7k"]
 
-[ext_resource type="Script" uid="uid://du51vxre2a65s" path="res://scripts/Player.gd" id="1_g2els"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://dsgqp0vwv7vuo" path="res://assets/sprites/player/vampiro_spritesheet.png" id="2_qhqgy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ie3fo"]
@@ -262,47 +262,51 @@ states/walk/position = Vector2(457, 200)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1ikvx"]
 size = Vector2(12, 14)
 
-[node name="Node2D" type="Node2D"]
+[node name="Node2D" type="Node2D" unique_id=816610571]
 metadata/_edit_horizontal_guides_ = [-2917.0]
 
-[node name="player" type="CharacterBody2D" parent="." node_paths=PackedStringArray("_animation_tree", "_attack_timer")]
+[node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_attack_timer", "_dash_timer")]
 script = ExtResource("1_g2els")
 _animation_tree = NodePath("AnimationTree")
-_attack_timer = NodePath("../attack_timer")
+_attack_timer = NodePath("attack_timer")
+_dash_timer = NodePath("dash_timer")
+_dash_speed = 500.0
 
-[node name="Sprite2D" type="Sprite2D" parent="player"]
+[node name="Sprite2D" type="Sprite2D" parent="player" unique_id=1696686061]
 texture = ExtResource("2_qhqgy")
 flip_h = true
 hframes = 3
 vframes = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=2130432294]
 position = Vector2(0, 2)
 shape = SubResource("CapsuleShape2D_ie3fo")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="player"]
-libraries = {
-&"": SubResource("AnimationLibrary_nrt7g")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="player" unique_id=46991328]
+libraries/ = SubResource("AnimationLibrary_nrt7g")
 
-[node name="AnimationTree" type="AnimationTree" parent="player"]
+[node name="AnimationTree" type="AnimationTree" parent="player" unique_id=666297555]
 tree_root = SubResource("AnimationNodeStateMachine_rcof1")
 anim_player = NodePath("../AnimationPlayer")
 parameters/attack/blend_position = Vector2(0, 0)
 parameters/idle/blend_position = Vector2(0, 0)
 parameters/walk/blend_position = Vector2(0, 0)
 
-[node name="attack" type="Area2D" parent="player"]
+[node name="attack" type="Area2D" parent="player" unique_id=645274846]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="player/attack"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player/attack" unique_id=604750917]
 position = Vector2(3, 12)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("RectangleShape2D_1ikvx")
 
-[node name="Camera2D" type="Camera2D" parent="player"]
+[node name="Camera2D" type="Camera2D" parent="player" unique_id=1467276290]
 
-[node name="attack_timer" type="Timer" parent="."]
+[node name="attack_timer" type="Timer" parent="player" unique_id=866919297]
 wait_time = 0.4
 one_shot = true
 
-[connection signal="timeout" from="attack_timer" to="player" method="_on_attack_timer_timeout"]
+[node name="dash_timer" type="Timer" parent="player" unique_id=1621842083]
+wait_time = 0.2
+
+[connection signal="timeout" from="player/attack_timer" to="player" method="_on_attack_timer_timeout"]
+[connection signal="timeout" from="player/dash_timer" to="player" method="_on_dash_timer_timeout"]
