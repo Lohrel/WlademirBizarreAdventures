@@ -1,0 +1,13 @@
+[gd_scene format=3 uid="uid://ctt3ybxltjmat"]
+
+[ext_resource type="Texture2D" uid="uid://btry4vdo5qvce" path="res://assets/sprites/maos_vampiro.png" id="1_0rx0y"]
+[ext_resource type="Script" uid="uid://bo4ddgro5a3of" path="res://hand.gd" id="2_edlm2"]
+
+[node name="garra_player" type="Node2D" unique_id=506683672]
+
+[node name="hand" type="Sprite2D" parent="." unique_id=96135502]
+position = Vector2(17, 0)
+texture = ExtResource("1_0rx0y")
+vframes = 2
+script = ExtResource("2_edlm2")
+distancia = 25

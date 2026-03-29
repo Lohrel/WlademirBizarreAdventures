@@ -1,20 +1,21 @@
 extends CharacterBody2D
 
-@export var _animation_tree: AnimationTree
-@export var _attack_timer : Timer = null				
+@export var _animation_tree: AnimationTree			
 @export var _dash_timer : Timer = null
 @export var _cooldown_dash : Timer = null
+@export var _attack_timer : Timer = null
 @export var _dash_speed: float = 200.0
 
 var _move_speed: float = 200.0
 var _use_dash: bool = true
 var _state_machine
-var _is_attacking: bool = false
 var _last_direction := Vector2.RIGHT
 var _dash_direction := Vector2.ZERO
 var _is_dashing: bool = false
+var _is_attacking: bool = false
 
 func _ready() -> void:
+	print ("ok")
 	_state_machine = _animation_tree["parameters/playback"]
 	add_to_group("player")
 		
@@ -44,11 +45,10 @@ func _physics_process(_delta):
 	else:
 		_move()
 		
-	_attack()
 	_animate()
 	move_and_slide()
 	_push_objects()
-	
+	_attack()
 
 
 # MOVIMENTO
@@ -78,40 +78,18 @@ func _move() -> void:
 
 		_animation_tree["parameters/walk/blend_position"] = _last_direction
 		_animation_tree["parameters/idle/blend_position"] = _last_direction
-		_animation_tree["parameters/attack/blend_position"] = _last_direction
-	
 	# Movimento
 	velocity = _direction.normalized() * _move_speed
-
-# ATAQUE
-
-func _attack() -> void:
-	if _is_dashing:
-		return
-	if Input.is_action_just_pressed("attack") and _is_attacking == false:
-		#set_physics_process(false)  # trava o player
-		_attack_timer.start()
-		_is_attacking = true
 
 # ANIMAÇÃO
 
 func _animate() -> void:
-	if _is_attacking:
-		_state_machine.travel("attack")
-		return
 		
 	if velocity.length() > 1:
 		_state_machine.travel("walk")
 		return
 	
 	_state_machine.travel("idle")
-
-# FIM DO ATAQUE
-
-func _on_attack_timer_timeout() -> void:
-	#set_physics_process(true) #destrava o player
-	_is_attacking = false
-	
 	
 # EMPURRAR OBJETOS
 
@@ -146,3 +124,17 @@ func _on_dash_timer_timeout() -> void:
 
 func _on_cooldown_dash_timeout() -> void:
 	_use_dash = true
+
+#attack
+func _attack() -> void:
+	if Input.is_action_just_pressed("attack") and _is_attacking == false:
+		_attack_timer.start()
+		_is_attacking = true
+		
+	if _is_attacking:
+		$garra_player/hand.distancia = 60
+		
+	
+func _on_attack_timer_timeout() -> void:
+	$garra_player/hand.distancia = 25
+	_is_attacking = false

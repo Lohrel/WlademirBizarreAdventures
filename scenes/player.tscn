@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://bls2nwi65cm7k"]
 
-[ext_resource type="Script" uid="uid://2ujr22kup2fb" path="res://scripts/Player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://2ujr22kup2fb" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://dsgqp0vwv7vuo" path="res://assets/sprites/player/vampiro_spritesheet.png" id="2_qhqgy"]
+[ext_resource type="PackedScene" uid="uid://ctt3ybxltjmat" path="res://garra_player.tscn" id="3_qhqgy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
 radius = 13.0
@@ -223,8 +224,6 @@ _data = {
 &"walk_right": SubResource("Animation_tuyoq")
 }
 
-[sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_nlooh"]
-
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_fjrip"]
 animation = &"idle_left"
 
@@ -252,25 +251,20 @@ blend_point_1/pos = Vector2(-1, 0)
 blend_mode = 1
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_rcof1"]
-states/attack/node = SubResource("AnimationNodeBlendSpace2D_nlooh")
-states/attack/position = Vector2(457, 286)
 states/idle/node = SubResource("AnimationNodeBlendSpace2D_epux0")
 states/idle/position = Vector2(457, 118)
 states/walk/node = SubResource("AnimationNodeBlendSpace2D_62abg")
 states/walk/position = Vector2(457, 200)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_1ikvx"]
-size = Vector2(12, 14)
-
 [node name="Node2D" type="Node2D" unique_id=816610571]
 metadata/_edit_horizontal_guides_ = [-2917.0]
 
-[node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_attack_timer", "_dash_timer", "_cooldown_dash")]
+[node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_dash_timer", "_cooldown_dash", "_attack_timer")]
 script = ExtResource("1_g2els")
 _animation_tree = NodePath("AnimationTree")
-_attack_timer = NodePath("attack_timer")
 _dash_timer = NodePath("dash_timer")
 _cooldown_dash = NodePath("cooldown_dash")
+_attack_timer = NodePath("attack_timer")
 _dash_speed = 500.0
 
 [node name="Sprite2D" type="Sprite2D" parent="player" unique_id=1696686061]
@@ -288,20 +282,8 @@ libraries/ = SubResource("AnimationLibrary_nrt7g")
 [node name="AnimationTree" type="AnimationTree" parent="player" unique_id=666297555]
 tree_root = SubResource("AnimationNodeStateMachine_rcof1")
 anim_player = NodePath("../AnimationPlayer")
-parameters/attack/blend_position = Vector2(0, 0)
 parameters/idle/blend_position = Vector2(-0.0016877651, 0.0066814423)
 parameters/walk/blend_position = Vector2(0, 0)
-
-[node name="attack" type="Area2D" parent="player" unique_id=645274846]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="player/attack" unique_id=604750917]
-position = Vector2(3, 12)
-scale = Vector2(0.5, 0.5)
-shape = SubResource("RectangleShape2D_1ikvx")
-
-[node name="attack_timer" type="Timer" parent="player" unique_id=866919297]
-wait_time = 0.4
-one_shot = true
 
 [node name="dash_timer" type="Timer" parent="player" unique_id=1621842083]
 wait_time = 0.3
@@ -309,6 +291,12 @@ wait_time = 0.3
 [node name="cooldown_dash" type="Timer" parent="player" unique_id=252727031]
 wait_time = 0.5
 
-[connection signal="timeout" from="player/attack_timer" to="player" method="_on_attack_timer_timeout"]
+[node name="attack_timer" type="Timer" parent="player" unique_id=710866501]
+wait_time = 0.2
+
+[node name="garra_player" parent="player" unique_id=506683672 instance=ExtResource("3_qhqgy")]
+z_index = -1
+
 [connection signal="timeout" from="player/dash_timer" to="player" method="_on_dash_timer_timeout"]
 [connection signal="timeout" from="player/cooldown_dash" to="player" method="_on_cooldown_dash_timeout"]
+[connection signal="timeout" from="player/attack_timer" to="player" method="_on_attack_timer_timeout"]

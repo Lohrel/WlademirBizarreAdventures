@@ -23,6 +23,7 @@ config/icon="res://assets/sprites/icon.svg"
 
 window/size/viewport_width=640
 window/size/viewport_height=360
+window/size/mode=3
 window/size/window_width_override=1280
 window/size/window_height_override=720
 window/stretch/mode="viewport"
@@ -77,3 +78,5 @@ attack={
 
 textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
+2d/size/mode=0
+2d/stretch/scale=1.0
