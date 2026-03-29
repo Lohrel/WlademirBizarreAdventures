@@ -3,10 +3,12 @@ extends CharacterBody2D
 @export var _animation_tree: AnimationTree
 @export var _attack_timer : Timer = null				
 @export var _dash_timer : Timer = null
+@export var _cooldown_dash : Timer = null
 @export var _dash_speed: float = 200.0
 
+var _move_speed: float = 200.0
+var _use_dash: bool = true
 var _state_machine
-var _move_speed: float = 120.0
 var _is_attacking: bool = false
 var _last_direction := Vector2.RIGHT
 var _dash_direction := Vector2.ZERO
@@ -14,8 +16,8 @@ var _is_dashing: bool = false
 
 func _ready() -> void:
 	_state_machine = _animation_tree["parameters/playback"]
-
-
+	add_to_group("player")
+		
 # INPUT (fullscreen + reset)
 
 func _input(event):
@@ -124,8 +126,7 @@ func _push_objects():
 # DASH
 
 func _dash() -> void:
-	if Input.is_action_just_pressed("dash") and _is_dashing == false:
-		
+	if Input.is_action_just_pressed("dash") and _is_dashing == false and _use_dash:
 		var x_input = Input.get_axis("move_left", "move_right")
 		var y_input = Input.get_axis("move_up", "move_down")
 	
@@ -134,9 +135,14 @@ func _dash() -> void:
 		if direction == Vector2.ZERO:
 			direction = _last_direction
 		_dash_direction = direction.normalized()
+		_use_dash = false
+		_cooldown_dash.start()
 		_dash_timer.start()
 		_is_dashing = true
 
 func _on_dash_timer_timeout() -> void:
 	
 	_is_dashing = false
+
+func _on_cooldown_dash_timeout() -> void:
+	_use_dash = true

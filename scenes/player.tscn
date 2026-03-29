@@ -1,13 +1,13 @@
 [gd_scene format=3 uid="uid://bls2nwi65cm7k"]
 
-[ext_resource type="Script" path="res://scripts/Player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://2ujr22kup2fb" path="res://scripts/Player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://dsgqp0vwv7vuo" path="res://assets/sprites/player/vampiro_spritesheet.png" id="2_qhqgy"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ie3fo"]
-radius = 14.0
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
+radius = 13.0
 height = 32.0
 
-[sub_resource type="Animation" id="Animation_ie3fo"]
+[sub_resource type="Animation" id="Animation_g2els"]
 length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -43,10 +43,10 @@ tracks/2/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_xax3k"]
+[sub_resource type="Animation" id="Animation_qhqgy"]
 resource_name = "idle_left"
 length = 0.5
 loop_mode = 1
@@ -88,7 +88,7 @@ tracks/2/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_lup3u"]
+[sub_resource type="Animation" id="Animation_dqkch"]
 resource_name = "idle_right"
 length = 0.5
 loop_mode = 1
@@ -130,7 +130,7 @@ tracks/2/keys = {
 "values": [false]
 }
 
-[sub_resource type="Animation" id="Animation_wvay7"]
+[sub_resource type="Animation" id="Animation_qlg0r"]
 resource_name = "walk_left"
 length = 0.3
 loop_mode = 1
@@ -172,7 +172,7 @@ tracks/2/keys = {
 "values": [true]
 }
 
-[sub_resource type="Animation" id="Animation_f5ym0"]
+[sub_resource type="Animation" id="Animation_tuyoq"]
 resource_name = "walk_right"
 length = 0.3
 loop_mode = 1
@@ -216,39 +216,39 @@ tracks/2/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_nrt7g"]
 _data = {
-&"RESET": SubResource("Animation_ie3fo"),
-&"idle_left": SubResource("Animation_xax3k"),
-&"idle_right": SubResource("Animation_lup3u"),
-&"walk_left": SubResource("Animation_wvay7"),
-&"walk_right": SubResource("Animation_f5ym0")
+&"RESET": SubResource("Animation_g2els"),
+&"idle_left": SubResource("Animation_qhqgy"),
+&"idle_right": SubResource("Animation_dqkch"),
+&"walk_left": SubResource("Animation_qlg0r"),
+&"walk_right": SubResource("Animation_tuyoq")
 }
 
 [sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_nlooh"]
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_db7w5"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_fjrip"]
 animation = &"idle_left"
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_t2u0t"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_smehm"]
 animation = &"idle_right"
 
 [sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_epux0"]
-blend_point_0/node = SubResource("AnimationNodeAnimation_db7w5")
+blend_point_0/node = SubResource("AnimationNodeAnimation_fjrip")
 blend_point_0/pos = Vector2(-1, 0)
-blend_point_1/node = SubResource("AnimationNodeAnimation_t2u0t")
+blend_point_1/node = SubResource("AnimationNodeAnimation_smehm")
 blend_point_1/pos = Vector2(1, 0)
 blend_mode = 1
 
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_7h23o"]
-animation = &"walk_left"
-
-[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_06kav"]
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ur7pv"]
 animation = &"walk_right"
 
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_y4r1p"]
+animation = &"walk_left"
+
 [sub_resource type="AnimationNodeBlendSpace2D" id="AnimationNodeBlendSpace2D_62abg"]
-blend_point_0/node = SubResource("AnimationNodeAnimation_7h23o")
-blend_point_0/pos = Vector2(-1, 0)
-blend_point_1/node = SubResource("AnimationNodeAnimation_06kav")
-blend_point_1/pos = Vector2(1, 0)
+blend_point_0/node = SubResource("AnimationNodeAnimation_ur7pv")
+blend_point_0/pos = Vector2(1, 0)
+blend_point_1/node = SubResource("AnimationNodeAnimation_y4r1p")
+blend_point_1/pos = Vector2(-1, 0)
 blend_mode = 1
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_rcof1"]
@@ -265,22 +265,22 @@ size = Vector2(12, 14)
 [node name="Node2D" type="Node2D" unique_id=816610571]
 metadata/_edit_horizontal_guides_ = [-2917.0]
 
-[node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_attack_timer", "_dash_timer")]
+[node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_attack_timer", "_dash_timer", "_cooldown_dash")]
 script = ExtResource("1_g2els")
 _animation_tree = NodePath("AnimationTree")
 _attack_timer = NodePath("attack_timer")
 _dash_timer = NodePath("dash_timer")
+_cooldown_dash = NodePath("cooldown_dash")
 _dash_speed = 500.0
 
 [node name="Sprite2D" type="Sprite2D" parent="player" unique_id=1696686061]
+texture_filter = 1
 texture = ExtResource("2_qhqgy")
-flip_h = true
-hframes = 3
-vframes = 3
+vframes = 9
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=2130432294]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=28330274]
 position = Vector2(0, 2)
-shape = SubResource("CapsuleShape2D_ie3fo")
+shape = SubResource("CapsuleShape2D_g2els")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="player" unique_id=46991328]
 libraries/ = SubResource("AnimationLibrary_nrt7g")
@@ -289,7 +289,7 @@ libraries/ = SubResource("AnimationLibrary_nrt7g")
 tree_root = SubResource("AnimationNodeStateMachine_rcof1")
 anim_player = NodePath("../AnimationPlayer")
 parameters/attack/blend_position = Vector2(0, 0)
-parameters/idle/blend_position = Vector2(0, 0)
+parameters/idle/blend_position = Vector2(-0.0016877651, 0.0066814423)
 parameters/walk/blend_position = Vector2(0, 0)
 
 [node name="attack" type="Area2D" parent="player" unique_id=645274846]
@@ -299,14 +299,16 @@ position = Vector2(3, 12)
 scale = Vector2(0.5, 0.5)
 shape = SubResource("RectangleShape2D_1ikvx")
 
-[node name="Camera2D" type="Camera2D" parent="player" unique_id=1467276290]
-
 [node name="attack_timer" type="Timer" parent="player" unique_id=866919297]
 wait_time = 0.4
 one_shot = true
 
 [node name="dash_timer" type="Timer" parent="player" unique_id=1621842083]
-wait_time = 0.2
+wait_time = 0.3
+
+[node name="cooldown_dash" type="Timer" parent="player" unique_id=252727031]
+wait_time = 0.5
 
 [connection signal="timeout" from="player/attack_timer" to="player" method="_on_attack_timer_timeout"]
 [connection signal="timeout" from="player/dash_timer" to="player" method="_on_dash_timer_timeout"]
+[connection signal="timeout" from="player/cooldown_dash" to="player" method="_on_cooldown_dash_timeout"]

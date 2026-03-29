@@ -8,8 +8,8 @@ var player = null
 func _process(delta):
 	# Se ainda não achou o jogador, tenta achar agora
 	if player == null:
-		player = get_parent().get_node_or_null("Player")
+		player = get_tree().get_first_node_in_group("player")
 	
 	# Se achou, segue ele
 	if player:
-		position = lerp(position, player.position, smooth_speed * delta)
+		position = lerp(position, player.position, smooth_speed * delta).round()
