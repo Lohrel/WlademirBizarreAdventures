@@ -1,0 +1,33 @@
+[gd_scene format=3 uid="uid://cx1r0w5q1y2n4"]
+
+[ext_resource type="Script" path="res://scripts/dummy.gd" id="1_dummy"]
+[ext_resource type="Texture2D" uid="uid://bt4m4k5k0w2p5" path="res://assets/sprites/icon.svg" id="2_icon"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_phys"]
+size = Vector2(16, 16)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
+radius = 12.0
+
+[node name="Dummy" type="StaticBody2D"]
+collision_layer = 1
+collision_mask = 2
+script = ExtResource("1_dummy")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.8, 0.4, 0.4, 1)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_icon")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_phys")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+unique_name_in_owner = true
+collision_layer = 8
+collision_mask = 4
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+shape = SubResource("CircleShape2D_hurt")
+
+[connection signal="area_entered" from="Hurtbox" to="." method="_on_hurtbox_area_entered"]

@@ -1,7 +1,10 @@
 [gd_scene format=3 uid="uid://ctt3ybxltjmat"]
 
-[ext_resource type="Texture2D" uid="uid://btry4vdo5qvce" path="res://assets/sprites/maos_vampiro.png" id="1_0rx0y"]
-[ext_resource type="Script" uid="uid://c06d3y85p4cqy" path="res://hand.gd" id="2_edlm2"]
+[ext_resource type="Texture2D" uid="uid://btry4vdo5qvce" path="res://assets/sprites/maos_vampiro.png" id="1_dyq0a"]
+[ext_resource type="Script" uid="uid://c06d3y85p4cqy" path="res://scripts/hand.gd" id="2_ojvbx"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
+radius = 14.0
 
 [sub_resource type="Curve" id="Curve_Scale"]
 _data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
@@ -15,20 +18,29 @@ colors = PackedColorArray(0.247, 0, 0.651, 1, 0.12, 0, 0.32, 0.8, 0, 0, 0, 0)
 
 [node name="hand" type="Sprite2D" parent="." unique_id=390138523]
 position = Vector2(17, 0)
-texture = ExtResource("1_0rx0y")
+texture = ExtResource("1_dyq0a")
 vframes = 2
-script = ExtResource("2_edlm2")
+script = ExtResource("2_ojvbx")
 distancia = 25
+
+[node name="Hitbox" type="Area2D" parent="hand" unique_id=998811]
+collision_layer = 4
+collision_mask = 8
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="hand/Hitbox" unique_id=998812]
+shape = SubResource("CircleShape2D_hitbox")
 
 [node name="ShadowTrail" type="CPUParticles2D" parent="hand" unique_id=1110338141]
 show_behind_parent = true
 emitting = false
-amount = 200
+amount = 100
 lifetime = 0.4
 preprocess = 0.01
-local_coords = false
+explosiveness = 0.1
 emission_shape = 1
-emission_sphere_radius = 5.0
+emission_sphere_radius = 10.0
 direction = Vector2(-1, 0)
 spread = 15.0
 gravity = Vector2(0, 0)

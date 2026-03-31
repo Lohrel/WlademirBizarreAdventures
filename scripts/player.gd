@@ -224,14 +224,19 @@ func _attack() -> void:
 	if Input.is_action_just_pressed("attack") and _is_attacking == false:
 		_attack_timer.start()
 		_is_attacking = true
+		$garra_player/hand.distancia = 0 # Inicia exatamente no centro do player
+		$garra_player/hand/Hitbox.monitorable = true
 		
 	if _is_attacking:
-		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 60, 350 * get_physics_process_delta_time())
+		var current_dist = $garra_player/hand.distancia
+		$garra_player/hand.distancia = move_toward(current_dist, 60, 350 * get_physics_process_delta_time())
 		$garra_player/hand/ShadowTrail.emitting = true
 	else:
 		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 25, 200 * get_physics_process_delta_time())
 		$garra_player/hand/ShadowTrail.emitting = false
+		$garra_player/hand/Hitbox.monitorable = false
 		
 	
 func _on_attack_timer_timeout() -> void:
 	_is_attacking = false
+	$garra_player/hand/Hitbox.monitorable = false

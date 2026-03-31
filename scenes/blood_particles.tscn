@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://c6u7v4l6n7p4j"]
+
+[sub_resource type="Curve" id="Curve_Blood"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="Gradient" id="Gradient_Blood"]
+colors = PackedColorArray(0.6, 0, 0, 1, 0.25, 0, 0, 1)
+
+[node name="BloodParticles" type="CPUParticles2D"]
+emitting = false
+amount = 20
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.8
+randomness = 0.5
+lifetime_randomness = 0.3
+spread = 180.0
+gravity = Vector2(0, 150)
+initial_velocity_min = 50.0
+initial_velocity_max = 120.0
+damping_min = 20.0
+damping_max = 50.0
+scale_amount_min = 2.0
+scale_amount_max = 4.0
+scale_amount_curve = SubResource("Curve_Blood")
+color_initial_ramp = SubResource("Gradient_Blood")
