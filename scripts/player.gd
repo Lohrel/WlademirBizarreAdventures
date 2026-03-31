@@ -6,6 +6,16 @@ extends CharacterBody2D
 @export var _attack_timer : Timer = null
 @export var _dash_speed: float = 200.0
 
+@export_group("Stats")
+@export var max_health: float = 100.0
+@export var health: float = 100.0
+@export var max_mana: float = 100.0
+@export var mana: float = 100.0
+
+@export_group("Skills Config")
+@export var dash_mana_cost: float = 25.0
+@export var dash_cooldown_time: float = 6.0
+
 var _move_speed: float = 200.0
 var _use_dash: bool = true
 var _state_machine
@@ -18,7 +28,29 @@ func _ready() -> void:
 	print ("ok")
 	_state_machine = _animation_tree["parameters/playback"]
 	add_to_group("player")
-		
+	_update_hud()
+	$PlayerLight.texture = _create_light_texture(256)
+
+func _create_light_texture(size: int) -> GradientTexture2D:
+	var grad = Gradient.new()
+	grad.offsets = [0.0, 0.8]
+	grad.colors = [Color(1,1,1,1), Color(1,1,1,0)]
+	var tex = GradientTexture2D.new()
+	tex.gradient = grad
+	tex.use_hdr = true
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5) 
+	tex.width = size
+	tex.height = size
+	return tex
+
+func _update_hud() -> void:
+	$HUD/Control/VBoxContainer/HealthBar.max_value = max_health
+	$HUD/Control/VBoxContainer/HealthBar.value = health
+	$HUD/Control/VBoxContainer/ManaBar.max_value = max_mana
+	$HUD/Control/VBoxContainer/ManaBar.value = mana
+
 # INPUT (fullscreen + reset)
 
 func _input(event):
@@ -105,6 +137,9 @@ func _push_objects():
 
 func _dash() -> void:
 	if Input.is_action_just_pressed("dash") and _is_dashing == false and _use_dash:
+		if mana < dash_mana_cost:
+			return
+			
 		var x_input = Input.get_axis("move_left", "move_right")
 		var y_input = Input.get_axis("move_up", "move_down")
 	
@@ -114,13 +149,18 @@ func _dash() -> void:
 			direction = _last_direction
 		_dash_direction = direction.normalized()
 		_use_dash = false
+		mana -= dash_mana_cost
+		_update_hud()
+		_cooldown_dash.wait_time = dash_cooldown_time
 		_cooldown_dash.start()
 		_dash_timer.start()
 		_is_dashing = true
+		$DashSmoke.emitting = true
 
 func _on_dash_timer_timeout() -> void:
 	
 	_is_dashing = false
+	$DashSmoke.emitting = false
 
 func _on_cooldown_dash_timeout() -> void:
 	_use_dash = true
@@ -132,9 +172,12 @@ func _attack() -> void:
 		_is_attacking = true
 		
 	if _is_attacking:
-		$garra_player/hand.distancia = 60
+		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 60, 350 * get_physics_process_delta_time())
+		$garra_player/hand/ShadowTrail.emitting = true
+	else:
+		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 25, 200 * get_physics_process_delta_time())
+		$garra_player/hand/ShadowTrail.emitting = false
 		
 	
 func _on_attack_timer_timeout() -> void:
-	$garra_player/hand.distancia = 25
 	_is_attacking = false

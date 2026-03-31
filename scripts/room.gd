@@ -35,6 +35,7 @@ func create_safe_radial_texture(size: int) -> GradientTexture2D:
 	grad.colors = [Color(1,1,1,1), Color(1,1,1,0)]
 	var tex = GradientTexture2D.new()
 	tex.gradient = grad
+	tex.use_hdr = true
 	tex.fill = GradientTexture2D.FILL_RADIAL
 	tex.fill_from = Vector2(0.5, 0.5)
 	tex.fill_to = Vector2(1.0, 0.5) 
@@ -48,6 +49,7 @@ func create_radial_blue_texture(size: int) -> GradientTexture2D:
 	grad.colors = [Color(0.5, 0.7, 1, 1), Color(0.5, 0.7, 1, 0)]
 	var tex = GradientTexture2D.new()
 	tex.gradient = grad
+	tex.use_hdr = true
 	tex.fill = GradientTexture2D.FILL_RADIAL
 	tex.fill_from = Vector2(0.5, 0.5)
 	tex.fill_to = Vector2(1.0, 0.5) 
@@ -104,14 +106,21 @@ func _process(_delta):
 		
 		# --- SOL ---
 		var s_val = sin(st)
-		if s_val > 0.3:
+		if s_val > 0.0:
 			sunlight.visible = true
 			sunlight.position.x = -cos(st) * 120.0
 			sunlight.color = Color(1, 0.98, 0.85)
-			sunlight.energy = (s_val - 0.3) * 2.0 
-			if not sun_audio.playing: sun_audio.play()
+			# Transição suave de energia
+			var target_energy = clamp((s_val - 0.2) * 2.5, 0.0, 2.0)
+			sunlight.energy = lerp(sunlight.energy, target_energy, 0.1)
+			
+			if sunlight.energy > 0.1:
+				if not sun_audio.playing: sun_audio.play()
+			else:
+				if sun_audio.playing: sun_audio.stop()
 		else:
 			sunlight.visible = false
+			sunlight.energy = 0
 			if sun_audio.playing: sun_audio.stop()
 			
 		# --- LUA E VAGALUMES ---

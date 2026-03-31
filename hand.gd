@@ -2,7 +2,7 @@ extends Sprite2D
 
 @export var distancia := 20
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	var player = get_parent().get_parent()
 	
 	var dir = (get_global_mouse_position() - player.global_position).normalized()
