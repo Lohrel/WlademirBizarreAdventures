@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bls2nwi65cm7k"]
 
-[ext_resource type="Script" uid="uid://2ujr22kup2fb" path="res://scripts/player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://c2wqoqv4fgwii" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://dsgqp0vwv7vuo" path="res://assets/sprites/player/vampiro_spritesheet.png" id="2_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://ctt3ybxltjmat" path="res://garra_player.tscn" id="3_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://c8y8q8u4n8p4x" path="res://scenes/hud.tscn" id="4_hud"]
@@ -8,6 +8,8 @@
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
 radius = 13.0
 height = 32.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_sun"]
 
 [sub_resource type="Animation" id="Animation_g2els"]
 length = 0.001
@@ -265,10 +267,15 @@ point_count = 2
 offsets = PackedFloat32Array(0, 0.2, 1)
 colors = PackedColorArray(0.2, 0.2, 0.2, 0.8, 0.1, 0.1, 0.1, 0.6, 0, 0, 0, 0)
 
+[sub_resource type="Curve" id="Curve_Burn"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 2
+
 [node name="Node2D" type="Node2D" unique_id=816610571]
 metadata/_edit_horizontal_guides_ = [-2917.0]
 
 [node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_dash_timer", "_cooldown_dash", "_attack_timer")]
+collision_layer = 2
 script = ExtResource("1_g2els")
 _animation_tree = NodePath("AnimationTree")
 _dash_timer = NodePath("dash_timer")
@@ -284,6 +291,11 @@ vframes = 9
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=28330274]
 position = Vector2(0, 2)
 shape = SubResource("CapsuleShape2D_g2els")
+
+[node name="SunShapeCast" type="ShapeCast2D" parent="player" unique_id=11223344]
+shape = SubResource("CircleShape2D_sun")
+target_position = Vector2(0, -1000)
+max_results = 1
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="player" unique_id=46991328]
 libraries/ = SubResource("AnimationLibrary_nrt7g")
@@ -308,7 +320,6 @@ show_behind_parent = true
 emitting = false
 amount = 120
 lifetime = 0.6
-local_coords = false
 emission_shape = 1
 emission_sphere_radius = 8.0
 gravity = Vector2(0, -20)
@@ -326,6 +337,22 @@ color_ramp = SubResource("Gradient_Smoke")
 color = Color(1, 0.4, 0.4, 1)
 energy = 0.6
 texture_scale = 0.6
+
+[node name="BurnParticles" type="CPUParticles2D" parent="player" unique_id=11224455]
+emitting = false
+amount = 20
+lifetime = 0.4
+preprocess = 0.1
+speed_scale = 1.2
+emission_shape = 1
+emission_sphere_radius = 20.0
+gravity = Vector2(0, -100)
+damping_min = 10.0
+damping_max = 20.0
+scale_amount_min = 1.5
+scale_amount_max = 3.0
+scale_amount_curve = SubResource("Curve_Burn")
+color = Color(1, 0.6, 0.2, 1)
 
 [node name="HUD" parent="player" unique_id=123456789 instance=ExtResource("4_hud")]
 

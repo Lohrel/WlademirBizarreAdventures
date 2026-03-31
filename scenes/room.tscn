@@ -37,6 +37,9 @@ size = Vector2(80, 20)
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_DoorHoriz"]
 polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_Room"]
+size = Vector2(400, 400)
+
 [node name="Room" type="Node2D" unique_id=1302318825]
 script = ExtResource("1_gw2vq")
 
@@ -341,3 +344,10 @@ occluder = SubResource("OccluderPolygon2D_DoorHoriz")
 stream = ExtResource("4_14vil")
 volume_db = -25.0
 autoplay = true
+
+[node name="DetectionArea" type="Area2D" parent="." unique_id=987123]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=987124]
+shape = SubResource("RectangleShape2D_Room")

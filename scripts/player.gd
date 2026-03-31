@@ -24,6 +24,9 @@ var _dash_direction := Vector2.ZERO
 var _is_dashing: bool = false
 var _is_attacking: bool = false
 
+var _current_room: Node2D = null
+var _in_sunlight: bool = false
+
 func _ready() -> void:
 	print ("ok")
 	_state_machine = _animation_tree["parameters/playback"]
@@ -81,7 +84,58 @@ func _physics_process(_delta):
 	move_and_slide()
 	_push_objects()
 	_attack()
+	_check_sunlight()
+	
+	if _in_sunlight:
+		health -= 5.0 * _delta
+		# print("Wlademir queimando! HP: ", health)
+		health = max(0, health)
+		_update_hud()
+		if health <= 0:
+			# Opcional: Adicionar lógica de morte aqui no futuro
+			pass
 
+func _check_sunlight() -> void:
+	# 1. Localiza a sala atual
+	if not _current_room or not _current_room.get_node("DetectionArea").overlaps_body(self):
+		_current_room = null
+		for node in get_tree().get_nodes_in_group("rooms"):
+			var area = node.get_node("DetectionArea")
+			if area.overlaps_body(self):
+				_current_room = node
+				break
+	
+	if not _current_room or not _current_room.has_open_ceiling:
+		_set_in_sunlight(false)
+		return
+
+	# 2. Verifica se a luz do sol está ativa na sala e se tem energia suficiente
+	var sunlight_node = _current_room.get_node_or_null("Sunlight")
+	if not sunlight_node or not sunlight_node.visible or sunlight_node.energy < 0.5:
+		_set_in_sunlight(false)
+		return
+		
+	# 3. Raycast em direção à FONTE de luz (o nó Sunlight)
+	# Isso garante que se houver uma caixa entre o player e a luz, 
+	# o player estará "nas sombras".
+	
+	# O target_position do Raycast/ShapeCast é relativo ao player.
+	# Apontamos para a posição global da luz.
+	$SunShapeCast.target_position = to_local(sunlight_node.global_position)
+	$SunShapeCast.force_shapecast_update()
+	
+	# Se colidir com algo (camada 1: obstáculos), o caminho da luz está bloqueado
+	_set_in_sunlight(not $SunShapeCast.is_colliding())
+
+func _set_in_sunlight(is_in: bool) -> void:
+	if _in_sunlight != is_in:
+		_in_sunlight = is_in
+		if _in_sunlight:
+			$HUD/Control/VBoxContainer/HealthBar.modulate = Color(2, 1, 1) # Feedback visual
+			$BurnParticles.emitting = true
+		else:
+			$HUD/Control/VBoxContainer/HealthBar.modulate = Color(1, 1, 1)
+			$BurnParticles.emitting = false
 
 # MOVIMENTO
 

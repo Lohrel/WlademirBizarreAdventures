@@ -19,6 +19,7 @@ var box_scene = preload("res://scenes/box.tscn")
 var has_open_ceiling = false
 
 func _ready():
+	add_to_group("rooms")
 	# Criamos texturas de alta definição (512px)
 	sunlight.texture = create_safe_radial_texture(512)
 	moonlight.texture = create_radial_blue_texture(512)
