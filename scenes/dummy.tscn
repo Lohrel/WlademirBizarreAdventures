@@ -9,9 +9,9 @@ size = Vector2(16, 16)
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
 
-[node name="Dummy" type="StaticBody2D"]
+[node name="Dummy" type="CharacterBody2D"]
 collision_layer = 1
-collision_mask = 2
+collision_mask = 3
 script = ExtResource("1_dummy")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -29,5 +29,25 @@ collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
 shape = SubResource("CircleShape2D_hurt")
+
+[node name="DetectionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea"]
+shape = SubResource("CircleShape2D_hurt")
+scale = Vector2(6, 6)
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+target_position = Vector2(0, 0)
+collision_mask = 1
+
+[node name="RayLeft" type="RayCast2D" parent="."]
+target_position = Vector2(-20, -20)
+collision_mask = 1
+
+[node name="RayRight" type="RayCast2D" parent="."]
+target_position = Vector2(20, -20)
+collision_mask = 1
 
 [connection signal="area_entered" from="Hurtbox" to="." method="_on_hurtbox_area_entered"]
