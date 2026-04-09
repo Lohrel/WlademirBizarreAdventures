@@ -28,6 +28,7 @@ var _current_room: Node2D = null
 var _in_sunlight: bool = false
 
 var blood_scene = preload("res://scenes/blood_particles.tscn")
+var death_screen_scene = preload("res://scenes/death_screen.tscn")
 
 func _ready() -> void:
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
@@ -254,8 +255,9 @@ func take_damage(amount: float) -> void:
 		get_tree().create_timer(blood.lifetime).timeout.connect(blood.queue_free)
 	
 	if health <= 0:
-		# Morte do player
-		get_tree().reload_current_scene()
+		# Player death - show death screen
+		var ds = death_screen_scene.instantiate()
+		get_tree().root.add_child(ds)
 
 func _on_attack_timer_timeout() -> void:
 	_is_attacking = false

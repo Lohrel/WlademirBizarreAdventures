@@ -3,16 +3,18 @@
 [ext_resource type="Script" path="res://scripts/level_generator.gd" id="1_eyghq"]
 [ext_resource type="PackedScene" uid="uid://dq7vkqodlkx7a" path="res://scenes/room.tscn" id="2_ss8ix"]
 [ext_resource type="PackedScene" uid="uid://bls2nwi65cm7k" path="res://scenes/player.tscn" id="3_4rulu"]
-[ext_resource type="Script" path="res://scripts/camera_2d.gd" id="4_camera"]
+[ext_resource type="PackedScene" uid="uid://b8o720cqn7as0" path="res://scenes/boss.tscn" id="4_boss"]
+[ext_resource type="Script" path="res://scripts/camera_2d.gd" id="5_camera"]
 
 [node name="LevelGenerator" type="Node2D"]
 script = ExtResource("1_eyghq")
 room_scene = ExtResource("2_ss8ix")
 player_scene = ExtResource("3_4rulu")
+boss_scene = ExtResource("4_boss")
 
 [node name="Darkness" type="CanvasModulate" parent="."]
 color = Color(0.15, 0.15, 0.2, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position_smoothing_enabled = true
-script = ExtResource("4_camera")
+script = ExtResource("5_camera")

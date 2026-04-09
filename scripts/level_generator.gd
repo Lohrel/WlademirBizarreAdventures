@@ -2,6 +2,7 @@ extends Node2D
 
 @export var room_scene: PackedScene # Onde vamos arrastar o Room.tscn no Inspector
 @export var player_scene: PackedScene # Onde vamos arrastar o Player.tscn
+@export var boss_scene: PackedScene 
 const ROOM_SIZE = Vector2(400, 400) # O tamanho/espaçamento entre as salas
 
 var map_data = {} 
@@ -143,6 +144,10 @@ func build_world():
 		# Vamos adicionar um marcador visual para o Boss para teste
 		if map_data[grid_pos] == "boss":
 			room_instance.modulate = Color(1, 0.5, 0.5) # Sala do Boss fica avermelhada
+			if boss_scene:
+				var boss = boss_scene.instantiate()
+				boss.position = room_instance.position # Mesma posição da sala (centro)
+				add_child(boss)
 
 func spawn_or_reset_player():
 	if player_node == null:

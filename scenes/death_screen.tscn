@@ -1,0 +1,71 @@
+[gd_scene format=3 uid="uid://c6f3y4p7v6q2v"]
+
+[ext_resource type="Script" uid="uid://d3v8y6p4m2j7x" path="res://scripts/death_screen.gd" id="1_death"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_Death"]
+font_size = 48
+font_color = Color(0.8, 0, 0, 1)
+outline_size = 8
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 4
+shadow_color = Color(0.2, 0, 0, 0.5)
+
+[node name="DeathScreen" type="CanvasLayer"]
+process_mode = 3
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_death")
+
+[node name="Background" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.1, 0, 0, 0.6)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -60.0
+offset_right = 100.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="YouDiedLabel" type="Label" parent="Control/VBoxContainer"]
+layout_mode = 2
+text = "YOU DIED"
+label_settings = SubResource("LabelSettings_Death")
+horizontal_alignment = 1
+
+[node name="RestartButton" type="Button" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "RESTART"
+
+[node name="QuitButton" type="Button" parent="Control/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "QUIT"
+
+[connection signal="pressed" from="Control/VBoxContainer/RestartButton" to="Control" method="_on_restart_button_pressed"]
+[connection signal="pressed" from="Control/VBoxContainer/QuitButton" to="Control" method="_on_quit_button_pressed"]
