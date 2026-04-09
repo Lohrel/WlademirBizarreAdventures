@@ -27,7 +27,10 @@ var _is_attacking: bool = false
 var _current_room: Node2D = null
 var _in_sunlight: bool = false
 
+var blood_scene = preload("res://scenes/blood_particles.tscn")
+
 func _ready() -> void:
+	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	print ("ok")
 	_state_machine = _animation_tree["parameters/playback"]
 	add_to_group("player")
@@ -87,13 +90,7 @@ func _physics_process(_delta):
 	_check_sunlight()
 	
 	if _in_sunlight:
-		health -= 5.0 * _delta
-		# print("Wlademir queimando! HP: ", health)
-		health = max(0, health)
-		_update_hud()
-		if health <= 0:
-			# Opcional: Adicionar lógica de morte aqui no futuro
-			pass
+		take_damage(5.0 * _delta)
 
 func _check_sunlight() -> void:
 	# 1. Localiza a sala atual
@@ -237,6 +234,28 @@ func _attack() -> void:
 		$garra_player/hand/Hitbox.monitorable = false
 		
 	
+func take_damage(amount: float) -> void:
+	health -= amount
+	health = max(0, health)
+	_update_hud()
+	
+	if amount > 0.5:
+		# Visual feedback (flash red) for bigger hits
+		var tween = create_tween()
+		tween.tween_property($Sprite2D, "modulate", Color(5, 0.5, 0.5), 0.1)
+		tween.tween_property($Sprite2D, "modulate", Color(1, 1, 1), 0.1)
+		
+		# Blood particles
+		var blood = blood_scene.instantiate()
+		get_parent().add_child(blood)
+		blood.global_position = global_position
+		blood.emitting = true
+		get_tree().create_timer(blood.lifetime).timeout.connect(blood.queue_free)
+	
+	if health <= 0:
+		# Morte do player
+		get_tree().reload_current_scene()
+
 func _on_attack_timer_timeout() -> void:
 	_is_attacking = false
 	$garra_player/hand/Hitbox.monitorable = false

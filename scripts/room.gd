@@ -15,6 +15,7 @@ extends Node2D
 var pillar_scene = preload("res://scenes/pillar.tscn")
 var box_scene = preload("res://scenes/box.tscn")
 var dummy_scene = preload("res://scenes/dummy.tscn")
+var skeleton_scene = preload("res://scenes/skeleton.tscn")
 
 # Variável que guarda se a sala tem teto aberto (usado para movimentar o sol)
 var has_open_ceiling = false
@@ -97,11 +98,11 @@ func spawn_procedural_objects(is_sunlight_room: bool):
 		b.position = rpos
 		add_child(b)
 		
-	# Spawn de Dummy (20% de chance por sala normal)
-	if randf() < 0.2:
-		var d = dummy_scene.instantiate()
-		d.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
-		add_child(d)
+	# Spawn de Inimigos (20% de chance por sala normal)
+	if randf() < 0.4:
+		var enemy = skeleton_scene.instantiate()
+		enemy.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
+		add_child(enemy)
 
 func setup_doors(has_north, has_south, has_east, has_west):
 	setup_room(has_north, has_south, has_east, has_west, false)
