@@ -18,7 +18,11 @@ func _input(event):
 			if event.pressed and not event.is_echo() and event.keycode == KEY_E:
 				is_e_pressed = true
 		
-		if is_e_pressed or event.is_action_pressed("interact"):
+		var is_interact_pressed = false
+		if InputMap.has_action("interact"):
+			is_interact_pressed = event.is_action_pressed("interact")
+			
+		if is_e_pressed or is_interact_pressed:
 			open_door()
 
 func open_door():

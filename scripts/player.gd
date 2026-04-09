@@ -182,7 +182,8 @@ func _push_objects():
 		var collider = collision.get_collider()
 		
 		if collider is RigidBody2D:
-			collider.apply_central_impulse(collision.get_normal() * -10.0)
+			# Increased impulse from -10.0 to -35.0 for easier pushing
+			collider.apply_central_impulse(collision.get_normal() * -25.0)
 
 # DASH
 
