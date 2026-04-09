@@ -90,7 +90,7 @@ func _physics_process(_delta):
 	_check_sunlight()
 	
 	if _in_sunlight:
-		take_damage(5.0 * _delta)
+		take_damage(15.0 * _delta)
 
 func _check_sunlight() -> void:
 	# 1. Localiza a sala atual

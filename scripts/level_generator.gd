@@ -64,15 +64,68 @@ func generate_map_data():
 	map_data[furthest_pos] = "boss"
 
 func build_world():
+	var spawned_doors = {} # Key: set(grid_pos_a, grid_pos_b), Value: bool
+	
 	for grid_pos in map_data.keys():
 		var room_instance = room_scene.instantiate()
 		room_instance.position = Vector2(grid_pos.x * ROOM_SIZE.x, grid_pos.y * ROOM_SIZE.y)
 		
-		var has_north = map_data.has(grid_pos + Vector2i.UP)
-		var has_south = map_data.has(grid_pos + Vector2i.DOWN)
-		var has_east = map_data.has(grid_pos + Vector2i.RIGHT)
-		var has_west = map_data.has(grid_pos + Vector2i.LEFT)
+		var north_pos = grid_pos + Vector2i.UP
+		var south_pos = grid_pos + Vector2i.DOWN
+		var east_pos = grid_pos + Vector2i.RIGHT
+		var west_pos = grid_pos + Vector2i.LEFT
 		
+		var has_north = map_data.has(north_pos)
+		var has_south = map_data.has(south_pos)
+		var has_east = map_data.has(east_pos)
+		var has_west = map_data.has(west_pos)
+		
+		var spawn_n = false
+		var spawn_s = false
+		var spawn_e = false
+		var spawn_w = false
+		
+		# For each neighbor, check if we should spawn a door and if we already did from the other side
+		if has_north:
+			var connection = [grid_pos, north_pos]
+			connection.sort()
+			var key = str(connection)
+			if not spawned_doors.has(key):
+				spawn_n = randf() < 0.35
+				spawned_doors[key] = spawn_n
+			else:
+				spawn_n = false # Door is handled by the other room's South spawn or already placed
+		
+		if has_south:
+			var connection = [grid_pos, south_pos]
+			connection.sort()
+			var key = str(connection)
+			if not spawned_doors.has(key):
+				spawn_s = randf() < 0.35
+				spawned_doors[key] = spawn_s
+			else:
+				spawn_s = false
+				
+		if has_east:
+			var connection = [grid_pos, east_pos]
+			connection.sort()
+			var key = str(connection)
+			if not spawned_doors.has(key):
+				spawn_e = randf() < 0.35
+				spawned_doors[key] = spawn_e
+			else:
+				spawn_e = false
+				
+		if has_west:
+			var connection = [grid_pos, west_pos]
+			connection.sort()
+			var key = str(connection)
+			if not spawned_doors.has(key):
+				spawn_w = randf() < 0.35
+				spawned_doors[key] = spawn_w
+			else:
+				spawn_w = false
+
 		add_child(room_instance)
 
 		# Regra de Sol: Boss e Start nunca têm sol. Outras têm 30% de chance.
@@ -80,8 +133,13 @@ func build_world():
 		if map_data[grid_pos] == "normal":
 			is_open = randf() < 0.3
 		
-		# Passa o tipo da sala para o setup
-		room_instance.setup_room(has_north, has_south, has_east, has_west, is_open)
+		# Passa o tipo da sala e as flags de porta para o setup
+		room_instance.setup_room(has_north, has_south, has_east, has_west, is_open, spawn_n, spawn_s, spawn_e, spawn_w)
+		
+		# Se a outra sala da conexão já "spawnou" a porta, nós não spawnamos aqui.
+		# Mas a porta "spawnada" na outra sala deve ser visível nesta sala também.
+		# Na verdade, a porta spawnada em um lado é suficiente porque ela bloqueia a passagem.
+		
 		# Vamos adicionar um marcador visual para o Boss para teste
 		if map_data[grid_pos] == "boss":
 			room_instance.modulate = Color(1, 0.5, 0.5) # Sala do Boss fica avermelhada

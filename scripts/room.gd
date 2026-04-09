@@ -16,6 +16,7 @@ var pillar_scene = preload("res://scenes/pillar.tscn")
 var box_scene = preload("res://scenes/box.tscn")
 var dummy_scene = preload("res://scenes/dummy.tscn")
 var skeleton_scene = preload("res://scenes/skeleton.tscn")
+var door_scene = preload("res://scenes/interactive_door.tscn")
 
 # Variável que guarda se a sala tem teto aberto (usado para movimentar o sol)
 var has_open_ceiling = false
@@ -60,7 +61,8 @@ func create_radial_blue_texture(size: int) -> GradientTexture2D:
 	tex.height = size
 	return tex
 
-func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool, is_open: bool):
+func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool, is_open: bool, 
+		spawn_n: bool = false, spawn_s: bool = false, spawn_e: bool = false, spawn_w: bool = false):
 	has_open_ceiling = is_open
 	door_north.visible = !has_north
 	door_north.get_node("CollisionShape2D").disabled = has_north
@@ -79,6 +81,22 @@ func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool
 	
 	if global_position != Vector2.ZERO:
 		spawn_procedural_objects(is_open)
+	
+	# Spawn de Portas Interativas (calculado pelo gerador para evitar duplicatas)
+	if spawn_n:
+		spawn_interactive_door(Vector2(0, -190), 0)
+	if spawn_s:
+		spawn_interactive_door(Vector2(0, 190), 0)
+	if spawn_e:
+		spawn_interactive_door(Vector2(190, 0), PI/2)
+	if spawn_w:
+		spawn_interactive_door(Vector2(-190, 0), PI/2)
+
+func spawn_interactive_door(pos: Vector2, rot: float):
+	var d = door_scene.instantiate()
+	d.position = pos
+	d.rotation = rot
+	add_child(d)
 
 func spawn_procedural_objects(is_sunlight_room: bool):
 	var corners = [Vector2(-140, -140), Vector2(140, -140), Vector2(-140, 140), Vector2(140, 140)]
