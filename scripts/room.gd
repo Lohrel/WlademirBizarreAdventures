@@ -1,5 +1,9 @@
+## Script para gerenciamento de salas individuais.
+## Gerencia visuais, ciclos ambientais (sol/lua) e geração de objetos.
+class_name Room
 extends Node2D
 
+# --- Referências de Nós ---
 @onready var door_north = $DoorNorth
 @onready var door_south = $DoorSouth
 @onready var door_east = $DoorEast
@@ -11,7 +15,7 @@ extends Node2D
 @onready var fireflies = $Fireflies
 @onready var firefly_light = $Fireflies/FireflyLight
 
-# Pré-carregamento dos objetos para a geração procedural
+# --- Cenas Pré-carregadas ---
 var pillar_scene = preload("res://scenes/pillar.tscn")
 var box_scene = preload("res://scenes/box.tscn")
 var dummy_scene = preload("res://scenes/dummy.tscn")
@@ -19,166 +23,171 @@ var skeleton_scene = preload("res://scenes/skeleton.tscn")
 var door_scene = preload("res://scenes/interactive_door.tscn")
 var quicksand_scene = preload("res://scenes/quicksand.tscn")
 
-# Variável que guarda se a sala tem teto aberto (usado para movimentar o sol)
-var has_open_ceiling = false
+# --- Configuração ---
+var has_open_ceiling: bool = false
 
-func _ready():
+# --- Ciclo de Vida ---
+
+func _ready() -> void:
 	add_to_group("rooms")
-	# Criamos texturas de alta definição (512px)
-	sunlight.texture = create_safe_radial_texture(512)
-	moonlight.texture = create_radial_blue_texture(512)
-	firefly_light.texture = create_safe_radial_texture(64)
 	
-	# Ajusta os tamanhos visuais
+	# Gera texturas procedurais para luzes
+	sunlight.texture = _create_radial_texture(512, Color(1, 1, 1, 1))
+	moonlight.texture = _create_radial_texture(512, Color(0.5, 0.7, 1, 1))
+	firefly_light.texture = _create_radial_texture(64, Color(1, 1, 1, 1))
+	
+	# Ajustes iniciais de escala
 	sunlight.texture_scale = 1.2
 	moonlight.texture_scale = 1.0
 	firefly_light.texture_scale = 1.0
 
-func create_safe_radial_texture(size: int) -> GradientTexture2D:
-	var grad = Gradient.new()
-	grad.offsets = [0.0, 0.8]
-	grad.colors = [Color(1,1,1,1), Color(1,1,1,0)]
-	var tex = GradientTexture2D.new()
-	tex.gradient = grad
-	tex.use_hdr = true
-	tex.fill = GradientTexture2D.FILL_RADIAL
-	tex.fill_from = Vector2(0.5, 0.5)
-	tex.fill_to = Vector2(1.0, 0.5) 
-	tex.width = size
-	tex.height = size
-	return tex
+func _process(_delta: float) -> void:
+	if has_open_ceiling:
+		_update_environmental_cycle()
 
-func create_radial_blue_texture(size: int) -> GradientTexture2D:
-	var grad = Gradient.new()
-	grad.offsets = [0.0, 0.8]
-	grad.colors = [Color(0.5, 0.7, 1, 1), Color(0.5, 0.7, 1, 0)]
-	var tex = GradientTexture2D.new()
-	tex.gradient = grad
-	tex.use_hdr = true
-	tex.fill = GradientTexture2D.FILL_RADIAL
-	tex.fill_from = Vector2(0.5, 0.5)
-	tex.fill_to = Vector2(1.0, 0.5) 
-	tex.width = size
-	tex.height = size
-	return tex
+# --- Configuração da Sala ---
 
-func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool, is_open: bool, 
+## Configura o layout da sala, portas e ambiente.
+func setup_room(has_n: bool, has_s: bool, has_e: bool, has_w: bool, 
+		is_open: bool, 
 		spawn_n: bool = false, spawn_s: bool = false, spawn_e: bool = false, spawn_w: bool = false):
-	has_open_ceiling = is_open
-	door_north.visible = !has_north
-	door_north.get_node("CollisionShape2D").disabled = has_north
-	door_south.visible = !has_south
-	door_south.get_node("CollisionShape2D").disabled = has_south
-	door_east.visible = !has_east
-	door_east.get_node("CollisionShape2D").disabled = has_east
-	door_west.visible = !has_west
-	door_west.get_node("CollisionShape2D").disabled = has_west
 	
+	has_open_ceiling = is_open
+	
+	# Visuais de Paredes/Portas Estáticas: visível se NÃO houver vizinho
+	door_north.visible = !has_n
+	door_north.get_node("CollisionShape2D").disabled = has_n
+	
+	door_south.visible = !has_s
+	door_south.get_node("CollisionShape2D").disabled = has_s
+	
+	door_east.visible = !has_e
+	door_east.get_node("CollisionShape2D").disabled = has_e
+	
+	door_west.visible = !has_w
+	door_west.get_node("CollisionShape2D").disabled = has_w
+	
+	# Visibilidade da Luz Solar/Luz Lunar
 	sunlight.visible = is_open
 	moonlight.visible = is_open
 	
+	# Detalhes ambientais aleatórios
 	fireflies.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
 	fireflies.emitting = false 
 	
+	# Gera objetos procedurais (a menos que seja a primeiríssima sala)
 	if global_position != Vector2.ZERO:
-		spawn_procedural_objects(is_open)
+		_spawn_procedural_content(is_open)
 	
-	# Spawn de Portas Interativas (calculado pelo gerador para evitar duplicatas)
-	if spawn_n:
-		spawn_interactive_door(Vector2(0, -190), 0)
-	if spawn_s:
-		spawn_interactive_door(Vector2(0, 190), 0)
-	if spawn_e:
-		spawn_interactive_door(Vector2(190, 0), PI/2)
-	if spawn_w:
-		spawn_interactive_door(Vector2(-190, 0), PI/2)
+	# Gera Portas Interativas se solicitado pelo LevelGenerator
+	if spawn_n: _spawn_interactive_door(Vector2(0, -190), 0)
+	if spawn_s: _spawn_interactive_door(Vector2(0, 190), 0)
+	if spawn_e: _spawn_interactive_door(Vector2(190, 0), PI/2)
+	if spawn_w: _spawn_interactive_door(Vector2(-190, 0), PI/2)
+
+# --- Geração Procedural ---
+
+## Popula a sala com pilares, caixas, inimigos e armadilhas.
+func _spawn_procedural_content(is_sunlight_room: bool) -> void:
+	# 1. Pilares nos cantos
+	var corners = [Vector2(-140, -140), Vector2(140, -140), Vector2(-140, 140), Vector2(140, 140)]
+	corners.shuffle()
+	for i in range(randi_range(1, 3)):
+		var p = pillar_scene.instantiate()
+		p.position = corners[i]
+		add_child(p)
+		if randf() < 0.4:
+			p.setup_torch(corners[i].y < 0)
+	
+	# 2. Caixas Aleatórias
+	for i in range(randi_range(3, 8)):
+		var b = box_scene.instantiate()
+		var rpos = Vector2(randf_range(-160, 160), randf_range(-160, 160))
+		# Evita gerar no centro se for uma sala com luz solar
+		if is_sunlight_room and rpos.length() < 80: continue
+		b.position = rpos
+		add_child(b)
 		
-	# Spawn de Quicksand (15% de chance, exceto na sala inicial absoluta)
-	if global_position != Vector2.ZERO and randf() < 0.35:
-		spawn_quicksand()
+	# 3. Inimigos (40% de chance)
+	if randf() < 0.4:
+		var enemy = skeleton_scene.instantiate()
+		enemy.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
+		add_child(enemy)
+		
+	# 4. Armadilhas de Areia Movediça (15% de chance)
+	if randf() < 0.15:
+		var qs = quicksand_scene.instantiate()
+		qs.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
+		add_child(qs)
 
-func spawn_quicksand():
-	var qs = quicksand_scene.instantiate()
-	# Random position within room bounds, avoiding the very center slightly
-	qs.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
-	add_child(qs)
-
-func spawn_interactive_door(pos: Vector2, rot: float):
+func _spawn_interactive_door(pos: Vector2, rot: float) -> void:
 	var d = door_scene.instantiate()
 	d.position = pos
 	d.rotation = rot
 	add_child(d)
 
-func spawn_procedural_objects(is_sunlight_room: bool):
-	var corners = [Vector2(-140, -140), Vector2(140, -140), Vector2(-140, 140), Vector2(140, 140)]
-	corners.shuffle()
-	for i in range(randi_range(1, 3)):
-		var pos = corners[i]
-		var p = pillar_scene.instantiate()
-		p.position = pos
-		add_child(p)
-		if randf() < 0.4:
-			p.setup_torch(pos.y < 0)
-	
-	for i in range(randi_range(3, 8)):
-		var b = box_scene.instantiate()
-		var rpos = Vector2(randf_range(-160, 160), randf_range(-160, 160))
-		if is_sunlight_room and rpos.length() < 80: continue
-		b.position = rpos
-		add_child(b)
-		
-	# Spawn de Inimigos (20% de chance por sala normal)
-	if randf() < 0.4:
-		var enemy = skeleton_scene.instantiate()
-		enemy.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
-		add_child(enemy)
+# --- Lógica de Ambiente ---
 
-func setup_doors(has_north, has_south, has_east, has_west):
-	setup_room(has_north, has_south, has_east, has_west, false)
-
-func _process(_delta):
-	if not has_open_ceiling: return
+## Atualiza os ciclos de sol/lua baseados no temporizador do LevelGenerator.
+func _update_environmental_cycle() -> void:
 	var gen = get_parent()
-	if gen and "sun_time" in gen:
-		var st = fmod(gen.sun_time, TAU)
+	if not gen or not "sun_time" in gen: return
+	
+	var st = fmod(gen.sun_time, TAU)
+	
+	# Atualiza o Sol
+	var s_val = sin(st)
+	if s_val > 0.0:
+		sunlight.visible = true
+		sunlight.position.x = -cos(st) * 120.0
+		sunlight.color = Color(1, 0.98, 0.85)
+		var target_energy = clamp((s_val - 0.2) * 2.5, 0.0, 2.0)
+		sunlight.energy = lerp(sunlight.energy, target_energy, 0.1)
 		
-		# --- SOL ---
-		var s_val = sin(st)
-		if s_val > 0.0:
-			sunlight.visible = true
-			sunlight.position.x = -cos(st) * 120.0
-			sunlight.color = Color(1, 0.98, 0.85)
-			# Transição suave de energia
-			var target_energy = clamp((s_val - 0.2) * 2.5, 0.0, 2.0)
-			sunlight.energy = lerp(sunlight.energy, target_energy, 0.1)
-			
-			if sunlight.energy > 0.1:
-				if not sun_audio.playing: sun_audio.play()
-			else:
-				if sun_audio.playing: sun_audio.stop()
+		if sunlight.energy > 0.1:
+			if not sun_audio.playing: sun_audio.play()
 		else:
-			sunlight.visible = false
-			sunlight.energy = 0
 			if sun_audio.playing: sun_audio.stop()
+	else:
+		sunlight.visible = false
+		sunlight.energy = 0
+		if sun_audio.playing: sun_audio.stop()
 			
-		# --- LUA E VAGALUMES ---
-		var m_st = fmod(st + PI, TAU)
-		var m_val = sin(m_st)
-		if m_val > 0.4:
-			moonlight.visible = true
-			moonlight.position.x = -cos(m_st) * 120.0
-			moonlight.energy = (m_val - 0.4) * 1.5 
-			fireflies.emitting = true
-			if not moon_audio.playing: moon_audio.play()
-			
-			var d = abs(fireflies.position.x - moonlight.position.x)
-			if d < 100:
-				firefly_light.visible = true
-				firefly_light.energy = (0.2 + randf() * 0.2) * (1.0 - d/100.0)
-			else:
-				firefly_light.visible = false
+	# Atualiza a Lua e os Vaga-lumes
+	var m_st = fmod(st + PI, TAU)
+	var m_val = sin(m_st)
+	if m_val > 0.4:
+		moonlight.visible = true
+		moonlight.position.x = -cos(m_st) * 120.0
+		moonlight.energy = (m_val - 0.4) * 1.5 
+		fireflies.emitting = true
+		if not moon_audio.playing: moon_audio.play()
+		
+		# Iluminação de vaga-lumes baseada em proximidade
+		var d = abs(fireflies.position.x - moonlight.position.x)
+		if d < 100:
+			firefly_light.visible = true
+			firefly_light.energy = (0.2 + randf() * 0.2) * (1.0 - d/100.0)
 		else:
-			moonlight.visible = false
-			fireflies.emitting = false
 			firefly_light.visible = false
-			if moon_audio.playing: moon_audio.stop()
+	else:
+		moonlight.visible = false
+		fireflies.emitting = false
+		firefly_light.visible = false
+		if moon_audio.playing: moon_audio.stop()
+
+# --- Utilitários ---
+
+func _create_radial_texture(size: int, main_color: Color) -> GradientTexture2D:
+	var grad = Gradient.new()
+	grad.offsets = [0.0, 0.8]
+	grad.colors = [main_color, Color(main_color.r, main_color.g, main_color.b, 0)]
+	var tex = GradientTexture2D.new()
+	tex.gradient = grad
+	tex.use_hdr = true
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5) 
+	tex.width = size
+	tex.height = size
+	return tex

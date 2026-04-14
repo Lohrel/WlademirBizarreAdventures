@@ -1,17 +1,26 @@
+## Script para gerenciar a tela de fim de jogo.
+## Gerencia o reinício do nível ou o fechamento do jogo.
+class_name DeathScreen
 extends Control
 
-func _ready():
-	# Ensure the screen is visible and handles input
+# --- Ciclo de Vida ---
+
+func _ready() -> void:
+	# Garante que a interação funcione enquanto o jogo está pausado
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	# Pause the game when death screen appears
 	get_tree().paused = true
-	# Make sure mouse is visible if it was hidden
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
-func _on_restart_button_pressed():
+# --- Lógica de Interação ---
+
+func _on_restart_button_pressed() -> void:
+	# Despausa antes de recarregar
 	get_tree().paused = false
 	get_tree().reload_current_scene()
+	
+	# Limpa a tela de morte
 	get_parent().queue_free()
 
-func _on_quit_button_pressed():
+func _on_quit_button_pressed() -> void:
+	# Fecha o aplicativo
 	get_tree().quit()
