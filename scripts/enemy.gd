@@ -252,10 +252,15 @@ func _perform_attack():
 	
 	attack_timer.start()
 
-func take_damage(amount: float):
+func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0):
 	health -= amount
 	current_state = State.AGGRESSIVE
 	suspicion = 1.0
+	
+	# Aplica knockback se uma posição de origem for fornecida
+	if source_pos != Vector2.ZERO:
+		var knock_dir = (global_position - source_pos).normalized()
+		velocity = knock_dir * knockback_strength
 
 	# Feedback de partículas
 	var bone = bone_scene.instantiate()
@@ -327,4 +332,4 @@ func _on_hitbox_body_entered(body):
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
 	if area.name == "Hitbox":
-		take_damage(10.0) # O dano do jogador é atualmente fixo em 10 (a menos que seja melhorado)
+		take_damage(10.0, area.global_position)

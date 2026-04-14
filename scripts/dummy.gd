@@ -165,12 +165,16 @@ func _update_visual_alert():
 	# Muda a cor baseado na suspeita (fica mais vermelho/vibrante)
 	sprite.modulate = Color(0.8 + (suspicion * 0.2), 0.4 - (suspicion * 0.4), 0.4 - (suspicion * 0.4))
 
-func take_damage(amount: float):
+func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0):
 	# health -= amount # Comentado para testes
 	
 	# Ao ser atacado, fica agressivo na hora
 	current_state = State.AGGRESSIVE
 	suspicion = 1.0
+
+	if source_pos != Vector2.ZERO:
+		var knock_dir = (global_position - source_pos).normalized()
+		velocity = knock_dir * knockback_strength
 
 	var blood = blood_scene.instantiate()
 	get_parent().add_child(blood)
@@ -194,4 +198,4 @@ func die():
 
 func _on_hurtbox_area_entered(area: Area2D) -> void:
 	if area.name == "Hitbox":
-		take_damage(10.0)
+		take_damage(10.0, area.global_position)
