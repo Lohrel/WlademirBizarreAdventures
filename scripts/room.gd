@@ -22,6 +22,7 @@ var dummy_scene = preload("res://scenes/dummy.tscn")
 var skeleton_scene = preload("res://scenes/skeleton.tscn")
 var door_scene = preload("res://scenes/interactive_door.tscn")
 var quicksand_scene = preload("res://scenes/quicksand.tscn")
+var pressure_plate_scene = preload("res://scenes/pressure_plate.tscn")
 
 # --- Configuração ---
 var has_open_ceiling: bool = false
@@ -266,6 +267,30 @@ func _spawn_procedural_content(is_sunlight_room: bool, min_enemies: int, max_ene
 		var qs = quicksand_scene.instantiate()
 		qs.position = Vector2(randf_range(-half_w + 80, half_w - 80), randf_range(-half_h + 80, half_h - 80))
 		add_child(qs)
+
+	# 5. Placas de Pressão (Dardos de Veneno)
+	if randf() < 0.3:
+		for i in range(randi_range(1, 3)):
+			var pp = pressure_plate_scene.instantiate()
+			var spawn_pos = Vector2.ZERO
+			var valid_pos = false
+			for attempt in range(10):
+				var rpos = Vector2(randf_range(-half_w + 100, half_w - 100), randf_range(-half_h + 100, half_h - 100))
+				var too_close = false
+				for pos in occupied_positions:
+					if rpos.distance_to(pos) < 60.0:
+						too_close = true
+						break
+				if not too_close:
+					spawn_pos = rpos
+					valid_pos = true
+					break
+			if valid_pos:
+				pp.position = spawn_pos
+				add_child(pp)
+				occupied_positions.append(spawn_pos)
+			else:
+				pp.queue_free()
 
 func _spawn_interactive_door(pos: Vector2, rot: float) -> void:
 	var d = door_scene.instantiate()
