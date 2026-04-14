@@ -17,6 +17,7 @@ var box_scene = preload("res://scenes/box.tscn")
 var dummy_scene = preload("res://scenes/dummy.tscn")
 var skeleton_scene = preload("res://scenes/skeleton.tscn")
 var door_scene = preload("res://scenes/interactive_door.tscn")
+var quicksand_scene = preload("res://scenes/quicksand.tscn")
 
 # Variável que guarda se a sala tem teto aberto (usado para movimentar o sol)
 var has_open_ceiling = false
@@ -91,6 +92,16 @@ func setup_room(has_north: bool, has_south: bool, has_east: bool, has_west: bool
 		spawn_interactive_door(Vector2(190, 0), PI/2)
 	if spawn_w:
 		spawn_interactive_door(Vector2(-190, 0), PI/2)
+		
+	# Spawn de Quicksand (15% de chance, exceto na sala inicial absoluta)
+	if global_position != Vector2.ZERO and randf() < 0.35:
+		spawn_quicksand()
+
+func spawn_quicksand():
+	var qs = quicksand_scene.instantiate()
+	# Random position within room bounds, avoiding the very center slightly
+	qs.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
+	add_child(qs)
 
 func spawn_interactive_door(pos: Vector2, rot: float):
 	var d = door_scene.instantiate()

@@ -17,6 +17,7 @@ extends CharacterBody2D
 @export var dash_cooldown_time: float = 6.0
 
 var _move_speed: float = 200.0
+var speed_multiplier: float = 1.0
 var _use_dash: bool = true
 var _state_machine
 var _last_direction := Vector2.RIGHT
@@ -163,7 +164,7 @@ func _move() -> void:
 		_animation_tree["parameters/walk/blend_position"] = _last_direction
 		_animation_tree["parameters/idle/blend_position"] = _last_direction
 	# Movimento
-	velocity = _direction.normalized() * _move_speed
+	velocity = _direction.normalized() * (_move_speed * speed_multiplier)
 
 # ANIMAÇÃO
 
