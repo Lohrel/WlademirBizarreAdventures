@@ -47,77 +47,224 @@ func _process(_delta: float) -> void:
 
 # --- Configuração da Sala ---
 
-## Configura o layout da sala, portas e ambiente.
+## Configura a sala com suporte a tamanhos variáveis.
+func setup_room_ext(custom_size: Vector2, has_n: bool, has_s: bool, has_e: bool, has_w: bool, 
+		is_open: bool, 
+		spawn_n: bool = false, spawn_s: bool = false, spawn_e: bool = false, spawn_w: bool = false,
+		min_enemies: int = 0, max_enemies: int = 2):
+
+	# 1. Ajusta o Chão (ColorRect)
+	var floor_node = $Floor
+	floor_node.size = custom_size
+	floor_node.position = -custom_size / 2.0
+
+	# 2. Ajusta a Área de Detecção (CollisionShape2D)
+	var room_shape = $DetectionArea/CollisionShape2D
+	room_shape.shape = room_shape.shape.duplicate()
+	room_shape.shape.size = custom_size
+
+	# 3. Reposiciona e Redimensiona as Paredes e Gatilhos de Porta
+	var half_w = custom_size.x / 2.0
+	var half_h = custom_size.y / 2.0
+	var wall_thickness = 10.0
+	var door_width = 80.0
+
+	# Calcula o tamanho que os segmentos de parede devem ter
+	var horizontal_wall_len = (custom_size.x - door_width) / 2.0
+	var vertical_wall_len = (custom_size.y - door_width) / 2.0
+
+	# Função auxiliar para redimensionar segmentos de parede e OCLUSORES
+	var resize_wall = func(node_path: String, new_len: float):
+		var wall = get_node(node_path)
+		var rect = wall.get_node("ColorRect")
+		var col = wall.get_node("CollisionShape2D")
+		var occ = wall.get_node("LightOccluder2D")
+		
+		# Duplica recursos para serem únicos
+		col.shape = col.shape.duplicate()
+		occ.occluder = occ.occluder.duplicate()
+		
+		# Redimensiona Visual e Colisão (sem overlap para evitar problemas com tiles)
+		rect.size = Vector2(new_len, 20)
+		rect.position = Vector2(-new_len / 2.0, -10)
+		col.shape.size = Vector2(new_len, 20)
+		
+		# Oclusores extremamente finos (1px) evitam o efeito funnel e bugs de sombra
+		var half_l = new_len / 2.0
+		var occ_thick = 0.5 
+		var points = PackedVector2Array([
+			Vector2(-half_l, -occ_thick),
+			Vector2(half_l, -occ_thick),
+			Vector2(half_l, occ_thick),
+			Vector2(-half_l, occ_thick)
+		])
+		occ.occluder.polygon = points
+
+	# Norte
+	var north_y = -half_h + wall_thickness
+	door_north.position = Vector2(0, north_y)
+	resize_wall.call("Walls/WallNorthLeft", horizontal_wall_len)
+	resize_wall.call("Walls/WallNorthRight", horizontal_wall_len)
+	$Walls/WallNorthLeft.position = Vector2(-half_w + horizontal_wall_len/2.0, north_y)
+	$Walls/WallNorthRight.position = Vector2(half_w - horizontal_wall_len/2.0, north_y)
+
+	# Sul
+	var south_y = half_h - wall_thickness
+	door_south.position = Vector2(0, south_y)
+	resize_wall.call("Walls/WallSouthLeft", horizontal_wall_len)
+	resize_wall.call("Walls/WallSouthRight", horizontal_wall_len)
+	$Walls/WallSouthLeft.position = Vector2(-half_w + horizontal_wall_len/2.0, south_y)
+	$Walls/WallSouthRight.position = Vector2(half_w - horizontal_wall_len/2.0, south_y)
+
+	# Leste
+	var east_x = half_w - wall_thickness
+	door_east.position = Vector2(east_x, 0)
+	resize_wall.call("Walls/WallEastTop", vertical_wall_len)
+	resize_wall.call("Walls/WallEastBottom", vertical_wall_len)
+	$Walls/WallEastTop.position = Vector2(east_x, -half_h + vertical_wall_len/2.0)
+	$Walls/WallEastBottom.position = Vector2(east_x, half_h - vertical_wall_len/2.0)
+
+	# Oeste
+	var west_x = -half_w + wall_thickness
+	door_west.position = Vector2(west_x, 0)
+	resize_wall.call("Walls/WallWestTop", vertical_wall_len)
+	resize_wall.call("Walls/WallWestBottom", vertical_wall_len)
+	$Walls/WallWestTop.position = Vector2(west_x, -half_h + vertical_wall_len/2.0)
+	$Walls/WallWestBottom.position = Vector2(west_x, half_h - vertical_wall_len/2.0)
+
+	# 4. Chama o setup original
+	setup_room(has_n, has_s, has_e, has_w, is_open, spawn_n, spawn_s, spawn_e, spawn_w, min_enemies, max_enemies)
+
+## Configura o layout, portas e ambiente da sala.
 func setup_room(has_n: bool, has_s: bool, has_e: bool, has_w: bool, 
 		is_open: bool, 
-		spawn_n: bool = false, spawn_s: bool = false, spawn_e: bool = false, spawn_w: bool = false):
-	
+		spawn_n: bool = false, spawn_s: bool = false, spawn_e: bool = false, spawn_w: bool = false,
+		min_enemies: int = 0, max_enemies: int = 2):
+
 	has_open_ceiling = is_open
-	
-	# Visuais de Paredes/Portas Estáticas: visível se NÃO houver vizinho
-	door_north.visible = !has_n
-	door_north.get_node("CollisionShape2D").disabled = has_n
-	
-	door_south.visible = !has_s
-	door_south.get_node("CollisionShape2D").disabled = has_s
-	
-	door_east.visible = !has_e
-	door_east.get_node("CollisionShape2D").disabled = has_e
-	
-	door_west.visible = !has_w
-	door_west.get_node("CollisionShape2D").disabled = has_w
-	
-	# Visibilidade da Luz Solar/Luz Lunar
+
+	# Função para alternar visibilidade e oclusores de portas estáticas
+	var toggle_door = func(door_node: Node2D, exists: bool):
+		door_node.visible = !exists
+		door_node.get_node("CollisionShape2D").disabled = exists
+		var occ = door_node.get_node_or_null("LightOccluder2D")
+		if occ: 
+			occ.visible = !exists
+			# Também afina o oclusor da porta estática
+			if !exists:
+				occ.occluder = occ.occluder.duplicate()
+				var points = PackedVector2Array([
+					Vector2(-40, -0.5), Vector2(40, -0.5), Vector2(40, 0.5), Vector2(-40, 0.5)
+				])
+				occ.occluder.polygon = points
+
+	toggle_door.call(door_north, has_n)
+	toggle_door.call(door_south, has_s)
+	toggle_door.call(door_east, has_e)
+	toggle_door.call(door_west, has_w)
+
 	sunlight.visible = is_open
 	moonlight.visible = is_open
-	
-	# Detalhes ambientais aleatórios
+
 	fireflies.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
 	fireflies.emitting = false 
-	
-	# Gera objetos procedurais (a menos que seja a primeiríssima sala)
+
+	# Gera conteúdo procedural
 	if global_position != Vector2.ZERO:
-		_spawn_procedural_content(is_open)
-	
-	# Gera Portas Interativas se solicitado pelo LevelGenerator
-	if spawn_n: _spawn_interactive_door(Vector2(0, -190), 0)
-	if spawn_s: _spawn_interactive_door(Vector2(0, 190), 0)
-	if spawn_e: _spawn_interactive_door(Vector2(190, 0), PI/2)
-	if spawn_w: _spawn_interactive_door(Vector2(-190, 0), PI/2)
+		_spawn_procedural_content(is_open, min_enemies, max_enemies)
+
+	# Gera Portas Interativas
+	var current_size = $Floor.size
+	var half_w = current_size.x / 2.0
+	var half_h = current_size.y / 2.0
+	var offset = 10.0
+
+	if spawn_n: _spawn_interactive_door(Vector2(0, -half_h + offset), 0)
+	if spawn_s: _spawn_interactive_door(Vector2(0, half_h - offset), 0)
+	if spawn_e: _spawn_interactive_door(Vector2(half_w - offset, 0), PI/2)
+	if spawn_w: _spawn_interactive_door(Vector2(-half_w + offset, 0), PI/2)
+
 
 # --- Geração Procedural ---
 
 ## Popula a sala com pilares, caixas, inimigos e armadilhas.
-func _spawn_procedural_content(is_sunlight_room: bool) -> void:
-	# 1. Pilares nos cantos
-	var corners = [Vector2(-140, -140), Vector2(140, -140), Vector2(-140, 140), Vector2(140, 140)]
+func _spawn_procedural_content(is_sunlight_room: bool, min_enemies: int, max_enemies: int) -> void:
+	var current_size = $Floor.size
+	var margin = 60.0
+	var half_w = current_size.x / 2.0
+	var half_h = current_size.y / 2.0
+	
+	var occupied_positions = []
+	var min_dist_between_objects = 50.0
+
+	# 1. Pilares
+	var corners = [
+		Vector2(-half_w + margin, -half_h + margin), 
+		Vector2(half_w - margin, -half_h + margin), 
+		Vector2(-half_w + margin, half_h - margin), 
+		Vector2(half_w - margin, half_h - margin)
+	]
 	corners.shuffle()
 	for i in range(randi_range(1, 3)):
 		var p = pillar_scene.instantiate()
 		p.position = corners[i]
 		add_child(p)
+		occupied_positions.append(p.position)
 		if randf() < 0.4:
 			p.setup_torch(corners[i].y < 0)
 	
-	# 2. Caixas Aleatórias
+	# 2. Caixas
 	for i in range(randi_range(3, 8)):
 		var b = box_scene.instantiate()
-		var rpos = Vector2(randf_range(-160, 160), randf_range(-160, 160))
-		# Evita gerar no centro se for uma sala com luz solar
-		if is_sunlight_room and rpos.length() < 80: continue
-		b.position = rpos
-		add_child(b)
+		var spawn_pos = Vector2.ZERO
+		var valid_pos = false
+		for attempt in range(10):
+			var rpos = Vector2(randf_range(-half_w + 40, half_w - 40), randf_range(-half_h + 40, half_h - 40))
+			if is_sunlight_room and rpos.length() < 80: continue
+			var too_close = false
+			for pos in occupied_positions:
+				if rpos.distance_to(pos) < min_dist_between_objects:
+					too_close = true
+					break
+			if not too_close:
+				spawn_pos = rpos
+				valid_pos = true
+				break
+		if valid_pos:
+			b.position = spawn_pos
+			add_child(b)
+			occupied_positions.append(spawn_pos)
+		else:
+			b.queue_free()
 		
-	# 3. Inimigos (40% de chance)
-	if randf() < 0.4:
+	# 3. Inimigos (Modular)
+	var num_enemies = randi_range(min_enemies, max_enemies)
+	for i in range(num_enemies):
 		var enemy = skeleton_scene.instantiate()
-		enemy.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
-		add_child(enemy)
+		var spawn_pos = Vector2.ZERO
+		var valid_pos = false
+		for attempt in range(10):
+			var rpos = Vector2(randf_range(-half_w + 80, half_w - 80), randf_range(-half_h + 80, half_h - 80))
+			var too_close = false
+			for pos in occupied_positions:
+				if rpos.distance_to(pos) < 40.0:
+					too_close = true
+					break
+			if not too_close:
+				spawn_pos = rpos
+				valid_pos = true
+				break
+		if valid_pos:
+			enemy.position = spawn_pos
+			add_child(enemy)
+			occupied_positions.append(spawn_pos)
+		else:
+			enemy.queue_free()
 		
-	# 4. Armadilhas de Areia Movediça (15% de chance)
+	# 4. Armadilhas de Areia Movediça
 	if randf() < 0.15:
 		var qs = quicksand_scene.instantiate()
-		qs.position = Vector2(randf_range(-100, 100), randf_range(-100, 100))
+		qs.position = Vector2(randf_range(-half_w + 80, half_w - 80), randf_range(-half_h + 80, half_h - 80))
 		add_child(qs)
 
 func _spawn_interactive_door(pos: Vector2, rot: float) -> void:
@@ -125,6 +272,15 @@ func _spawn_interactive_door(pos: Vector2, rot: float) -> void:
 	d.position = pos
 	d.rotation = rot
 	add_child(d)
+	
+	# Afina o oclusor da porta interativa para deixar a luz passar melhor
+	var occ = d.get_node_or_null("LightOccluder2D")
+	if occ and occ.occluder:
+		occ.occluder = occ.occluder.duplicate()
+		var points = PackedVector2Array([
+			Vector2(-40, -0.5), Vector2(40, -0.5), Vector2(40, 0.5), Vector2(-40, 0.5)
+		])
+		occ.occluder.polygon = points
 
 # --- Lógica de Ambiente ---
 

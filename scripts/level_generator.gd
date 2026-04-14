@@ -17,10 +17,14 @@ extends Node2D
 const ROOM_SIZE = Vector2(400, 400)
 
 # --- Variáveis de Tempo de Execução ---
-var map_data = {} # Chave: Vector2i (pos. da grade), Valor: String (tipo de sala)
+var map_data = {} # Chave: Vector2i (pos. da grade), Valor: Dictionary (tipo e tamanho)
 var current_level: int = 1
 var sun_time: float = 0.0
 var player_node: Node2D = null
+
+# Armazena as dimensões de cada coluna e linha para manter a grade alinhada
+var col_widths = {}
+var row_heights = {}
 
 # --- Ciclo de Vida ---
 
@@ -45,6 +49,8 @@ func generate_new_level() -> void:
 			child.queue_free()
 	
 	map_data.clear()
+	col_widths.clear()
+	row_heights.clear()
 	
 	# Gera o layout do andar e constrói o visual
 	_generate_map_layout()
@@ -56,7 +62,8 @@ func generate_new_level() -> void:
 ## Usa um algoritmo de "random walk" para gerar o layout das salas.
 func _generate_map_layout() -> void:
 	var current_position = Vector2i(0, 0)
-	map_data[current_position] = "start"
+	
+	map_data[current_position] = {"type": "start"}
 	
 	var rooms_created = 1
 	var directions = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
@@ -66,7 +73,7 @@ func _generate_map_layout() -> void:
 		current_position += dir
 		
 		if not map_data.has(current_position):
-			map_data[current_position] = "normal"
+			map_data[current_position] = {"type": "normal"}
 			rooms_created += 1
 	
 	# Designa a sala mais distante como a sala do Chefe
@@ -78,15 +85,28 @@ func _generate_map_layout() -> void:
 			max_dist = dist
 			furthest_pos = pos
 	
-	map_data[furthest_pos] = "boss"
+	map_data[furthest_pos]["type"] = "boss"
+	
+	# Atribui larguras para colunas e alturas para linhas baseadas nas salas
+	for pos in map_data.keys():
+		if not col_widths.has(pos.x):
+			col_widths[pos.x] = [300, 400, 500, 600].pick_random()
+		if not row_heights.has(pos.y):
+			row_heights[pos.y] = [300, 400, 500, 600].pick_random()
+		
+		# Salva o tamanho final na sala
+		map_data[pos]["size"] = Vector2(col_widths[pos.x], row_heights[pos.y])
 
 ## Instancia as cenas das salas e as conecta.
 func _build_world_visuals() -> void:
 	var spawned_doors = {} # Rastreia conexões únicas para evitar portas duplicadas
 	
 	for grid_pos in map_data.keys():
+		var room_info = map_data[grid_pos]
 		var room_instance = room_scene.instantiate()
-		room_instance.position = Vector2(grid_pos.x * ROOM_SIZE.x, grid_pos.y * ROOM_SIZE.y)
+		
+		# Calcula a posição física acumulando larguras/alturas
+		room_instance.position = _get_physical_position(grid_pos)
 		add_child(room_instance)
 		
 		# Verificação de vizinhos
@@ -108,20 +128,50 @@ func _build_world_visuals() -> void:
 
 		# Iluminação: Salas normais têm 30% de chance de teto aberto
 		var is_open = false
-		if map_data[grid_pos] == "normal":
+		if room_info["type"] == "normal":
 			is_open = randf() < 0.3
-		
-		# Configura o visual e as conexões da sala
-		room_instance.setup_room(has_n, has_s, has_e, has_w, is_open, spawn_n, spawn_s, spawn_e, spawn_w)
+
+		# Calcula a quantidade modular de inimigos baseada no nível
+		# Nível 1: 0-2 inimigos, Nível 2: 1-3, etc.
+		var min_enemies = clampi(current_level - 1, 0, 5)
+		var max_enemies = clampi(current_level + 1, 1, 8)
+
+		# Configura o tamanho, visuais, conexões e inimigos da sala
+		room_instance.setup_room_ext(room_info["size"], has_n, has_s, has_e, has_w, is_open, 
+				spawn_n, spawn_s, spawn_e, spawn_w, min_enemies, max_enemies)
+
 		
 		# Gerencia a configuração específica da sala do Chefe
-		if map_data[grid_pos] == "boss":
+		if room_info["type"] == "boss":
 			room_instance.modulate = Color(1, 0.5, 0.5) # Dica visual para o Chefe
 			if boss_scene:
 				var boss = boss_scene.instantiate()
 				boss.position = room_instance.position
 				boss.boss_died.connect(_on_boss_died)
 				add_child(boss)
+
+## Calcula a posição física baseada na soma das larguras e alturas da grade.
+func _get_physical_position(grid_pos: Vector2i) -> Vector2:
+	var px = 0.0
+	var py = 0.0
+	
+	# Soma larguras para X (do 0 até pos.x)
+	if grid_pos.x > 0:
+		for i in range(grid_pos.x):
+			px += (col_widths[i] + col_widths[i+1]) / 2.0
+	elif grid_pos.x < 0:
+		for i in range(0, grid_pos.x, -1):
+			px -= (col_widths[i] + col_widths[i-1]) / 2.0
+			
+	# Soma alturas para Y (do 0 até pos.y)
+	if grid_pos.y > 0:
+		for i in range(grid_pos.y):
+			py += (row_heights[i] + row_heights[i+1]) / 2.0
+	elif grid_pos.y < 0:
+		for i in range(0, grid_pos.y, -1):
+			py -= (row_heights[i] + row_heights[i-1]) / 2.0
+			
+	return Vector2(px, py)
 
 ## Auxiliar para determinar se uma porta interativa deve ser gerada em uma conexão.
 func _should_spawn_door(pos_a: Vector2i, pos_b: Vector2i, exists: bool, record: Dictionary) -> bool:

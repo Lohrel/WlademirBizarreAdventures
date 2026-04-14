@@ -22,7 +22,7 @@ func _ready() -> void:
 func _generate_random_shape() -> void:
 	var points = PackedVector2Array()
 	var num_points = randi_range(5, 8)
-	var base_radius = randf_range(40, 80)
+	var base_radius = randf_range(60, 120) # Aumentado de 40-80 para 60-120
 	
 	for i in range(num_points):
 		var angle = (float(i) / num_points) * TAU
