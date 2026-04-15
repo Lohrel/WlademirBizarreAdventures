@@ -8,8 +8,8 @@ var _can_fire: bool = true
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
-	# Garante que o visual inicial está correto
-	$BaseVisual.color = Color(0.4, 0.4, 0.4, 1) # Cinza escuro
+	# Quase a cor do chão (um pouco mais escuro)
+	$BaseVisual.color = Color(0.55, 0.43, 0.3, 1)
 
 func _on_body_entered(body: Node2D) -> void:
 	if _can_fire and body.has_method("take_damage"):
@@ -17,9 +17,10 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _trigger_trap() -> void:
 	_can_fire = false
-	
-	# Feedback visual: placa afunda (muda de cor)
-	$BaseVisual.color = Color(0.7, 0.2, 0.2, 1) # Vermelho ativado
+
+	# Feedback visual: placa afunda (fica mais escura)
+	$BaseVisual.color = Color(0.45, 0.35, 0.2, 1)
+
 	
 	# Atira dardos em 4 direções
 	var directions = [Vector2.UP, Vector2.DOWN, Vector2.LEFT, Vector2.RIGHT]
@@ -40,4 +41,4 @@ func _fire_dart(dir: Vector2) -> void:
 
 func _reset_trap() -> void:
 	_can_fire = true
-	$BaseVisual.color = Color(0.4, 0.4, 0.4, 1)
+	$BaseVisual.color = Color(0.55, 0.43, 0.3, 1)

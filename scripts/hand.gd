@@ -9,12 +9,16 @@ extends Sprite2D
 # --- Referências ---
 @onready var hitbox = $Hitbox
 
+var _already_hit_areas: Array[Area2D] = []
+
 # --- Ciclo de Vida ---
 
 func _ready() -> void:
 	# Conecta o sinal de colisão para causar dano
 	if hitbox:
 		hitbox.area_entered.connect(_on_hitbox_area_entered)
+		hitbox.monitoring = false
+		hitbox.monitorable = false
 
 func _physics_process(_delta: float) -> void:
 	var player = get_parent().get_parent()
@@ -35,10 +39,37 @@ func _physics_process(_delta: float) -> void:
 		else:
 			scale.y = 1
 
+# --- Lógica de Ataque ---
+
+func start_attack() -> void:
+	distancia = 0
+	_already_hit_areas.clear()
+	if hitbox:
+		hitbox.monitoring = true
+		hitbox.monitorable = true
+		# Verifica imediatamente quem já está dentro da hitbox
+		# Isso resolve o problema de inimigos colados no player
+		_check_initial_overlaps()
+
+func stop_attack() -> void:
+	if hitbox:
+		hitbox.monitoring = false
+		hitbox.monitorable = false
+	_already_hit_areas.clear()
+
+func _check_initial_overlaps() -> void:
+	if not hitbox: return
+	
+	var overlapping_areas = hitbox.get_overlapping_areas()
+	for area in overlapping_areas:
+		_on_hitbox_area_entered(area)
+
 # --- Sinais ---
 
 func _on_hitbox_area_entered(area: Area2D) -> void:
-	# Se atingir a área de dano de um inimigo
-	if area.name == "Hurtbox" and area.owner.has_method("take_damage"):
-		# Aplica dano e knockback usando a posição da garra
-		area.owner.take_damage(attack_damage, global_position)
+	if not area in _already_hit_areas:
+		# Se atingir a área de dano de um inimigo
+		if area.name == "Hurtbox" and area.owner.has_method("take_damage"):
+			_already_hit_areas.append(area)
+			# Aplica dano e knockback usando a posição da garra
+			area.owner.take_damage(attack_damage, global_position)

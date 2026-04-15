@@ -195,7 +195,3 @@ func die():
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.2)
 	tween.finished.connect(queue_free)
-
-func _on_hurtbox_area_entered(area: Area2D) -> void:
-	if area.name == "Hitbox":
-		take_damage(10.0, area.global_position)

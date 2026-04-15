@@ -329,7 +329,3 @@ func _on_hitbox_body_entered(body):
 		var tween = create_tween()
 		tween.tween_property(sprite, "modulate", Color(2, 2, 2), 0.05)
 		tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
-
-func _on_hurtbox_area_entered(area: Area2D) -> void:
-	if area.name == "Hitbox":
-		take_damage(10.0, area.global_position)

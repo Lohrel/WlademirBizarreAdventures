@@ -154,8 +154,7 @@ func _attack() -> void:
 	if Input.is_action_just_pressed("attack") and not _is_attacking:
 		_attack_timer.start()
 		_is_attacking = true
-		$garra_player/hand.distancia = 0 
-		$garra_player/hand/Hitbox.monitorable = true
+		$garra_player/hand.start_attack()
 		
 	if _is_attacking:
 		var current_dist = $garra_player/hand.distancia
@@ -165,7 +164,6 @@ func _attack() -> void:
 	else:
 		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 25, 200 * get_physics_process_delta_time())
 		$garra_player/hand/ShadowTrail.emitting = false
-		$garra_player/hand/Hitbox.monitorable = false
 
 ## Detecção de luz solar usando o contexto da sala e raycasts.
 func _check_sunlight() -> void:
@@ -277,4 +275,4 @@ func _on_cooldown_dash_timeout() -> void:
 
 func _on_attack_timer_timeout() -> void:
 	_is_attacking = false
-	$garra_player/hand/Hitbox.monitorable = false
+	$garra_player/hand.stop_attack()
