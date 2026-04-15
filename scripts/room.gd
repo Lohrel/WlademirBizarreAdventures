@@ -26,6 +26,7 @@ var pressure_plate_scene = preload("res://scenes/pressure_plate.tscn")
 
 # --- Configuração ---
 var has_open_ceiling: bool = false
+var _disabled_occluders: Array[LightOccluder2D] = []
 
 # --- Ciclo de Vida ---
 
@@ -135,6 +136,12 @@ func setup_room_ext(custom_size: Vector2, has_n: bool, has_s: bool, has_e: bool,
 
 	# 4. Chama o setup original
 	setup_room(has_n, has_s, has_e, has_w, is_open, spawn_n, spawn_s, spawn_e, spawn_w, min_enemies, max_enemies)
+	
+	# 5. Ajusta a escala das luzes para o tamanho da sala
+	var avg_size = (custom_size.x + custom_size.y) / 2.0
+	var scale_factor = avg_size / 400.0 # 400 é o tamanho base original
+	sunlight.texture_scale = 1.2 * scale_factor
+	moonlight.texture_scale = 1.0 * scale_factor
 
 ## Configura o layout, portas e ambiente da sala.
 func setup_room(has_n: bool, has_s: bool, has_e: bool, has_w: bool, 
@@ -263,10 +270,11 @@ func _spawn_procedural_content(is_sunlight_room: bool, min_enemies: int, max_ene
 			enemy.queue_free()
 		
 	# 4. Armadilhas de Areia Movediça
-	if randf() < 0.15:
-		var qs = quicksand_scene.instantiate()
-		qs.position = Vector2(randf_range(-half_w + 80, half_w - 80), randf_range(-half_h + 80, half_h - 80))
-		add_child(qs)
+	if randf() < 0.40:
+		for i in range(randi_range(1, 3)):
+			var qs = quicksand_scene.instantiate()
+			qs.position = Vector2(randf_range(-half_w + 80, half_w - 80), randf_range(-half_h + 80, half_h - 80))
+			add_child(qs)
 
 	# 5. Placas de Pressão (Dardos de Veneno)
 	if randf() < 0.3:
@@ -314,19 +322,28 @@ func _update_environmental_cycle() -> void:
 	var gen = get_parent()
 	if not gen or not "sun_time" in gen: return
 	
+	# Restaura oclusores desativados no passo anterior
+	for occ in _disabled_occluders:
+		if is_instance_valid(occ):
+			occ.visible = true
+	_disabled_occluders.clear()
+	
 	var st = fmod(gen.sun_time, TAU)
 	
 	# Atualiza o Sol
 	var s_val = sin(st)
+	var move_range = $Floor.size.x * 0.3 # Move 30% da largura da sala
+	
 	if s_val > 0.0:
 		sunlight.visible = true
-		sunlight.position.x = -cos(st) * 120.0
+		sunlight.position.x = -cos(st) * move_range
 		sunlight.color = Color(1, 0.98, 0.85)
 		var target_energy = clamp((s_val - 0.2) * 2.5, 0.0, 2.0)
 		sunlight.energy = lerp(sunlight.energy, target_energy, 0.1)
 		
 		if sunlight.energy > 0.1:
 			if not sun_audio.playing: sun_audio.play()
+			_check_light_collision(sunlight)
 		else:
 			if sun_audio.playing: sun_audio.stop()
 	else:
@@ -339,10 +356,11 @@ func _update_environmental_cycle() -> void:
 	var m_val = sin(m_st)
 	if m_val > 0.4:
 		moonlight.visible = true
-		moonlight.position.x = -cos(m_st) * 120.0
+		moonlight.position.x = -cos(m_st) * move_range
 		moonlight.energy = (m_val - 0.4) * 1.5 
 		fireflies.emitting = true
 		if not moon_audio.playing: moon_audio.play()
+		_check_light_collision(moonlight)
 		
 		# Iluminação de vaga-lumes baseada em proximidade
 		var d = abs(fireflies.position.x - moonlight.position.x)
@@ -356,6 +374,20 @@ func _update_environmental_cycle() -> void:
 		fireflies.emitting = false
 		firefly_light.visible = false
 		if moon_audio.playing: moon_audio.stop()
+
+func _check_light_collision(light: PointLight2D) -> void:
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsPointQueryParameters2D.new()
+	query.position = light.global_position
+	query.collision_mask = 1 # Camada de caixas e pilares
+	
+	var results = space_state.intersect_point(query)
+	for result in results:
+		var body = result.collider
+		var occ = body.get_node_or_null("LightOccluder2D")
+		if occ:
+			occ.visible = false
+			_disabled_occluders.append(occ)
 
 # --- Utilitários ---
 

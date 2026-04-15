@@ -90,9 +90,9 @@ func _generate_map_layout() -> void:
 	# Atribui larguras para colunas e alturas para linhas baseadas nas salas
 	for pos in map_data.keys():
 		if not col_widths.has(pos.x):
-			col_widths[pos.x] = [300, 400, 500, 600].pick_random()
+			col_widths[pos.x] = [300, 400, 600, 800].pick_random()
 		if not row_heights.has(pos.y):
-			row_heights[pos.y] = [300, 400, 500, 600].pick_random()
+			row_heights[pos.y] = [300, 400, 600, 800].pick_random()
 		
 		# Salva o tamanho final na sala
 		map_data[pos]["size"] = Vector2(col_widths[pos.x], row_heights[pos.y])

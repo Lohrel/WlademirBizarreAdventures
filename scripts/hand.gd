@@ -58,7 +58,7 @@ func stop_attack() -> void:
 	_already_hit_areas.clear()
 
 func _check_initial_overlaps() -> void:
-	if not hitbox: return
+	if not hitbox or not hitbox.is_inside_tree(): return
 	
 	var overlapping_areas = hitbox.get_overlapping_areas()
 	for area in overlapping_areas:
