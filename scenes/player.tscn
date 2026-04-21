@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bls2nwi65cm7k"]
 
-[ext_resource type="Script" uid="uid://c2wqoqv4fgwii" path="res://scripts/player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://cn5l0n8msddel" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://dsgqp0vwv7vuo" path="res://assets/sprites/player/vampiro_spritesheet.png" id="2_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://ctt3ybxltjmat" path="res://scenes/garra_player.tscn" id="3_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://c8y8q8u4n8p4x" path="res://scenes/hud.tscn" id="4_hud"]
@@ -48,6 +48,24 @@ tracks/2/keys = {
 "transitions": PackedFloat32Array(1),
 "update": 1,
 "values": [false]
+}
+
+[sub_resource type="Animation" id="Animation_smehm"]
+resource_name = "dash"
+length = 0.4
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [8, 9]
 }
 
 [sub_resource type="Animation" id="Animation_qhqgy"]
@@ -221,11 +239,15 @@ tracks/2/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_nrt7g"]
 _data = {
 &"RESET": SubResource("Animation_g2els"),
+&"dash": SubResource("Animation_smehm"),
 &"idle_left": SubResource("Animation_qhqgy"),
 &"idle_right": SubResource("Animation_dqkch"),
 &"walk_left": SubResource("Animation_qlg0r"),
 &"walk_right": SubResource("Animation_tuyoq")
 }
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dqkch"]
+animation = &"dash_up"
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_fjrip"]
 animation = &"idle_left"
@@ -254,6 +276,8 @@ blend_point_1/pos = Vector2(-1, 0)
 blend_mode = 1
 
 [sub_resource type="AnimationNodeStateMachine" id="AnimationNodeStateMachine_rcof1"]
+states/dash/node = SubResource("AnimationNodeAnimation_dqkch")
+states/dash/position = Vector2(634, 96)
 states/idle/node = SubResource("AnimationNodeBlendSpace2D_epux0")
 states/idle/position = Vector2(457, 118)
 states/walk/node = SubResource("AnimationNodeBlendSpace2D_62abg")
@@ -281,18 +305,20 @@ _animation_tree = NodePath("AnimationTree")
 _dash_timer = NodePath("dash_timer")
 _cooldown_dash = NodePath("cooldown_dash")
 _attack_timer = NodePath("attack_timer")
-_dash_speed = 500.0
 
 [node name="Sprite2D" type="Sprite2D" parent="player" unique_id=1696686061]
 texture_filter = 1
 texture = ExtResource("2_qhqgy")
-vframes = 9
+hframes = 3
+vframes = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="player" unique_id=28330274]
+visible = false
 position = Vector2(0, 2)
 shape = SubResource("CapsuleShape2D_g2els")
 
 [node name="SunShapeCast" type="ShapeCast2D" parent="player" unique_id=11223344]
+visible = false
 shape = SubResource("CircleShape2D_sun")
 target_position = Vector2(0, -1000)
 max_results = 1
