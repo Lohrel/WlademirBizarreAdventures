@@ -11,10 +11,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Player Movement and Melee Foundation' (Protocol in workflow.md)
 
 ## Phase 2: Enemy AI and Telegraphing
-- [ ] Task: Refine Mummy AI
-    - [ ] Write Tests: Mummy detection radius and projectile firing rate.
-    - [ ] Implement Feature: Update `mumia.gd` for clearer attack tells and smoother movement.
-- [ ] Task: Refine Skeleton AI
+- [x] Task: Refine Mummy AI 14e4511
+    - [x] Write Tests: Mummy detection radius and projectile firing rate.
+    - [x] Implement Feature: Update `mumia.gd` for clearer attack tells and smoother movement.
+- [~] Task: Refine Skeleton AI
     - [ ] Write Tests: Skeleton melee range and engagement behavior.
     - [ ] Implement Feature: Update `skeleton.gd` to improve pathfinding toward the player.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Enemy AI and Telegraphing' (Protocol in workflow.md)
