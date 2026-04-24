@@ -20,10 +20,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Enemy AI and Telegraphing' (Protocol in workflow.md)
 
 ## Phase 3: Combat Integration and Polish
-- [ ] Task: Damage and Resource Hookup
-    - [ ] Write Tests: Player taking damage, enemy taking damage, health updates.
-    - [ ] Implement Feature: Ensure `hud.tscn` accurately reflects combat state changes.
-- [ ] Task: Game Feel and Hit Stop
+- [x] Task: Damage and Resource Hookup 8af5883
+    - [x] Write Tests: Player taking damage, enemy taking damage, health updates.
+    - [x] Implement Feature: Ensure `hud.tscn` accurately reflects combat state changes.
+- [~] Task: Game Feel and Hit Stop
     - [ ] Write Tests: Hit stop timing triggers.
     - [ ] Implement Feature: Add subtle hit stop (frame freeze) and camera shake on critical hits.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Combat Integration and Polish' (Protocol in workflow.md)
