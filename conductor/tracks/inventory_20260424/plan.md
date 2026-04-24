@@ -1,13 +1,13 @@
 # Implementation Plan: Implement 5-slot equipment inventory
 
-## Phase 1: Item Data Structure and Generation
+## Phase 1: Item Data Structure and Generation [checkpoint: 12185d5]
 - [x] Task: Define Equipment Item Structure 079389b
     - [x] Write Tests: Ensure Item Resource/Class stores stats and slot type correctly.
     - [x] Implement Feature: Create `equipment.gd` (Resource) defining slot enum and stat dictionary.
 - [x] Task: Procedural Generation Logic 079389b
     - [x] Write Tests: Ensure RNG generates stats within expected ranges based on level and slot constraints.
     - [x] Implement Feature: Create a generation script/autoload to spawn equipment with randomized stats tailored to their slot (Boots, Gloves, Tunic, Hat, Ring).
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Item Data Structure and Generation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Item Data Structure and Generation' (Protocol in workflow.md)
 
 ## Phase 2: Player Inventory and Stat Hookup
 - [ ] Task: Inventory System
