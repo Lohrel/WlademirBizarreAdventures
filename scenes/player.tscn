@@ -298,6 +298,8 @@ point_count = 2
 [node name="Node2D" type="Node2D" unique_id=816610571]
 metadata/_edit_horizontal_guides_ = [-2917.0]
 
+[node name="HUD" parent="." unique_id=123456789 instance=ExtResource("4_hud")]
+
 [node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_dash_timer", "_cooldown_dash", "_attack_timer")]
 collision_layer = 2
 script = ExtResource("1_g2els")
@@ -365,22 +367,6 @@ energy = 0.6
 texture_scale = 0.6
 
 [node name="BurnParticles" type="CPUParticles2D" parent="player" unique_id=11224455]
-emitting = false
-amount = 20
-lifetime = 0.4
-preprocess = 0.1
-speed_scale = 1.2
-emission_shape = 1
-emission_sphere_radius = 20.0
-gravity = Vector2(0, -100)
-damping_min = 10.0
-damping_max = 20.0
-scale_amount_min = 1.5
-scale_amount_max = 3.0
-scale_amount_curve = SubResource("Curve_Burn")
-color = Color(1, 0.6, 0.2, 1)
-
-[node name="HUD" parent="player" unique_id=123456789 instance=ExtResource("4_hud")]
 
 [node name="garra_player" parent="player" unique_id=506683672 instance=ExtResource("3_qhqgy")]
 z_index = -1
