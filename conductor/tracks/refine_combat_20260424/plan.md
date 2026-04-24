@@ -1,14 +1,14 @@
 # Implementation Plan: Refine Player combat mechanics and Enemy AI interactions
 
-## Phase 1: Player Movement and Melee Foundation
+## Phase 1: Player Movement and Melee Foundation [checkpoint: b367e30]
 - [x] Task: Set up unit testing framework for Godot GDScript (if not present). ddc9bdf
 - [x] Task: Refine Player Dash 8fafab8
     - [x] Write Tests: Dash speed, distance, and invincibility frames.
     - [x] Implement Feature: Update `player.gd` and `player.tscn` to adjust dash mechanics.
-- [~] Task: Polish Melee Attack (Claws)
-    - [ ] Write Tests: Hitbox active frames and damage calculation.
-    - [ ] Implement Feature: Update claw attack animations, hitboxes, and particle effects.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Player Movement and Melee Foundation' (Protocol in workflow.md)
+- [x] Task: Polish Melee Attack (Claws) 423c27a
+    - [x] Write Tests: Hitbox active frames and damage calculation.
+    - [x] Implement Feature: Update claw attack animations, hitboxes, and particle effects.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Player Movement and Melee Foundation' (Protocol in workflow.md)
 
 ## Phase 2: Enemy AI and Telegraphing
 - [ ] Task: Refine Mummy AI
