@@ -16,8 +16,8 @@
     - [x] Implement Feature: Update item color and point light to match its rarity tier.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Interactive Pickup & Visuals' (Protocol in workflow.md)
 
-## Phase 3: UI Feedback Tooltips
-- [ ] Task: Implement Hover Tooltips
-    - [ ] Write Tests: Verify tooltip becomes visible when player enters area and hides when leaving/collected.
-    - [ ] Implement Feature: Add a `PanelContainer` with `Label`s to `item_drop.tscn`. Update it in `_ready()` with the formatted equipment stats and toggle its visibility in `_on_body_entered` and `_on_body_exited`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: UI Feedback Tooltips' (Protocol in workflow.md)
+## Phase 3: UI Feedback Tooltips [checkpoint: 2d3e43d]
+- [x] Task: Implement Hover Tooltips 2d3e43d
+    - [x] Write Tests: Verify tooltip becomes visible when player enters area and hides when leaving/collected.
+    - [x] Implement Feature: Add a `PanelContainer` with `Label`s to `item_drop.tscn`. Update it in `_ready()` with the formatted equipment stats and toggle its visibility in `_on_body_entered` and `_on_body_exited`.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: UI Feedback Tooltips' (Protocol in workflow.md)
