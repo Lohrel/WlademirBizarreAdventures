@@ -19,10 +19,8 @@ func test_mummy_attack_range():
 	assert_eq(_mummy._get_attack_range(), 200.0, "Mummy should have an attack range of 200")
 
 func test_mummy_telegraphing():
-	# We want to ensure there's a delay or signal before the projectile is actually spawned
-	# This is hard to test with the current implementation using await
-	# I will refactor mumia.gd to use a state or a more testable sequence
-	pass
+	_mummy._perform_attack()
+	assert_true(_mummy._is_charging, "Mummy should be in charging state when telegraphing")
 
 func test_mummy_stops_during_attack():
 	_mummy.velocity = Vector2(100, 100)
