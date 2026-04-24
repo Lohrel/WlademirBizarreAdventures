@@ -4,7 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Polish Item Drop Tooltip UI**
+- [x] **Track: Polish Item Drop Tooltip UI**
   *Link: [./tracks/tooltip_polish_20260424/](./tracks/tooltip_polish_20260424/)*
 
 ---

@@ -59,13 +59,13 @@ func _setup_tooltip() -> void:
 	}
 	%RarityLabel.add_theme_color_override("font_color", rarity_colors[equipment_data.rarity])
 	
-	var stats_text = ""
+	var stats_text = "[center]"
 	for stat in equipment_data.stats:
 		var val = equipment_data.stats[stat]
 		var percent = int(val * 100)
-		stats_text += "+%d%% %s\n" % [percent, stat.replace("_", " ").capitalize()]
+		stats_text += "[color=green]+%d%%[/color] [color=gray]%s[/color]\n" % [percent, stat.replace("_", " ").capitalize()]
 	
-	%StatsLabel.text = stats_text.strip_edges()
+	%StatsLabel.text = stats_text.strip_edges() + "[/center]"
 
 func _process(_delta: float) -> void:
 	if _player_in_range and equipment_data:
