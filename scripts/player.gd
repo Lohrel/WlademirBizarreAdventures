@@ -16,6 +16,7 @@ extends CharacterBody2D
 @export var health: float = 100.0
 @export var max_mana: float = 100.0
 @export var mana: float = 100.0
+@export var mana_regen_rate: float = 5.0 # Mana por segundo
 
 # --- Configuração de Habilidades ---
 @export_group("Skills Config")
@@ -35,6 +36,7 @@ var _use_dash: bool = true
 var _state_machine: AnimationNodeStateMachinePlayback
 var _last_direction := Vector2.RIGHT
 var _dash_direction := Vector2.ZERO
+
 var _is_dashing: bool = false
 var _is_attacking: bool = false
 var _current_room: Node2D = null
@@ -116,10 +118,16 @@ func _handle_environment(delta: float) -> void:
 	if _in_sunlight:
 		take_damage(15.0 * delta)
 	
-	# Aplica regeneração passiva
+	# Aplica regeneração passiva de vida
 	if health < max_health and passive_regen_percent > 0:
 		health += max_health * passive_regen_percent * delta
 		health = min(health, max_health)
+		update_hud()
+		
+	# Aplica regeneração de mana
+	if mana < max_mana:
+		mana += mana_regen_rate * delta
+		mana = min(mana, max_mana)
 		update_hud()
 
 # --- Mecânicas Principais ---
