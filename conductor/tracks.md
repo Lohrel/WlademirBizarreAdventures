@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Fix player light and mummy double attack bugs**
+- [~] **Track: Fix player light and mummy double attack bugs**
   *Link: [./tracks/bug_fixes_20260424/](./tracks/bug_fixes_20260424/)*
