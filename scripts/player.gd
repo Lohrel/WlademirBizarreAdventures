@@ -20,7 +20,7 @@ extends CharacterBody2D
 # --- Configuração de Habilidades ---
 @export_group("Skills Config")
 @export var _move_speed: float = 200.0
-@export var _dash_speed: float = 500.0
+@export var _dash_speed: float = 600.0
 @export var dash_mana_cost: float = 25.0
 @export var dash_cooldown_time: float = 0.5
 
@@ -204,7 +204,7 @@ func _check_sunlight() -> void:
 # --- Utilitários ---
 
 func take_damage(amount: float) -> void:
-	if is_immortal: return
+	if is_immortal or _is_dashing: return
 	
 	health -= amount
 	health = max(0, health)
