@@ -118,6 +118,7 @@ func _create_radial_texture(size: int) -> GradientTexture2D:
 	grad.colors = [Color.WHITE, Color(1, 1, 1, 0)]
 	var tex = GradientTexture2D.new()
 	tex.gradient = grad
+	tex.use_hdr = true
 	tex.fill = GradientTexture2D.FILL_RADIAL
 	tex.fill_from = Vector2(0.5, 0.5)
 	tex.fill_to = Vector2(1.0, 0.5) 

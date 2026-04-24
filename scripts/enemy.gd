@@ -21,6 +21,7 @@ enum State { IDLE, WANDER, ALERT, AGGRESSIVE, ATTACK }
 @export var alert_to_aggro_time: float = 1.5
 @export var suspicion_drain_time: float = 8.0
 @export var aggro_loss_time: float = 5.0
+@export var drop_chance: float = 0.3
 
 # --- Variáveis de Tempo de Execução ---
 var current_state: State = State.IDLE
@@ -44,6 +45,7 @@ var spawn_pos: Vector2
 
 # --- Cenas ---
 var bone_scene = preload("res://scenes/bone_particles.tscn")
+var item_drop_scene = preload("res://scenes/item_drop.tscn")
 
 # --- Ciclo de Vida ---
 
@@ -286,9 +288,24 @@ func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_st
 
 func die():
 	enemy_died.emit()
+	
+	if randf() < drop_chance:
+		call_deferred("_spawn_drop")
+		
 	var tween = create_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.3)
 	tween.finished.connect(queue_free)
+
+func _spawn_drop():
+	var drop = item_drop_scene.instantiate()
+	get_parent().add_child(drop)
+	drop.global_position = global_position
+	
+	var jump_target = global_position + Vector2(randf_range(-25, 25), randf_range(-25, 25))
+	var tween = drop.create_tween()
+	tween.tween_property(drop, "global_position:y", global_position.y - 20, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(drop, "global_position:y", jump_target.y, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.parallel().tween_property(drop, "global_position:x", jump_target.x, 0.3)
 
 # --- Métodos Virtuais para Customização ---
 

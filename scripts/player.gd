@@ -39,6 +39,7 @@ var _is_dashing: bool = false
 var _is_attacking: bool = false
 var _current_room: Node2D = null
 var _in_sunlight: bool = false
+var is_immortal: bool = false
 
 # --- Cenas Pré-carregadas ---
 var blood_scene = preload("res://scenes/blood_particles.tscn")
@@ -83,6 +84,14 @@ func _input(event: InputEvent) -> void:
 	# F5: Reinício Rápido
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F5:
 		get_tree().reload_current_scene()
+
+	# F1: God Mode
+	if event is InputEventKey and event.pressed and event.keycode == KEY_F1:
+		is_immortal = !is_immortal
+		if is_immortal:
+			$Sprite2D.modulate = Color(2, 2, 0) # Tint dourado
+		else:
+			$Sprite2D.modulate = Color(1, 1, 1)
 
 # --- Métodos do Sistema ---
 
@@ -195,6 +204,8 @@ func _check_sunlight() -> void:
 # --- Utilitários ---
 
 func take_damage(amount: float) -> void:
+	if is_immortal: return
+	
 	health -= amount
 	health = max(0, health)
 	update_hud()
