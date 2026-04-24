@@ -73,3 +73,13 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 			_already_hit_areas.append(area)
 			# Aplica dano e knockback usando a posição da garra
 			area.owner.take_damage(attack_damage, global_position)
+			
+			# Feedback visual na garra
+			var tween = create_tween()
+			tween.tween_property(self, "scale", Vector2(1.5, 1.5), 0.05)
+			tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1)
+			
+			# Shake da câmera
+			var cam = get_viewport().get_camera_2d()
+			if cam and cam.has_method("shake"):
+				cam.shake(5.0)
