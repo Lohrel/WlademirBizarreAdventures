@@ -32,6 +32,7 @@ var last_known_player_pos: Vector2
 var target_wander_pos: Vector2
 var wander_timer: float = 0.0
 var spawn_pos: Vector2
+var _is_charging: bool = false
 
 # --- Nós Onready ---
 @onready var sprite = $Sprite2D
@@ -160,7 +161,7 @@ func _handle_aggressive(delta: float, in_range: bool, has_los: bool):
 	
 	# Ataca se estiver ao alcance e o cooldown tiver acabado
 	var attack_range = _get_attack_range()
-	if dist < attack_range and attack_timer.is_stopped():
+	if dist < attack_range and attack_timer.is_stopped() and not _is_charging:
 		current_state = State.ATTACK
 		_perform_attack()
 		return
@@ -256,7 +257,8 @@ func _perform_attack():
 
 func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0):
 	health -= amount
-	current_state = State.AGGRESSIVE
+	if current_state != State.ATTACK:
+		current_state = State.AGGRESSIVE
 	suspicion = 1.0
 	
 	# Aplica knockback se uma posição de origem for fornecida

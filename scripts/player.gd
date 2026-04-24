@@ -102,6 +102,7 @@ func _ready() -> void:
 	if get_parent():
 		_hud_node = get_parent().get_node_or_null("HUD")
 	
+	$PlayerLight.texture = _create_light_texture(256)
 	update_hud()
 
 func recalculate_stats() -> void:
@@ -313,3 +314,16 @@ func _on_cooldown_dash_timeout() -> void: _use_dash = true
 func _on_attack_timer_timeout() -> void:
 	_is_attacking = false
 	$garra_player/hand.stop_attack()
+
+func _create_light_texture(size: int) -> GradientTexture2D:
+	var grad = Gradient.new()
+	grad.offsets = [0.0, 1.0]
+	grad.colors = [Color(1,1,1,1), Color(1,1,1,0)]
+	var tex = GradientTexture2D.new()
+	tex.gradient = grad
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = size
+	tex.height = size
+	return tex

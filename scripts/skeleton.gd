@@ -2,8 +2,6 @@
 ## Inimigo padrão com atributos padrão.
 extends Enemy
 
-var _is_charging: bool = false
-
 func _perform_attack():
 	# O esqueleto prepara um ataque de investida
 	velocity = Vector2.ZERO

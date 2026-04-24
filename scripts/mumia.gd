@@ -14,8 +14,6 @@ func _ready():
 	# Dobra o tempo de recarga do ataque (o padrão no Enemy é 1.2s, definido no tscn)
 	attack_timer.wait_time = 2.4
 
-var _is_charging: bool = false
-
 func _perform_attack():
 	# A múmia para para lançar o projétil
 	velocity = Vector2.ZERO
