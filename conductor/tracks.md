@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Implement 5-slot equipment inventory**
+- [x] **Track: Implement 5-slot equipment inventory**
   *Link: [./tracks/inventory_20260424/](./tracks/inventory_20260424/)*
