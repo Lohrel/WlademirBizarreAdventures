@@ -11,11 +11,21 @@ func after_each():
 	_gen.free()
 
 func test_generate_item_level_1_scaling():
+	# Since scaling now depends on rarity, we check against the rarity multiplier
 	var item = _gen.generate_item(1)
 	assert_not_null(item, "Should generate an item")
+	
+	var mult = 1.0
+	match item.rarity:
+		Equipment.Rarity.UNCOMMON: mult = 1.2
+		Equipment.Rarity.RARE: mult = 1.5
+		Equipment.Rarity.EPIC: mult = 2.0
+		Equipment.Rarity.LEGENDARY: mult = 3.0
+	
 	for stat in item.stats:
 		var val = item.stats[stat]
-		assert_between(val, 0.01, 0.06, "Level 1 stat boost should be between 1% and 6%")
+		# base is 0.01 to 0.06 * level * rarity_mult
+		assert_between(val, 0.009 * mult, 0.061 * mult, "Stat boost should scale with rarity")
 
 func test_generate_item_level_10_scaling():
 	var item = _gen.generate_item(10)
