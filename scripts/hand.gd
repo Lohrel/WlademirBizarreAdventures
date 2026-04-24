@@ -82,4 +82,4 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 			# Shake da câmera
 			var cam = get_viewport().get_camera_2d()
 			if cam and cam.has_method("shake"):
-				cam.shake(4.0)
+				cam.shake(3.0)

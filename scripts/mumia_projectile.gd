@@ -39,6 +39,11 @@ func _on_area_entered(area: Area2D) -> void:
 		_explode()
 
 func _explode():
+	# Shake da câmera
+	var cam = get_viewport().get_camera_2d()
+	if cam and cam.has_method("shake"):
+		cam.shake(10.0)
+		
 	# Create a visual explosion effect
 	_create_explosion_effect()
 	

@@ -211,6 +211,11 @@ func take_damage(amount: float) -> void:
 	update_hud()
 	
 	if amount > 0.5:
+		# Shake da câmera
+		var cam = get_viewport().get_camera_2d()
+		if cam and cam.has_method("shake"):
+			cam.shake(5.0) # Dano causa um shake um pouco mais forte que o ataque
+			
 		# Flash visual
 		var tween = create_tween()
 		tween.tween_property($Sprite2D, "modulate", Color(5, 0.5, 0.5), 0.1)
