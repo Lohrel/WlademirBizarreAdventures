@@ -2,10 +2,10 @@
 
 ## Phase 1: Player Movement and Melee Foundation
 - [x] Task: Set up unit testing framework for Godot GDScript (if not present). ddc9bdf
-- [~] Task: Refine Player Dash
-    - [ ] Write Tests: Dash speed, distance, and invincibility frames.
-    - [ ] Implement Feature: Update `player.gd` and `player.tscn` to adjust dash mechanics.
-- [ ] Task: Polish Melee Attack (Claws)
+- [x] Task: Refine Player Dash 8fafab8
+    - [x] Write Tests: Dash speed, distance, and invincibility frames.
+    - [x] Implement Feature: Update `player.gd` and `player.tscn` to adjust dash mechanics.
+- [~] Task: Polish Melee Attack (Claws)
     - [ ] Write Tests: Hitbox active frames and damage calculation.
     - [ ] Implement Feature: Update claw attack animations, hitboxes, and particle effects.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Player Movement and Melee Foundation' (Protocol in workflow.md)
