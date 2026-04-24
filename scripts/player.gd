@@ -43,20 +43,94 @@ var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
 
+# --- Inventário e Equipamento ---
+var equipment: Dictionary = {
+	Equipment.Slot.BOOTS: null,
+	Equipment.Slot.GLOVES: null,
+	Equipment.Slot.TUNIC: null,
+	Equipment.Slot.HAT: null,
+	Equipment.Slot.RING: null
+}
+
+func equip_item(item: Equipment) -> void:
+	equipment[item.slot] = item
+	recalculate_stats()
+
+func unequip_item(slot: int) -> void:
+	equipment[slot] = null
+	recalculate_stats()
+
 # --- Cenas Pré-carregadas ---
 var blood_scene = preload("res://scenes/blood_particles.tscn")
 var death_screen_scene = preload("res://scenes/death_screen.tscn")
 
-# --- Ciclo de Vida ---
+# --- Stats de Base (Cópia dos exports para cálculo) ---
+var base_max_health: float
+var base_max_mana: float
+var base_move_speed: float
+var base_dash_speed: float
+var base_dash_mana: float
+var base_dash_cooldown: float
+var base_attack_damage: float
 
 func _ready() -> void:
+	# Inicializa valores base
+	base_max_health = max_health
+	base_max_mana = max_mana
+	base_move_speed = _move_speed
+	base_dash_speed = _dash_speed
+	base_dash_mana = dash_mana_cost
+	base_dash_cooldown = dash_cooldown_time
+	# Verifica se a mão existe antes de pegar o dano base
+	var hand = get_node_or_null("garra_player/hand")
+	if hand:
+		base_attack_damage = hand.attack_damage
+	else:
+		base_attack_damage = 10.0 # fallback
+
 	# Essencial para movimento flutuante top-down
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
-	
+
 	_state_machine = _animation_tree["parameters/playback"]
 	add_to_group("player")
-	
+
 	update_hud()
+
+func recalculate_stats() -> void:
+	# Reseta para valores base
+	max_health = base_max_health
+	max_mana = base_max_mana
+	_move_speed = base_move_speed
+	_dash_speed = base_dash_speed
+	dash_mana_cost = base_dash_mana
+	dash_cooldown_time = base_dash_cooldown
+	var hand = get_node_or_null("garra_player/hand")
+	if hand:
+		hand.attack_damage = base_attack_damage
+
+	# Soma bônus de equipamentos
+	for slot in equipment:
+		var item = equipment[slot]
+		if item and item is Equipment:
+			for stat in item.stats:
+				var bonus = item.stats[stat]
+				match stat:
+					"move_speed": _move_speed += bonus
+					"max_health": max_health += bonus
+					"max_mana": max_mana += bonus
+					"attack_damage": 
+						if hand: hand.attack_damage += bonus
+					"dash_mana_cost_reduction": dash_mana_cost -= bonus
+					"dash_cooldown_reduction": dash_cooldown_time -= bonus
+
+	# Clampa valores
+	health = min(health, max_health)
+	mana = min(mana, max_mana)
+	dash_mana_cost = max(5.0, dash_mana_cost)
+	dash_cooldown_time = max(0.1, dash_cooldown_time)
+
+	update_hud()
+
 	$PlayerLight.texture = _create_light_texture(256)
 
 func _physics_process(delta: float) -> void:

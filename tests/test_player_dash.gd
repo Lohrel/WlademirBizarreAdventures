@@ -4,19 +4,14 @@ var Player = load("res://scripts/player.gd")
 var _player = null
 
 func before_each():
-	_player = Player.new()
-	# We need to mock some dependencies or ensure they exist if we use instantiate
-	# For unit tests, it's better to use Player.new() if logic is decoupled
-	# but Godot classes often depend on nodes.
-	
-	# Since player.gd uses @export and $, we might need to instantiate the scene instead
 	var scene = load("res://scenes/player.tscn")
 	var root = scene.instantiate()
 	_player = root.get_node("player")
 	add_child(root)
 
 func after_each():
-	_player.get_parent().free()
+	if _player and _player.get_parent():
+		_player.get_parent().free()
 
 func test_dash_mana_cost():
 	var initial_mana = _player.mana
