@@ -1,9 +1,21 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/item_drop.gd" id="1_item_script"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item"]
 size = Vector2(16, 16)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
+bg_color = Color(0, 0, 0, 0.7)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 1, 1, 0.3)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
 
 [node name="ItemDrop" type="Area2D"]
 collision_layer = 0
@@ -17,7 +29,56 @@ offset_left = -8.0
 offset_top = -8.0
 offset_right = 8.0
 offset_bottom = 8.0
-color = Color(0, 0.5, 1, 1)
+color = Color(1, 1, 1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_item")
+
+[node name="Tooltip" type="PanelContainer" parent="."]
+visible = false
+z_index = 10
+custom_minimum_size = Vector2(80, 0)
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -40.0
+offset_top = -60.0
+offset_right = 40.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
+
+[node name="VBox" type="VBoxContainer" parent="Tooltip"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="NameLabel" type="Label" parent="Tooltip/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+text = "Item Name"
+horizontal_alignment = 1
+
+[node name="RarityLabel" type="Label" parent="Tooltip/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "Rarity"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="Tooltip/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 8
+text = "+10% Speed"
+horizontal_alignment = 1
+
+[node name="InteractLabel" type="Label" parent="Tooltip/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 8
+text = "[E] Collect"
+horizontal_alignment = 1

@@ -10,9 +10,11 @@ func _ready() -> void:
 	if equipment_data:
 		item_name = equipment_data.name
 		_setup_rarity_visuals()
-		print("DEBUG: Spawned equipment drop: ", item_name)
+		_setup_tooltip()
 		if equipment_data.icon:
 			$Sprite2D.texture = equipment_data.icon
+	else:
+		$Tooltip.queue_free() # Sem tooltip para itens de cura
 	
 	# Conecta os sinais de entrada e saída
 	body_entered.connect(_on_body_entered)
@@ -42,6 +44,29 @@ func _setup_rarity_visuals() -> void:
 	light.texture = _create_light_texture(128)
 	add_child(light)
 
+func _setup_tooltip() -> void:
+	%NameLabel.text = equipment_data.name
+	
+	var rarity_names = ["Common", "Uncommon", "Rare", "Epic", "Legendary"]
+	%RarityLabel.text = rarity_names[equipment_data.rarity]
+	
+	var rarity_colors = {
+		Equipment.Rarity.COMMON: Color(1, 1, 1),
+		Equipment.Rarity.UNCOMMON: Color(0.4, 1, 0.4),
+		Equipment.Rarity.RARE: Color(0.4, 0.6, 1),
+		Equipment.Rarity.EPIC: Color(0.9, 0.4, 1),
+		Equipment.Rarity.LEGENDARY: Color(1, 0.9, 0.4)
+	}
+	%RarityLabel.add_theme_color_override("font_color", rarity_colors[equipment_data.rarity])
+	
+	var stats_text = ""
+	for stat in equipment_data.stats:
+		var val = equipment_data.stats[stat]
+		var percent = int(val * 100)
+		stats_text += "+%d%% %s\n" % [percent, stat.replace("_", " ").capitalize()]
+	
+	%StatsLabel.text = stats_text.strip_edges()
+
 func _process(_delta: float) -> void:
 	if _player_in_range and equipment_data:
 		if Input.is_action_just_pressed("interact"):
@@ -64,14 +89,15 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		if equipment_data:
 			_player_in_range = body
-			# Tooltip será mostrado aqui na Fase 3
+			$Tooltip.show()
 		else:
-			# Auto-collect para itens de cura
 			_collect(body)
 
 func _on_body_exited(body: Node2D) -> void:
 	if body == _player_in_range:
 		_player_in_range = null
+		if has_node("Tooltip"):
+			$Tooltip.hide()
 
 func _collect(player: Node2D) -> void:
 	if equipment_data:
