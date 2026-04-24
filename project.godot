@@ -33,6 +33,10 @@ window/mode=3
 
 project/assembly_name="Wlademir Bizarre Adventures"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/gut/plugin.cfg")
+
 [input]
 
 move_right={
@@ -82,7 +86,3 @@ rendering_device/driver.windows="d3d12"
 2d/snap/snap_2d_vertices_to_pixel=true
 2d/size/mode=0
 2d/stretch/scale=1.0
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/gut/plugin.cfg")

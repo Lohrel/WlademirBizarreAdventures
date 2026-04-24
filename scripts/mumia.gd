@@ -18,15 +18,17 @@ func _perform_attack():
 	# A múmia para para lançar o projétil
 	velocity = Vector2.ZERO
 	
-	# Animação de ataque (se houver, senão usamos idle por um momento)
-	# Como não temos uma animação de "cast" específica no spritesheet de 6 frames,
-	# vamos usar o feedback visual de pulo ou apenas uma pausa.
+	# Telegraphing: Brilho antes de atirar
+	var tween = create_tween()
+	tween.tween_property(sprite, "modulate", Color(2, 2, 0), 0.4) # Amarelo brilhante
+	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.1)
+	
 	_visual_jump()
 	
-	# Espera um pequeno delay para "lançar"
-	await get_tree().create_timer(0.3).timeout
+	# Espera o delay de telegraphing
+	await get_tree().create_timer(0.5).timeout
 	
-	if player:
+	if is_instance_valid(self) and player:
 		var dir = (player.global_position - global_position).normalized()
 		var proj = projectile_scene.instantiate()
 		get_parent().add_child(proj)

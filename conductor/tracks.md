@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Refine Player combat mechanics and Enemy AI interactions**
+- [~] **Track: Refine Player combat mechanics and Enemy AI interactions**
   *Link: [./tracks/refine_combat_20260424/](./tracks/refine_combat_20260424/)*
