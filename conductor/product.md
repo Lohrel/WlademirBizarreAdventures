@@ -18,5 +18,7 @@ Wlademir's combat toolkit is versatile, allowing for multiple approaches:
 ## Core Resource Management
 Survival hinges on managing multiple critical resources simultaneously:
 - **Health and Mana:** Essential for combat and utilizing magical abilities.
-- **Inventory:** Managing collected items effectively.
+- **Inventory & Equipment:** A 5-slot equipment system (Boots, Gloves, Tunic, Hat, Ring) that allows players to customize Wlademir's build.
+  - **Procedural Loot:** Items drop with randomized, level-scaled stats.
+  - **Strategic Boosts:** Different slots provide specific advantages, such as movement speed, attack damage, or sunlight resistance.
 - **Time/Sunlight:** A ticking clock mechanic where spending too much time results in the dungeon ceiling collapsing, flooding all rooms with lethal sunlight.
