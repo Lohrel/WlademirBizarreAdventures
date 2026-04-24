@@ -1,10 +1,10 @@
 # Implementation Plan: Expand item drop system (Rarity, UI, Interaction)
 
 ## Phase 1: Rarity Data Structure & Generation
-- [ ] Task: Implement Rarity System
-    - [ ] Write Tests: Ensure `Equipment` resource handles rarity and `EquipmentGenerator` correctly scales stats based on rolled rarity.
-    - [ ] Implement Feature: Update `equipment.gd` with Rarity enum. Update `equipment_generator.gd` to assign rarity and scale stat values/counts accordingly.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Rarity Data Structure & Generation' (Protocol in workflow.md)
+- [x] Task: Implement Rarity System 7ae2e7c
+    - [x] Write Tests: Ensure `Equipment` resource handles rarity and `EquipmentGenerator` correctly scales stats based on rolled rarity.
+    - [x] Implement Feature: Update `equipment.gd` with Rarity enum. Update `equipment_generator.gd` to assign rarity and scale stat values/counts accordingly.
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Rarity Data Structure & Generation' (Protocol in workflow.md)
 
 ## Phase 2: Interactive Pickup & Visuals
 - [ ] Task: Implement Interact Action
