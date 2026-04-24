@@ -42,6 +42,7 @@ var _is_attacking: bool = false
 var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
+var sunlight_damage_reduction: float = 0.0
 
 # --- Inventário e Equipamento ---
 var equipment: Dictionary = {
@@ -104,6 +105,10 @@ func recalculate_stats() -> void:
 	_dash_speed = base_dash_speed
 	dash_mana_cost = base_dash_mana
 	dash_cooldown_time = base_dash_cooldown
+	
+	# Sunlight reduction calculation
+	var total_sun_reduction = 0.0
+	
 	var hand = get_node_or_null("garra_player/hand")
 	if hand:
 		hand.attack_damage = base_attack_damage
@@ -122,6 +127,7 @@ func recalculate_stats() -> void:
 						if hand: hand.attack_damage += bonus
 					"dash_mana_cost_reduction": dash_mana_cost -= bonus
 					"dash_cooldown_reduction": dash_cooldown_time -= bonus
+					"sunlight_damage_reduction": total_sun_reduction += bonus
 
 	# Clampa valores
 	health = min(health, max_health)
@@ -188,7 +194,10 @@ func _handle_environment(delta: float) -> void:
 	
 	# Aplica dano solar se exposto
 	if _in_sunlight:
-		take_damage(15.0 * delta)
+		var dmg = 15.0 * delta
+		# Reduz dano se tiver equipamento (ex: Hat)
+		dmg = max(0, dmg - (dmg * sunlight_damage_reduction))
+		take_damage(dmg)
 	
 	# Aplica regeneração passiva de vida
 	if health < max_health and passive_regen_percent > 0:
@@ -335,11 +344,11 @@ func update_hud() -> void:
 
 	var hud = get_parent().get_node_or_null("HUD")
 	if hud:
-		var health_bar = hud.get_node_or_null("Control/MarginContainer/VBoxContainer/HealthBar")
+		var health_bar = hud.get_node_or_null("Control/VBoxContainer/HealthBar")
 		if health_bar:
 			health_bar.max_value = max_health
 			health_bar.value = health
-		var mana_bar = hud.get_node_or_null("Control/MarginContainer/VBoxContainer/ManaBar")
+		var mana_bar = hud.get_node_or_null("Control/VBoxContainer/ManaBar")
 		if mana_bar:
 			mana_bar.max_value = max_mana
 			mana_bar.value = mana
@@ -351,7 +360,7 @@ func update_hud() -> void:
 		_update_equipment_slot_ui(hud, "Ring", Equipment.Slot.RING)
 
 func _update_equipment_slot_ui(hud: Node, slot_name: String, slot_enum: int) -> void:
-	var path = "Control/MarginContainer/VBoxContainer/EquipmentSlots/" + slot_name
+	var path = "Control/VBoxContainer/EquipmentSlots/" + slot_name
 	var slot_node = hud.get_node_or_null(path)
 	if slot_node and slot_node is TextureRect:
 		var item = equipment[slot_enum]
