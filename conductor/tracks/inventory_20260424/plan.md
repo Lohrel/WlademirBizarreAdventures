@@ -10,12 +10,12 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Item Data Structure and Generation' (Protocol in workflow.md)
 
 ## Phase 2: Player Inventory and Stat Hookup
-- [ ] Task: Inventory System
-    - [ ] Write Tests: Verify equipping, unequipping, and replacing items in the 5 slots.
-    - [ ] Implement Feature: Add an `Inventory` system to `player.gd` managing the 5 specific slots.
-- [ ] Task: Dynamic Stat Recalculation
-    - [ ] Write Tests: Verify player stats accurately reflect equipped item bonuses and base values.
-    - [ ] Implement Feature: Refactor player attributes to calculate final values dynamically from base + equipment modifiers.
+- [x] Task: Inventory System 642479c
+    - [x] Write Tests: Verify equipping, unequipping, and replacing items in the 5 slots.
+    - [x] Implement Feature: Add an `Inventory` system to `player.gd` managing the 5 specific slots.
+- [x] Task: Dynamic Stat Recalculation 642479c
+    - [x] Write Tests: Verify player stats accurately reflect equipped item bonuses and base values.
+    - [x] Implement Feature: Refactor player attributes to calculate final values dynamically from base + equipment modifiers.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Player Inventory and Stat Hookup' (Protocol in workflow.md)
 
 ## Phase 3: Drops and UI Integration
