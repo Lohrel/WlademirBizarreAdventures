@@ -10,14 +10,14 @@
     - [x] Implement Feature: Update claw attack animations, hitboxes, and particle effects.
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Player Movement and Melee Foundation' (Protocol in workflow.md)
 
-## Phase 2: Enemy AI and Telegraphing
+## Phase 2: Enemy AI and Telegraphing [checkpoint: f5514e2]
 - [x] Task: Refine Mummy AI 14e4511
     - [x] Write Tests: Mummy detection radius and projectile firing rate.
     - [x] Implement Feature: Update `mumia.gd` for clearer attack tells and smoother movement.
 - [x] Task: Refine Skeleton AI d877b75
     - [x] Write Tests: Skeleton melee range and engagement behavior.
     - [x] Implement Feature: Update `skeleton.gd` to improve pathfinding toward the player.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Enemy AI and Telegraphing' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Enemy AI and Telegraphing' (Protocol in workflow.md)
 
 ## Phase 3: Combat Integration and Polish
 - [ ] Task: Damage and Resource Hookup
