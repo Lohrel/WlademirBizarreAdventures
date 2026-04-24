@@ -361,4 +361,3 @@ func _on_hitbox_body_entered(body):
 		var tween = create_tween()
 		tween.tween_property(sprite, "modulate", Color(2, 2, 2), 0.05)
 		tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.05)
-late", Color(1, 1, 1), 0.05)
