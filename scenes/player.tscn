@@ -367,6 +367,20 @@ energy = 0.6
 texture_scale = 0.6
 
 [node name="BurnParticles" type="CPUParticles2D" parent="player" unique_id=11224455]
+emitting = false
+amount = 20
+lifetime = 0.4
+preprocess = 0.1
+speed_scale = 1.2
+emission_shape = 1
+emission_sphere_radius = 20.0
+gravity = Vector2(0, -100)
+damping_min = 10.0
+damping_max = 20.0
+scale_amount_min = 1.5
+scale_amount_max = 3.0
+scale_amount_curve = SubResource("Curve_Burn")
+color = Color(1, 0.6, 0.2, 1)
 
 [node name="garra_player" parent="player" unique_id=506683672 instance=ExtResource("3_qhqgy")]
 z_index = -1
