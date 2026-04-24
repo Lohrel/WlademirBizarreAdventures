@@ -300,8 +300,22 @@ func _spawn_drop():
 	var drop = item_drop_scene.instantiate()
 	get_parent().add_child(drop)
 	drop.global_position = global_position
-	
+
+	# 20% de chance de ser um equipamento em vez de cura padrão
+	if randf() < 0.2:
+		var gen = get_tree().root.find_child("LevelGenerator", true, false)
+		var level = 1
+		if gen and "current_level" in gen:
+			level = gen.current_level
+
+		# Carrega o gerador de equipamentos (ou usa o autoload se registrado)
+		var EquipmentGenerator = load("res://scripts/equipment_generator.gd").new()
+		var item = EquipmentGenerator.generate_item(level)
+		drop.equipment_data = item
+		EquipmentGenerator.free()
+
 	var jump_target = global_position + Vector2(randf_range(-25, 25), randf_range(-25, 25))
+
 	var tween = drop.create_tween()
 	tween.tween_property(drop, "global_position:y", global_position.y - 20, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	tween.tween_property(drop, "global_position:y", jump_target.y, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)

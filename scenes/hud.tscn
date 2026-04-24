@@ -55,3 +55,42 @@ layout_mode = 2
 theme_override_styles/fill = SubResource("StyleBoxFlat_mana")
 value = 100.0
 show_percentage = false
+
+[node name="EquipmentSlots" type="HBoxContainer" parent="Control/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Boots" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Gloves" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Tunic" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Hat" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Ring" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(16, 16)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5

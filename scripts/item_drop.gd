@@ -2,8 +2,15 @@ extends Area2D
 
 @export var item_name: String = "Placeholder Item"
 @export var heal_amount: float = 20.0
+@export var equipment_data: Equipment = null
 
 func _ready() -> void:
+	if equipment_data:
+		item_name = equipment_data.name
+		# Aqui poderíamos trocar o sprite do item pelo ícone do equipamento
+		if equipment_data.icon:
+			$Sprite2D.texture = equipment_data.icon
+	
 	# Conecta o sinal de entrada de corpo
 	body_entered.connect(_on_body_entered)
 	
@@ -17,13 +24,17 @@ func _on_body_entered(body: Node2D) -> void:
 		_collect(body)
 
 func _collect(player: Node2D) -> void:
-	# Para agora, apenas cura o jogador como exemplo de efeito
-	if player.has_method("heal"):
-		player.heal(heal_amount)
-	elif "health" in player:
-		player.health = min(player.health + heal_amount, player.max_health)
-		if player.has_method("update_hud"):
-			player.update_hud()
+	if equipment_data:
+		if player.has_method("equip_item"):
+			player.equip_item(equipment_data)
+	else:
+		# Para agora, apenas cura o jogador como exemplo de efeito
+		if player.has_method("heal"):
+			player.heal(heal_amount)
+		elif "health" in player:
+			player.health = min(player.health + heal_amount, player.max_health)
+			if player.has_method("update_hud"):
+				player.update_hud()
 	
 	# Efeito visual de coleta
 	var tween = create_tween()

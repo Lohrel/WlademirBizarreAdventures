@@ -334,12 +334,33 @@ func _die() -> void:
 	get_tree().root.add_child(ds)
 
 func update_hud() -> void:
+	if not is_instance_valid(self): return
+	
 	if has_node("HUD/Control/VBoxContainer/HealthBar"):
 		$HUD/Control/VBoxContainer/HealthBar.max_value = max_health
 		$HUD/Control/VBoxContainer/HealthBar.value = health
 	if has_node("HUD/Control/VBoxContainer/ManaBar"):
 		$HUD/Control/VBoxContainer/ManaBar.max_value = max_mana
 		$HUD/Control/VBoxContainer/ManaBar.value = mana
+		
+	# Atualiza slots de equipamento
+	_update_equipment_slot_ui("Boots", Equipment.Slot.BOOTS)
+	_update_equipment_slot_ui("Gloves", Equipment.Slot.GLOVES)
+	_update_equipment_slot_ui("Tunic", Equipment.Slot.TUNIC)
+	_update_equipment_slot_ui("Hat", Equipment.Slot.HAT)
+	_update_equipment_slot_ui("Ring", Equipment.Slot.RING)
+
+func _update_equipment_slot_ui(slot_name: String, slot_enum: int) -> void:
+	var path = "HUD/Control/VBoxContainer/EquipmentSlots/" + slot_name
+	if has_node(path):
+		var slot_node = get_node(path)
+		var item = equipment[slot_enum]
+		if item and item.icon:
+			slot_node.texture = item.icon
+			slot_node.modulate = Color(1, 1, 1, 1)
+		else:
+			slot_node.texture = null
+			slot_node.modulate = Color(1, 1, 1, 0.2)
 
 func _set_in_sunlight(is_in: bool) -> void:
 	if _in_sunlight != is_in:
