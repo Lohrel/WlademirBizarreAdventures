@@ -9,3 +9,6 @@
 ## Export Targets
 - **Web (HTML5/WebAssembly):** The game is configured for web deployment, ensuring accessibility directly through the browser.
 - **Desktop:** Standard executable export for PC.
+
+## Testing
+- **GUT (Godot Unit Test) v9.6.0:** Used for unit testing and ensuring gameplay mechanics (combat, movement, AI) remain robust during development.
