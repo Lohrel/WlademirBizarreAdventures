@@ -21,6 +21,14 @@ func _ready() -> void:
 		if equipment_data.icon:
 			$Sprite2D.texture = equipment_data.icon
 
+	# Conecta o sinal de entrada de corpo
+	body_entered.connect(_on_body_entered)
+	
+	# Pequena animação de flutuar
+	var tween = create_tween().set_loops()
+	tween.tween_property($Sprite2D, "position:y", -5, 0.6).set_trans(Tween.TRANS_SINE)
+	tween.tween_property($Sprite2D, "position:y", 5, 0.6).set_trans(Tween.TRANS_SINE)
+
 func _create_light_texture(size: int) -> GradientTexture2D:
 	var grad = Gradient.new()
 	grad.offsets = [0.0, 1.0]
@@ -33,14 +41,6 @@ func _create_light_texture(size: int) -> GradientTexture2D:
 	tex.width = size
 	tex.height = size
 	return tex
-	
-	# Conecta o sinal de entrada de corpo
-	body_entered.connect(_on_body_entered)
-	
-	# Pequena animação de flutuar
-	var tween = create_tween().set_loops()
-	tween.tween_property($Sprite2D, "position:y", -5, 0.6).set_trans(Tween.TRANS_SINE)
-	tween.tween_property($Sprite2D, "position:y", 5, 0.6).set_trans(Tween.TRANS_SINE)
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
