@@ -1,8 +1,8 @@
 # Implementation Plan: Refine Player combat mechanics and Enemy AI interactions
 
 ## Phase 1: Player Movement and Melee Foundation
-- [ ] Task: Set up unit testing framework for Godot GDScript (if not present).
-- [ ] Task: Refine Player Dash
+- [x] Task: Set up unit testing framework for Godot GDScript (if not present). ddc9bdf
+- [~] Task: Refine Player Dash
     - [ ] Write Tests: Dash speed, distance, and invincibility frames.
     - [ ] Implement Feature: Update `player.gd` and `player.tscn` to adjust dash mechanics.
 - [ ] Task: Polish Melee Attack (Claws)
