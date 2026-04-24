@@ -23,6 +23,7 @@ corner_radius_top_left = 2
 corner_radius_top_right = 2
 corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
+
 [node name="HUD" type="CanvasLayer"]
 
 [node name="Control" type="Control" parent="."]
@@ -34,6 +35,14 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
+[node name="Background" type="ColorRect" parent="Control"]
+layout_mode = 0
+offset_left = 5.0
+offset_top = 5.0
+offset_right = 120.0
+offset_bottom = 55.0
+color = Color(0, 0, 0, 0.4)
+
 [node name="VBoxContainer" type="VBoxContainer" parent="Control"]
 layout_mode = 0
 offset_left = 10.0
@@ -41,7 +50,6 @@ offset_top = 10.0
 offset_right = 110.0
 offset_bottom = 50.0
 theme_override_constants/separation = 4
-
 
 [node name="HealthBar" type="ProgressBar" parent="Control/VBoxContainer"]
 unique_name_in_owner = true
@@ -63,37 +71,32 @@ show_percentage = false
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Boots" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+[node name="Boots" type="ColorRect" parent="Control/VBoxContainer/EquipmentSlots"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
+color = Color(1, 1, 1, 0.2)
 
-[node name="Gloves" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+[node name="Gloves" type="ColorRect" parent="Control/VBoxContainer/EquipmentSlots"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
+color = Color(1, 1, 1, 0.2)
 
-[node name="Tunic" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+[node name="Tunic" type="ColorRect" parent="Control/VBoxContainer/EquipmentSlots"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
+color = Color(1, 1, 1, 0.2)
 
-[node name="Hat" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+[node name="Hat" type="ColorRect" parent="Control/VBoxContainer/EquipmentSlots"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
+color = Color(1, 1, 1, 0.2)
 
-[node name="Ring" type="TextureRect" parent="Control/VBoxContainer/EquipmentSlots"]
+[node name="Ring" type="ColorRect" parent="Control/VBoxContainer/EquipmentSlots"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
-expand_mode = 1
-stretch_mode = 5
+color = Color(1, 1, 1, 0.2)
