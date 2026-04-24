@@ -83,3 +83,8 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 			var cam = get_viewport().get_camera_2d()
 			if cam and cam.has_method("shake"):
 				cam.shake(3.0)
+				
+			# Hit Stop (Freeze frame)
+			Engine.time_scale = 0.05
+			await get_tree().create_timer(0.05 * Engine.time_scale).timeout
+			Engine.time_scale = 1.0
