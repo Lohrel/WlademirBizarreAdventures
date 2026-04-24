@@ -1,4 +1,4 @@
-# Track inventory_20260424 Context
+# Track tooltip_polish_20260424 Context
 
 - [Specification](./spec.md)
 - [Implementation Plan](./plan.md)
