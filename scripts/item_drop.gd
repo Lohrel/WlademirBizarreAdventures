@@ -4,30 +4,48 @@ extends Area2D
 @export var heal_amount: float = 20.0
 @export var equipment_data: Equipment = null
 
+var _player_in_range: Node2D = null
+
 func _ready() -> void:
 	if equipment_data:
 		item_name = equipment_data.name
-		self_modulate = Color(1.5, 0.2, 2.5) # Roxo vibrante (HDR)
-		
-		# Adiciona uma luz púrpura pequena se for equipamento
-		var light = PointLight2D.new()
-		light.color = Color(0.8, 0.2, 1.0)
-		light.energy = 0.5
-		light.texture_scale = 0.3
-		light.texture = _create_light_texture(64)
-		add_child(light)
-		
+		_setup_rarity_visuals()
 		print("DEBUG: Spawned equipment drop: ", item_name)
 		if equipment_data.icon:
 			$Sprite2D.texture = equipment_data.icon
-
-	# Conecta o sinal de entrada de corpo
+	
+	# Conecta os sinais de entrada e saída
 	body_entered.connect(_on_body_entered)
+	body_exited.connect(_on_body_exited)
 	
 	# Pequena animação de flutuar
 	var tween = create_tween().set_loops()
 	tween.tween_property($Sprite2D, "position:y", -5, 0.6).set_trans(Tween.TRANS_SINE)
 	tween.tween_property($Sprite2D, "position:y", 5, 0.6).set_trans(Tween.TRANS_SINE)
+
+func _setup_rarity_visuals() -> void:
+	var rarity_colors = {
+		Equipment.Rarity.COMMON: Color(1, 1, 1),
+		Equipment.Rarity.UNCOMMON: Color(0.2, 1, 0.2),
+		Equipment.Rarity.RARE: Color(0.2, 0.4, 1),
+		Equipment.Rarity.EPIC: Color(0.8, 0.2, 1),
+		Equipment.Rarity.LEGENDARY: Color(1, 0.8, 0.2)
+	}
+	var color = rarity_colors[equipment_data.rarity]
+	self_modulate = color * 1.5 # Brilho HDR
+	
+	# Adiciona uma luz com a cor da raridade
+	var light = PointLight2D.new()
+	light.color = color
+	light.energy = 0.6
+	light.texture_scale = 0.4
+	light.texture = _create_light_texture(128)
+	add_child(light)
+
+func _process(_delta: float) -> void:
+	if _player_in_range and equipment_data:
+		if Input.is_action_just_pressed("interact"):
+			_collect(_player_in_range)
 
 func _create_light_texture(size: int) -> GradientTexture2D:
 	var grad = Gradient.new()
@@ -44,14 +62,22 @@ func _create_light_texture(size: int) -> GradientTexture2D:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		_collect(body)
+		if equipment_data:
+			_player_in_range = body
+			# Tooltip será mostrado aqui na Fase 3
+		else:
+			# Auto-collect para itens de cura
+			_collect(body)
+
+func _on_body_exited(body: Node2D) -> void:
+	if body == _player_in_range:
+		_player_in_range = null
 
 func _collect(player: Node2D) -> void:
 	if equipment_data:
 		if player.has_method("equip_item"):
 			player.equip_item(equipment_data)
 	else:
-		# Para agora, apenas cura o jogador como exemplo de efeito
 		if player.has_method("heal"):
 			player.heal(heal_amount)
 		elif "health" in player:

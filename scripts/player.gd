@@ -102,6 +102,13 @@ func _ready() -> void:
 	if get_parent():
 		_hud_node = get_parent().get_node_or_null("HUD")
 	
+	# Registra ação de interação se não existir
+	if not InputMap.has_action("interact"):
+		InputMap.add_action("interact")
+		var event = InputEventKey.new()
+		event.keycode = KEY_E
+		InputMap.action_add_event("interact", event)
+	
 	$PlayerLight.texture = _create_light_texture(256)
 	update_hud()
 
