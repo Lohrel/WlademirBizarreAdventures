@@ -19,10 +19,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Player Inventory and Stat Hookup' (Protocol in workflow.md)
 
 ## Phase 3: Drops and UI Integration
-- [ ] Task: Equipment Drops
-    - [ ] Write Tests: Verify enemies drop equipment and the player can pick them up.
-    - [ ] Implement Feature: Update `item_drop.tscn` to handle equipment and update enemy loot tables.
-- [ ] Task: Inventory UI
-    - [ ] Write Tests: Verify UI slots correctly display equipped items.
-    - [ ] Implement Feature: Update `hud.tscn` to visually represent the 5 equipment slots and allow basic interaction (viewing/equipping).
+- [x] Task: Equipment Drops e614c35
+    - [x] Write Tests: Verify enemies drop equipment and the player can pick them up.
+    - [x] Implement Feature: Update `item_drop.tscn` to handle equipment and update enemy loot tables.
+- [x] Task: Inventory UI e614c35
+    - [x] Write Tests: Verify UI slots correctly display equipped items.
+    - [x] Implement Feature: Update `hud.tscn` to visually represent the 5 equipment slots and allow basic interaction (viewing/equipping).
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Drops and UI Integration' (Protocol in workflow.md)
