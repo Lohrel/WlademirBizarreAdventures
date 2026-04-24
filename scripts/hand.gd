@@ -86,5 +86,5 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 				
 			# Hit Stop (Freeze frame)
 			Engine.time_scale = 0.05
-			await get_tree().create_timer(0.1, true, false, true).timeout
+			await get_tree().create_timer(0.05, true, false, true).timeout
 			Engine.time_scale = 1.0
