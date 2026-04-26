@@ -58,7 +58,8 @@ func _impact_visual():
 	get_parent().add_child(spark)
 	spark.global_position = global_position
 	
-	var tween = create_tween()
+	# Create tween bound to the spark node so it survives bullet deletion
+	var tween = spark.create_tween()
 	tween.tween_property(sprite, "scale", Vector2(0.1, 0.1), 0.1)
 	tween.tween_property(sprite, "modulate:a", 0.0, 0.1)
 	tween.finished.connect(spark.queue_free)
