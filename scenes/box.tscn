@@ -32,5 +32,4 @@ visible = false
 shape = SubResource("RectangleShape2D_1")
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="." unique_id=549112390]
-visible = false
 occluder = SubResource("OccluderPolygon2D_1")
