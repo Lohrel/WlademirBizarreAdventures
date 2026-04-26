@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://dtu0872usqvw"]
+[gd_scene load_steps=9 format=3]
 
-[ext_resource type="Script" uid="uid://ds33nxcfgx7ww" path="res://scripts/mumia.gd" id="1_dtdj1"]
-[ext_resource type="Texture2D" uid="uid://sysq5q58jsb4" path="res://assets/sprites/bandido_arma/bandido_arma_spritesheet.png" id="2_dtdj1"]
+[ext_resource type="Script" path="res://scripts/bandido_arma.gd" id="1_bandido_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bandido_arma/bandido_arma_spritesheet.png" id="2_bandido_sprite"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
 length = 0.001
@@ -54,7 +54,7 @@ tracks/0/keys = {
 "values": [3, 4, 5]
 }
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_skel"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bandido"]
 _data = {
 &"RESET": SubResource("Animation_qco4w"),
 &"idle": SubResource("Animation_idle"),
@@ -67,67 +67,63 @@ radius = 8.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 18.0
-
-[node name="bandido_arma" type="CharacterBody2D" unique_id=804358572]
+[node name="BandidoArma" type="CharacterBody2D" unique_id=904358572]
 collision_mask = 3
-script = ExtResource("1_dtdj1")
+script = ExtResource("1_bandido_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=580403191]
-texture = ExtResource("2_dtdj1")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=680403191]
+texture = ExtResource("2_bandido_sprite")
 hframes = 3
 vframes = 2
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2103828038]
-libraries/ = SubResource("AnimationLibrary_skel")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=3103828038]
+libraries/ = SubResource("AnimationLibrary_bandido")
 autoplay = &"idle"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1558247494]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1658247494]
 visible = false
 shape = SubResource("CircleShape2D_phys")
 
-[node name="Hurtbox" type="Area2D" parent="." unique_id=910886390]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=920886390]
 unique_name_in_owner = true
 visible = false
 collision_layer = 8
 collision_mask = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=981760755]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=991760755]
 shape = SubResource("CircleShape2D_hurt")
 
-[node name="DetectionArea" type="Area2D" parent="." unique_id=1851027474]
+[node name="DetectionArea" type="Area2D" parent="." unique_id=1951027474]
 visible = false
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1662143031]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1762143031]
 visible = false
-scale = Vector2(12, 12)
+scale = Vector2(15, 15)
 shape = SubResource("CircleShape2D_hurt")
 
-[node name="RayCast2D" type="RayCast2D" parent="." unique_id=1915289275]
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=2015289275]
 visible = false
 target_position = Vector2(0, 0)
 
-[node name="RayLeft" type="RayCast2D" parent="." unique_id=1273825642]
+[node name="RayLeft" type="RayCast2D" parent="." unique_id=1373825642]
 visible = false
 target_position = Vector2(-20, -20)
 
-[node name="RayRight" type="RayCast2D" parent="." unique_id=197828789]
+[node name="RayRight" type="RayCast2D" parent="." unique_id=207828789]
 visible = false
 target_position = Vector2(20, -20)
 
-[node name="Hitbox" type="Area2D" parent="." unique_id=1040153149]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1140153149]
 visible = false
 collision_layer = 16
 collision_mask = 2
 monitoring = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=327567472]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=427567472]
 visible = false
-shape = SubResource("CircleShape2D_hitbox")
 
-[node name="AttackTimer" type="Timer" parent="." unique_id=264014608]
-wait_time = 1.2
+[node name="AttackTimer" type="Timer" parent="." unique_id=364014608]
+wait_time = 4.0
 one_shot = true
