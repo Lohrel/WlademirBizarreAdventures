@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://dq7vkqodlkx7a"]
+[gd_scene load_steps=13 format=3 uid="uid://dq7vkqodlkx7a"]
 
 [ext_resource type="Script" uid="uid://bgb2hj1pa4iei" path="res://scripts/room.gd" id="1_gw2vq"]
 [ext_resource type="AudioStream" uid="uid://24q5ojik8is8" path="res://assets/sounds/Sun.wav" id="2_85yof"]
-[ext_resource type="AudioStream" uid="uid://cd2r0qsy4nvo3" path="res://assets/sounds/WindyNight.wav" id="2_ffxv4"]
+[ext_resource type="AudioStream" uid="uid://cd2r0qsy4nvo3" path="res://assets/sounds/WindyNight.wav" id="3_ffxv4"]
 [ext_resource type="AudioStream" uid="uid://ctrf26bem8y3m" path="res://assets/sounds/Cave.wav" id="4_14vil"]
+[ext_resource type="TileSet" uid="uid://dknoycye6hjt4" path="res://assets/sprites/tile_map/tilemap_teste.tres" id="5_tileset"]
 
 [sub_resource type="Gradient" id="Gradient_1"]
 offsets = PackedFloat32Array(0, 0.4, 0.8, 1)
@@ -31,25 +32,25 @@ size = Vector2(160, 20)
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_WallHoriz"]
 polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_Door"]
-size = Vector2(80, 20)
-
-[sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_DoorHoriz"]
-polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_Room"]
 size = Vector2(400, 400)
 
 [node name="Room" type="Node2D" unique_id=1302318825]
 script = ExtResource("1_gw2vq")
 
-[node name="Floor" type="ColorRect" parent="." unique_id=1139661807]
-z_index = -1
-offset_left = -200.0
-offset_top = -200.0
-offset_right = 200.0
-offset_bottom = 200.0
-color = Color(0.6368613, 0.49854672, 0.34870586, 1)
+[node name="TileMap" type="TileMap" parent="." unique_id=1139661807]
+scale = Vector2(2, 2)
+tile_set = ExtResource("5_tileset")
+format = 2
+layer_0/name = "Floor"
+layer_0/z_index = -2
+layer_1/name = "Walls"
+layer_1/enabled = true
+layer_1/modulate = Color(1, 1, 1, 1)
+layer_1/y_sort_enabled = false
+layer_1/y_sort_origin = 0
+layer_1/z_index = 0
+layer_1/tile_data = PackedInt32Array()
 
 [node name="Sunlight" type="PointLight2D" parent="." unique_id=1108759850]
 color = Color(1, 0.901961, 0.470588, 1)
@@ -108,7 +109,7 @@ scale_amount_max = 1.2
 color = Color(0.7, 0.8, 1, 0.3)
 
 [node name="MoonlightAudio" type="AudioStreamPlayer2D" parent="Moonlight" unique_id=1816263861]
-stream = ExtResource("2_ffxv4")
+stream = ExtResource("3_ffxv4")
 max_distance = 600.0
 panning_strength = 2.0
 
@@ -143,14 +144,6 @@ texture_scale = 2.0
 [node name="Walls" type="Node2D" parent="." unique_id=260623342]
 
 [node name="WallNorthLeft" type="StaticBody2D" parent="Walls" unique_id=2067134689]
-position = Vector2(-120, -190)
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallNorthLeft" unique_id=1398325033]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallNorthLeft" unique_id=1381305813]
 shape = SubResource("RectangleShape2D_Wall")
@@ -159,14 +152,6 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallNorthRight" type="StaticBody2D" parent="Walls" unique_id=982135275]
-position = Vector2(120, -190)
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallNorthRight" unique_id=848145623]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallNorthRight" unique_id=1971750981]
 shape = SubResource("RectangleShape2D_Wall")
@@ -175,14 +160,6 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallSouthLeft" type="StaticBody2D" parent="Walls" unique_id=1606292879]
-position = Vector2(-120, 190)
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallSouthLeft" unique_id=1957334027]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallSouthLeft" unique_id=2124685517]
 shape = SubResource("RectangleShape2D_Wall")
@@ -191,14 +168,6 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallSouthRight" type="StaticBody2D" parent="Walls" unique_id=586173586]
-position = Vector2(120, 190)
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallSouthRight" unique_id=1940919457]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallSouthRight" unique_id=958300618]
 shape = SubResource("RectangleShape2D_Wall")
@@ -207,15 +176,7 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallEastTop" type="StaticBody2D" parent="Walls" unique_id=1029205819]
-position = Vector2(190, -120)
 rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallEastTop" unique_id=27402575]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallEastTop" unique_id=756419829]
 shape = SubResource("RectangleShape2D_Wall")
@@ -224,15 +185,7 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallEastBottom" type="StaticBody2D" parent="Walls" unique_id=1189131567]
-position = Vector2(190, 120)
 rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallEastBottom" unique_id=558456222]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallEastBottom" unique_id=1330425134]
 shape = SubResource("RectangleShape2D_Wall")
@@ -241,15 +194,7 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallWestTop" type="StaticBody2D" parent="Walls" unique_id=2061758492]
-position = Vector2(-190, -120)
 rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallWestTop" unique_id=55149260]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallWestTop" unique_id=561452326]
 shape = SubResource("RectangleShape2D_Wall")
@@ -258,15 +203,7 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="WallWestBottom" type="StaticBody2D" parent="Walls" unique_id=534819973]
-position = Vector2(-190, 120)
 rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="Walls/WallWestBottom" unique_id=769134297]
-offset_left = -80.0
-offset_top = -10.0
-offset_right = 80.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Walls/WallWestBottom" unique_id=296593806]
 shape = SubResource("RectangleShape2D_Wall")
@@ -275,70 +212,36 @@ shape = SubResource("RectangleShape2D_Wall")
 occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="DoorNorth" type="StaticBody2D" parent="." unique_id=1909234650]
-position = Vector2(0, -190)
-
-[node name="ColorRect" type="ColorRect" parent="DoorNorth" unique_id=760639742]
-offset_left = -40.0
-offset_top = -10.0
-offset_right = 40.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DoorNorth" unique_id=1314792308]
-shape = SubResource("RectangleShape2D_Door")
+shape = SubResource("RectangleShape2D_Wall")
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="DoorNorth" unique_id=1770473471]
-occluder = SubResource("OccluderPolygon2D_DoorHoriz")
+occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="DoorSouth" type="StaticBody2D" parent="." unique_id=1180434902]
-position = Vector2(0, 190)
-
-[node name="ColorRect" type="ColorRect" parent="DoorSouth" unique_id=225430984]
-offset_left = -40.0
-offset_top = -10.0
-offset_right = 40.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DoorSouth" unique_id=1465146958]
-shape = SubResource("RectangleShape2D_Door")
+shape = SubResource("RectangleShape2D_Wall")
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="DoorSouth" unique_id=1325323953]
-occluder = SubResource("OccluderPolygon2D_DoorHoriz")
+occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="DoorEast" type="StaticBody2D" parent="." unique_id=1646932253]
-position = Vector2(190, 0)
-rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="DoorEast" unique_id=991657053]
-offset_left = -40.0
-offset_top = -10.0
-offset_right = 40.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DoorEast" unique_id=1496176516]
-shape = SubResource("RectangleShape2D_Door")
+shape = SubResource("RectangleShape2D_Wall")
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="DoorEast" unique_id=209254422]
-occluder = SubResource("OccluderPolygon2D_DoorHoriz")
+occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="DoorWest" type="StaticBody2D" parent="." unique_id=1492745992]
-position = Vector2(-190, 0)
-rotation = 1.5708
-
-[node name="ColorRect" type="ColorRect" parent="DoorWest" unique_id=679023419]
-offset_left = -40.0
-offset_top = -10.0
-offset_right = 40.0
-offset_bottom = 10.0
-color = Color(0.28, 0.22, 0.15, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DoorWest" unique_id=919347353]
-shape = SubResource("RectangleShape2D_Door")
+shape = SubResource("RectangleShape2D_Wall")
 
 [node name="LightOccluder2D" type="LightOccluder2D" parent="DoorWest" unique_id=623641146]
-occluder = SubResource("OccluderPolygon2D_DoorHoriz")
+occluder = SubResource("OccluderPolygon2D_WallHoriz")
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=648828358]
 stream = ExtResource("4_14vil")

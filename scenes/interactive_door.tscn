@@ -3,13 +3,13 @@
 [ext_resource type="Script" uid="uid://d3v8y6p4m2j7w" path="res://scripts/interactive_door.gd" id="1_door"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_Door"]
-size = Vector2(80, 20)
+size = Vector2(64, 32)
 
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_DoorHoriz"]
-polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+polygon = PackedVector2Array(-32, -16, 32, -16, 32, 16, -32, 16)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_Detection"]
-size = Vector2(100, 60)
+size = Vector2(96, 96)
 
 [sub_resource type="LabelSettings" id="LabelSettings_Interact"]
 font_size = 12
@@ -20,10 +20,10 @@ outline_color = Color(0, 0, 0, 1)
 script = ExtResource("1_door")
 
 [node name="ColorRect" type="ColorRect" parent="."]
-offset_left = -40.0
-offset_top = -10.0
-offset_right = 40.0
-offset_bottom = 10.0
+offset_left = -32.0
+offset_top = -16.0
+offset_right = 32.0
+offset_bottom = 16.0
 color = Color(0.4, 0.3, 0.2, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

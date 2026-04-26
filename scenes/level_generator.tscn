@@ -17,5 +17,4 @@ color = Color(0.15, 0.15, 0.2, 1)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = true
-position_smoothing_enabled = true
 script = ExtResource("5_camera")

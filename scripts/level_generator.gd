@@ -59,42 +59,110 @@ func generate_new_level() -> void:
 	# Redefine o jogador para a posição inicial
 	_spawn_or_reset_player()
 
-## Usa um algoritmo de "random walk" para gerar o layout das salas.
+## Usa um algoritmo de "Corridor Skeleton" para gerar o layout.
+## Corredores formam uma rede (em coordenadas ímpares) e salas surgem como "apêndices" (dead ends).
 func _generate_map_layout() -> void:
-	var current_position = Vector2i(0, 0)
+	var current_hub = Vector2i(1, 1) # Começa em coordenada ímpar (hub)
+	map_data[current_hub] = {"type": "corridor"}
 	
-	map_data[current_position] = {"type": "start"}
-	
-	var rooms_created = 1
 	var directions = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
 	
-	while rooms_created < max_rooms:
+	# 1. Gera o Esqueleto de Corredores (Random Walk entre Hubs)
+	var skeleton_steps = max_rooms * 2
+	for i in range(skeleton_steps):
 		var dir = directions.pick_random()
-		current_position += dir
+		var connector = current_hub + dir
+		var next_hub = current_hub + dir * 2
 		
-		if not map_data.has(current_position):
-			map_data[current_position] = {"type": "normal"}
-			rooms_created += 1
+		# Marca o conector e o próximo hub como corredores
+		map_data[connector] = {"type": "corridor"}
+		map_data[next_hub] = {"type": "corridor"}
+		current_hub = next_hub
 	
-	# Designa a sala mais distante como a sala do Chefe
-	var furthest_pos = Vector2i.ZERO
-	var max_dist = 0
+	# 2. Anexa Salas ao Esqueleto
+	var rooms_created = 0
+	var corridor_keys = map_data.keys()
+	corridor_keys.shuffle()
+	
+	for pos in corridor_keys:
+		if rooms_created >= max_rooms: break
+		
+		var neighbors = directions.duplicate()
+		neighbors.shuffle()
+		
+		for dir in neighbors:
+			var room_pos = pos + dir
+			# Regra: Salas apenas em (par, par) para manter o grid limpo
+			if abs(room_pos.x) % 2 == 0 and abs(room_pos.y) % 2 == 0:
+				if not map_data.has(room_pos):
+					map_data[room_pos] = {"type": "normal"}
+					rooms_created += 1
+					if rooms_created >= max_rooms: break
+	
+	# 3. Garante salas mínimas (Início e Chefe)
+	if rooms_created < 2:
+		# Fallback: Tenta converter qualquer spot válido
+		for x in range(-10, 11, 2):
+			for y in range(-10, 11, 2):
+				var p = Vector2i(x, y)
+				if not map_data.has(p):
+					map_data[p] = {"type": "normal"}
+					rooms_created += 1
+					# Conecta ao esqueleto
+					for d in directions:
+						map_data[p+d] = {"type": "corridor"}
+				if rooms_created >= 2: break
+			if rooms_created >= 2: break
+
+	# 4. Designa Início e Chefe
+	var room_positions = []
 	for pos in map_data.keys():
-		var dist = abs(pos.x) + abs(pos.y)
+		if map_data[pos]["type"] == "normal":
+			room_positions.append(pos)
+	
+	# Início: a primeira sala encontrada
+	var start_pos = room_positions[0]
+	map_data[start_pos]["type"] = "start"
+	
+	# Chefe: a sala mais distante do início
+	var furthest_pos = start_pos
+	var max_dist = 0
+	for pos in room_positions:
+		var dist = (pos - start_pos).length_squared()
 		if dist > max_dist:
 			max_dist = dist
 			furthest_pos = pos
-	
 	map_data[furthest_pos]["type"] = "boss"
 	
-	# Atribui larguras para colunas e alturas para linhas baseadas nas salas
+	# 5. Define dimensões dinâmicas baseadas na presença de salas
+	var room_cols = {}
+	var room_rows = {}
+	var min_x = 0
+	var max_x = 0
+	var min_y = 0
+	var max_y = 0
+	
 	for pos in map_data.keys():
-		if not col_widths.has(pos.x):
-			col_widths[pos.x] = [300, 400, 600, 800].pick_random()
-		if not row_heights.has(pos.y):
-			row_heights[pos.y] = [300, 400, 600, 800].pick_random()
-		
-		# Salva o tamanho final na sala
+		if map_data[pos]["type"] != "corridor":
+			room_cols[pos.x] = true
+			room_rows[pos.y] = true
+		min_x = min(min_x, pos.x)
+		max_x = max(max_x, pos.x)
+		min_y = min(min_y, pos.y)
+		max_y = max(max_y, pos.y)
+	
+	# Preenche todas as colunas e linhas no intervalo (incluindo 0)
+	for x in range(min_x, max_x + 1):
+		col_widths[x] = 12 * 32 if room_cols.has(x) else 4 * 32
+	
+	for y in range(min_y, max_y + 1):
+		if room_rows.has(y):
+			row_heights[y] = [12, 18, 24].pick_random() * 32
+		else:
+			row_heights[y] = 6 * 32
+			
+	# Atualiza o tamanho em map_data usando os valores finais
+	for pos in map_data.keys():
 		map_data[pos]["size"] = Vector2(col_widths[pos.x], row_heights[pos.y])
 
 ## Instancia as cenas das salas e as conecta.
@@ -132,9 +200,19 @@ func _build_world_visuals() -> void:
 			is_open = randf() < 0.3
 
 		# Calcula a quantidade modular de inimigos baseada no nível
-		# Nível 1: 0-2 inimigos, Nível 2: 1-3, etc.
-		var min_enemies = clampi(current_level - 1, 0, 5)
-		var max_enemies = clampi(current_level + 1, 1, 8)
+		var min_enemies = 0
+		var max_enemies = 0
+		
+		# Salas de início e corredores (opcional) não devem ter inimigos ou ter quantidade reduzida
+		if room_info["type"] == "normal" or room_info["type"] == "boss":
+			min_enemies = clampi(current_level - 1, 0, 5)
+			max_enemies = clampi(current_level + 1, 1, 8)
+		elif room_info["type"] == "corridor":
+			min_enemies = 0
+			max_enemies = 1 # Lightly populated corridors
+		elif room_info["type"] == "start":
+			min_enemies = 0
+			max_enemies = 0 # No enemies in start room
 
 		# Configura o tamanho, visuais, conexões e inimigos da sala
 		room_instance.setup_room_ext(room_info["size"], has_n, has_s, has_e, has_w, is_open, 
@@ -198,12 +276,26 @@ func _spawn_or_reset_player() -> void:
 		player_node.name = "Player"
 		add_child(player_node)
 	
+	# Encontra a posição física da sala "start"
+	var start_grid_pos = Vector2i.ZERO
+	for pos in map_data.keys():
+		if map_data[pos]["type"] == "start":
+			start_grid_pos = pos
+			break
+			
+	var world_pos = _get_physical_position(start_grid_pos)
+	
 	# Redefine a posição raiz
-	player_node.position = Vector2.ZERO
+	player_node.position = world_pos
 	
 	# Redefine a posição interna do CharacterBody2D
 	if player_node.has_node("player"):
 		player_node.get_node("player").position = Vector2.ZERO
+		
+	# Avisa a câmera para dar "snap" e evitar o deslizamento inicial
+	var cam = get_node_or_null("Camera2D")
+	if cam and cam.has_method("snap_to_player"):
+		cam.snap_to_player()
 
 # --- Manipuladores de Sinais ---
 
