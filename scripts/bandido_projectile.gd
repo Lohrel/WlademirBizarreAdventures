@@ -27,7 +27,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if body == source:
 		return
 	
-	if body.has_method("take_damage"):
+	if body.is_in_group("player") and body.has_method("take_damage"):
 		body.take_damage(damage)
 	
 	_impact_visual()
@@ -37,9 +37,13 @@ func _on_area_entered(area: Area2D) -> void:
 	if area.owner == source:
 		return
 	
-	if area.is_in_group("destructible") or area.name == "Hurtbox":
-		if area.owner.has_method("take_damage"):
+	if area.name == "Hurtbox":
+		if area.owner.is_in_group("player") and area.owner.has_method("take_damage"):
 			area.owner.take_damage(damage)
+		_impact_visual()
+		queue_free()
+	elif area.is_in_group("destructible"):
+		# Impact visual but don't damage (don't break boxes)
 		_impact_visual()
 		queue_free()
 
