@@ -1,7 +1,7 @@
-[gd_scene format=3 uid="uid://douynn4crkd7u"]
+[gd_scene load_steps=9 format=3]
 
-[ext_resource type="Script" uid="uid://ds33nxcfgx7ww" path="res://scripts/mumia.gd" id="1_dc04r"]
-[ext_resource type="Texture2D" uid="uid://ccsil8hoxohrx" path="res://assets/sprites/bandido_faca/bandido_faca_spritesheet.png" id="2_dc04r"]
+[ext_resource type="Script" path="res://scripts/bandido_faca.gd" id="1_bandido_faca_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/bandido_faca/bandido_faca_spritesheet.png" id="2_bandido_faca_sprite"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
 length = 0.001
@@ -17,33 +17,27 @@ tracks/0/keys = {
 "update": 1,
 "values": [0]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:centered")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+
+[sub_resource type="Animation" id="Animation_idle"]
+resource_name = "idle"
+length = 0.6
+loop_mode = 1
+step = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [true]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:offset")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
+"values": [0, 1, 2]
 }
 
-[sub_resource type="Animation" id="Animation_wjpdy"]
-resource_name = "attack"
+[sub_resource type="Animation" id="Animation_walk"]
+resource_name = "walk"
 length = 0.3
 loop_mode = 1
 step = 0.1
@@ -57,122 +51,13 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.1, 0.2),
 "transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [6, 7, 8]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:centered")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0.29406834),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:offset")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0.023980891),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-
-[sub_resource type="Animation" id="Animation_idle"]
-resource_name = "idle"
-length = 0.1
-loop_mode = 1
-step = 0.2
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(-0.4),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [0]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:offset")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:centered")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-
-[sub_resource type="Animation" id="Animation_walk"]
-resource_name = "walk"
-length = 0.6
-loop_mode = 1
-step = 0.2
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:frame")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0.012005043, 0.2, 0.3),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 1,
 "values": [3, 4, 5]
 }
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Sprite2D:centered")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [true]
-}
-tracks/2/type = "value"
-tracks/2/imported = false
-tracks/2/enabled = true
-tracks/2/path = NodePath("Sprite2D:offset")
-tracks/2/interp = 1
-tracks/2/loop_wrap = true
-tracks/2/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector2(0, 0)]
-}
 
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_skel"]
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_bandido"]
 _data = {
 &"RESET": SubResource("Animation_qco4w"),
-&"attack": SubResource("Animation_wjpdy"),
-&"idle": SubResource("Animation_idle"),
+&&"idle": SubResource("Animation_idle"),
 &"walk": SubResource("Animation_walk")
 }
 
@@ -182,67 +67,63 @@ radius = 8.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 18.0
-
-[node name="bandido_faca" type="CharacterBody2D" unique_id=804358572]
+[node name="BandidoFaca" type="CharacterBody2D" unique_id=904358573]
 collision_mask = 3
-script = ExtResource("1_dc04r")
+script = ExtResource("1_bandido_faca_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=580403191]
-texture = ExtResource("2_dc04r")
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=680403192]
+texture = ExtResource("2_bandido_faca_sprite")
 hframes = 3
-vframes = 3
+vframes = 2
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2103828038]
-libraries/ = SubResource("AnimationLibrary_skel")
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=3103828039]
+libraries/ = SubResource("AnimationLibrary_bandido")
 autoplay = &"idle"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1558247494]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1658247495]
 visible = false
 shape = SubResource("CircleShape2D_phys")
 
-[node name="Hurtbox" type="Area2D" parent="." unique_id=910886390]
+[node name="Hurtbox" type="Area2D" parent="." unique_id=920886391]
 unique_name_in_owner = true
 visible = false
 collision_layer = 8
 collision_mask = 4
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=981760755]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=991760756]
 shape = SubResource("CircleShape2D_hurt")
 
-[node name="DetectionArea" type="Area2D" parent="." unique_id=1851027474]
+[node name="DetectionArea" type="Area2D" parent="." unique_id=1951027475]
 visible = false
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1662143031]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DetectionArea" unique_id=1762143032]
 visible = false
 scale = Vector2(12, 12)
 shape = SubResource("CircleShape2D_hurt")
 
-[node name="RayCast2D" type="RayCast2D" parent="." unique_id=1915289275]
+[node name="RayCast2D" type="RayCast2D" parent="." unique_id=2015289276]
 visible = false
 target_position = Vector2(0, 0)
 
-[node name="RayLeft" type="RayCast2D" parent="." unique_id=1273825642]
+[node name="RayLeft" type="RayCast2D" parent="." unique_id=1373825643]
 visible = false
 target_position = Vector2(-20, -20)
 
-[node name="RayRight" type="RayCast2D" parent="." unique_id=197828789]
+[node name="RayRight" type="RayCast2D" parent="." unique_id=207828791]
 visible = false
 target_position = Vector2(20, -20)
 
-[node name="Hitbox" type="Area2D" parent="." unique_id=1040153149]
+[node name="Hitbox" type="Area2D" parent="." unique_id=1140153150]
 visible = false
 collision_layer = 16
 collision_mask = 2
 monitoring = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=327567472]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=427567473]
 visible = false
-shape = SubResource("CircleShape2D_hitbox")
 
-[node name="AttackTimer" type="Timer" parent="." unique_id=264014608]
-wait_time = 1.2
+[node name="AttackTimer" type="Timer" parent="." unique_id=364014609]
+wait_time = 1.0
 one_shot = true

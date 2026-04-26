@@ -290,6 +290,25 @@ func take_damage(amount: float) -> void:
 		get_tree().create_timer(blood.lifetime).timeout.connect(blood.queue_free)
 	if health <= 0: _die()
 
+## Aplica um efeito de veneno ou sangramento que causa dano ao longo do tempo.
+func apply_poison(total_damage: float, duration: float) -> void:
+	var ticks = 5
+	var damage_per_tick = total_damage / ticks
+	
+	# Efeito visual de sangramento (avermelhado)
+	var visual_tween = create_tween()
+	visual_tween.tween_property($Sprite2D, "modulate", Color(2, 0.5, 0.5), 0.2)
+	
+	for i in range(ticks):
+		await get_tree().create_timer(duration / ticks).timeout
+		if is_instance_valid(self) and health > 0:
+			take_damage(damage_per_tick)
+	
+	# Restaura cor original
+	if is_instance_valid(self):
+		var restore_tween = create_tween()
+		restore_tween.tween_property($Sprite2D, "modulate", Color(1, 1, 1), 0.2)
+
 func _die() -> void:
 	var ds = death_screen_scene.instantiate()
 	get_tree().root.add_child(ds)

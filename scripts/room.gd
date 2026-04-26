@@ -22,6 +22,7 @@ var dummy_scene = preload("res://scenes/dummy.tscn")
 var skeleton_scene = preload("res://scenes/skeleton.tscn")
 var mumia_scene = preload("res://scenes/mumia.tscn")
 var bandido_arma_scene = preload("res://scenes/bandido_arma.tscn")
+var bandido_faca_scene = preload("res://scenes/bandido_faca.tscn")
 var door_scene = preload("res://scenes/interactive_door.tscn")
 var quicksand_scene = preload("res://scenes/quicksand.tscn")
 var pressure_plate_scene = preload("res://scenes/pressure_plate.tscn")
@@ -253,9 +254,11 @@ func _spawn_procedural_content(is_sunlight_room: bool, min_enemies: int, max_ene
 		var enemy_roll = randf()
 		var enemy_scene = skeleton_scene
 		
-		if enemy_roll < 0.25:
+		if enemy_roll < 0.15:
+			enemy_scene = bandido_faca_scene
+		elif enemy_roll < 0.35:
 			enemy_scene = bandido_arma_scene
-		elif enemy_roll < 0.60:
+		elif enemy_roll < 0.65:
 			enemy_scene = mumia_scene
 			
 		var enemy = enemy_scene.instantiate()
