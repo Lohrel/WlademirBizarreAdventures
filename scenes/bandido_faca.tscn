@@ -57,7 +57,7 @@ tracks/0/keys = {
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_bandido"]
 _data = {
 &"RESET": SubResource("Animation_qco4w"),
-&&"idle": SubResource("Animation_idle"),
+&"idle": SubResource("Animation_idle"),
 &"walk": SubResource("Animation_walk")
 }
 
