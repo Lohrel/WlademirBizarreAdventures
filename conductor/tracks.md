@@ -4,7 +4,7 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Add Bandit with Gun (burst fire) enemy**
+- [x] **Track: Add Bandit with Gun (burst fire) enemy**
   *Link: [./tracks/bandido_arma_20260424/](./tracks/bandido_arma_20260424/)*
 
 ---
