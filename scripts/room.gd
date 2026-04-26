@@ -21,6 +21,7 @@ var box_scene = preload("res://scenes/box.tscn")
 var dummy_scene = preload("res://scenes/dummy.tscn")
 var skeleton_scene = preload("res://scenes/skeleton.tscn")
 var mumia_scene = preload("res://scenes/mumia.tscn")
+var bandido_arma_scene = preload("res://scenes/bandido_arma.tscn")
 var door_scene = preload("res://scenes/interactive_door.tscn")
 var quicksand_scene = preload("res://scenes/quicksand.tscn")
 var pressure_plate_scene = preload("res://scenes/pressure_plate.tscn")
@@ -249,8 +250,12 @@ func _spawn_procedural_content(is_sunlight_room: bool, min_enemies: int, max_ene
 	# 3. Inimigos (Modular)
 	var num_enemies = randi_range(min_enemies, max_enemies)
 	for i in range(num_enemies):
+		var enemy_roll = randf()
 		var enemy_scene = skeleton_scene
-		if randf() < 0.4:
+		
+		if enemy_roll < 0.25:
+			enemy_scene = bandido_arma_scene
+		elif enemy_roll < 0.60:
 			enemy_scene = mumia_scene
 			
 		var enemy = enemy_scene.instantiate()
