@@ -48,18 +48,21 @@ func _on_area_entered(area: Area2D) -> void:
 		queue_free()
 
 func _impact_visual():
-	# Simple spark or flash at impact point
+	# Crias um flash/faísca simples no ponto de impacto usando um polígono
 	var spark = Node2D.new()
-	var sprite = Sprite2D.new()
-	# Using icon as a placeholder for spark
-	sprite.texture = preload("res://assets/sprites/icon.svg")
-	sprite.scale = Vector2(0.05, 0.05)
-	spark.add_child(sprite)
+	var poly = Polygon2D.new()
+	# Formato de diamante pequeno
+	poly.polygon = PackedVector2Array([
+		Vector2(0, -3), Vector2(3, 0), Vector2(0, 3), Vector2(-3, 0)
+	])
+	poly.color = Color.WHITE
+	spark.add_child(poly)
 	get_parent().add_child(spark)
 	spark.global_position = global_position
-	
+
 	# Create tween bound to the spark node so it survives bullet deletion
 	var tween = spark.create_tween()
-	tween.tween_property(sprite, "scale", Vector2(0.1, 0.1), 0.1)
-	tween.tween_property(sprite, "modulate:a", 0.0, 0.1)
+	tween.tween_property(poly, "scale", Vector2(1.5, 1.5), 0.1)
+	tween.tween_property(poly, "modulate:a", 0.0, 0.1)
 	tween.finished.connect(spark.queue_free)
+
