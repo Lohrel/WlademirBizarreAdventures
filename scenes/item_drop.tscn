@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/item_drop.gd" id="1_item_script"]
+[ext_resource type="FontFile" uid="uid://c6y7p2v8m3l2x" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item"]
 size = Vector2(16, 16)
@@ -46,7 +47,7 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -50.0
-offset_top = -85.0
+offset_top = -90.0
 offset_right = 50.0
 offset_bottom = -25.0
 grow_horizontal = 2
@@ -66,14 +67,16 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 2
-theme_override_font_sizes/font_size = 10
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 8
 text = "Item Name"
 horizontal_alignment = 1
 
 [node name="RarityLabel" type="Label" parent="Tooltip/VBox/Header"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/font_size = 8
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 6
 text = "Rarity"
 horizontal_alignment = 1
 
@@ -83,9 +86,10 @@ layout_mode = 2
 [node name="StatsLabel" type="RichTextLabel" parent="Tooltip/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_font_sizes/normal_font_size = 8
+theme_override_fonts/normal_font = ExtResource("2_font")
+theme_override_font_sizes/normal_font_size = 6
 bbcode_enabled = true
-text = "+10% Speed"
+text = "[center]+10% Speed[/center]"
 fit_content = true
 autowrap_mode = 0
 
@@ -95,6 +99,7 @@ layout_mode = 2
 [node name="InteractLabel" type="Label" parent="Tooltip/VBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0, 1)
-theme_override_font_sizes/font_size = 8
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 6
 text = "[E] Collect"
 horizontal_alignment = 1
