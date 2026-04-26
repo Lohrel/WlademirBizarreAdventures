@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bov2u6i55gh4x"]
+
+[ext_resource type="Script" uid="uid://ch1gi7mb1hxsf" path="res://scripts/mumia_projectile.gd" id="1_vrtcc"]
+[ext_resource type="Texture2D" uid="uid://blw0gocctgrw1" path="res://assets/sprites/bandido_arma/projetil_bandido.png" id="2_vrtcc"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_proj"]
+radius = 6.0
+
+[node name="MumiaProjectile" type="Area2D" unique_id=2014312878]
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("1_vrtcc")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=827927220]
+texture = ExtResource("2_vrtcc")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=356114590]
+shape = SubResource("CircleShape2D_proj")

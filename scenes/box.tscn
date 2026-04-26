@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene format=3 uid="uid://dd2cq7sr1tb2u"]
 
-[ext_resource type="Script" path="res://scripts/box.gd" id="1_box_script"]
+[ext_resource type="Script" uid="uid://uocr3gahoiov" path="res://scripts/box.gd" id="1_box_script"]
+[ext_resource type="Texture2D" uid="uid://ox5tthtb7j06" path="res://assets/sprites/box/formato_teste.png" id="2_ks2v0"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(32, 32)
@@ -8,22 +9,28 @@ size = Vector2(32, 32)
 [sub_resource type="OccluderPolygon2D" id="OccluderPolygon2D_1"]
 polygon = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 
-[node name="Box" type="RigidBody2D"]
+[node name="Box" type="RigidBody2D" unique_id=674304768]
 mass = 2.0
 gravity_scale = 0.0
 lock_rotation = true
 linear_damp = 10.0
 script = ExtResource("1_box_script")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=116964345]
+texture = ExtResource("2_ks2v0")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=872486470]
+visible = false
 offset_left = -16.0
 offset_top = -16.0
 offset_right = 16.0
 offset_bottom = 16.0
 color = Color(0.380392, 0.231373, 0.101961, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=371531083]
+visible = false
 shape = SubResource("RectangleShape2D_1")
 
-[node name="LightOccluder2D" type="LightOccluder2D" parent="."]
+[node name="LightOccluder2D" type="LightOccluder2D" parent="." unique_id=549112390]
+visible = false
 occluder = SubResource("OccluderPolygon2D_1")
