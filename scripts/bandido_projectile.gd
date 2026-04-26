@@ -8,6 +8,11 @@ var direction: Vector2 = Vector2.RIGHT
 var source: Node2D = null
 
 func _ready() -> void:
+	# Garante que o visual está correto
+	var sprite = get_node_or_null("Sprite2D")
+	if sprite and sprite.texture == null:
+		sprite.texture = preload("res://assets/sprites/bandido_arma/projetil_bandido.png")
+	
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
 	# Auto-destruction after some time
