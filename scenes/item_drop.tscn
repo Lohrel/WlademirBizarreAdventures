@@ -47,7 +47,7 @@ anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
 offset_left = -50.0
-offset_top = -90.0
+offset_top = -100.0
 offset_right = 50.0
 offset_bottom = -25.0
 grow_horizontal = 2
@@ -60,7 +60,7 @@ theme_override_constants/separation = 2
 
 [node name="Header" type="VBoxContainer" parent="Tooltip/VBox"]
 layout_mode = 2
-theme_override_constants/separation = -2
+theme_override_constants/separation = 2
 
 [node name="NameLabel" type="Label" parent="Tooltip/VBox/Header"]
 unique_name_in_owner = true
@@ -76,7 +76,7 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 6
+theme_override_font_sizes/font_size = 8
 text = "Rarity"
 horizontal_alignment = 1
 
@@ -87,10 +87,11 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_font")
-theme_override_font_sizes/normal_font_size = 6
+theme_override_font_sizes/normal_font_size = 8
 bbcode_enabled = true
 text = "[center]+10% Speed[/center]"
 fit_content = true
+scroll_active = false
 autowrap_mode = 0
 
 [node name="HSeparator2" type="HSeparator" parent="Tooltip/VBox"]
@@ -100,6 +101,6 @@ layout_mode = 2
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 theme_override_fonts/font = ExtResource("2_font")
-theme_override_font_sizes/font_size = 6
+theme_override_font_sizes/font_size = 8
 text = "[E] Collect"
 horizontal_alignment = 1
