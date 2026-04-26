@@ -1,8 +1,8 @@
 {
-  "track_id": "pixel_font_integration_20260424",
+  "track_id": "bandido_arma_20260424",
   "type": "feature",
   "status": "new",
   "created_at": "2026-04-24T00:00:00Z",
   "updated_at": "2026-04-24T00:00:00Z",
-  "description": "Integrate pixel font across UI elements"
+  "description": "Add Bandit with Gun (burst fire) enemy"
 }
