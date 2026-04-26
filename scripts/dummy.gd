@@ -28,6 +28,7 @@ var _last_strafe_dir: Vector2 = Vector2.ZERO
 @onready var detection_area = $DetectionArea
 
 var blood_scene = preload("res://scenes/blood_particles.tscn")
+var damage_indicator_scene = preload("res://scenes/damage_indicator.tscn")
 
 func _ready():
 	spawn_pos = global_position
@@ -184,6 +185,12 @@ func _update_visual_alert():
 	sprite.modulate = Color(0.8 + (suspicion * 0.2), 0.4 - (suspicion * 0.4), 0.4 - (suspicion * 0.4))
 
 func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0):
+	if amount > 0:
+		var indicator = damage_indicator_scene.instantiate()
+		get_parent().add_child(indicator)
+		indicator.global_position = global_position + Vector2(0, -20)
+		indicator.setup(str(int(amount)), Color(1, 1, 0.4))
+	
 	# health -= amount # Comentado para testes
 	
 	# Ao ser atacado, fica agressivo na hora

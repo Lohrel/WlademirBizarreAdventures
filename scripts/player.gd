@@ -67,6 +67,7 @@ func unequip_item(slot: int) -> void:
 # --- Cenas Pré-carregadas ---
 var blood_scene = preload("res://scenes/blood_particles.tscn")
 var death_screen_scene = preload("res://scenes/death_screen.tscn")
+var damage_indicator_scene = preload("res://scenes/damage_indicator.tscn")
 
 # --- Stats de Base (Cópia dos exports para cálculo) ---
 var base_max_health: float
@@ -120,6 +121,8 @@ func recalculate_stats() -> void:
 	dash_mana_cost = base_dash_mana
 	dash_cooldown_time = base_dash_cooldown
 	sunlight_damage_reduction = 0.0
+	attack_range_multiplier = 1.0
+	passive_regen_percent = 0.0
 	
 	var hand = get_node_or_null("garra_player/hand")
 	if hand:
@@ -131,14 +134,17 @@ func recalculate_stats() -> void:
 			for stat in item.stats:
 				var bonus = item.stats[stat]
 				match stat:
-					"move_speed": _move_speed += bonus
-					"max_health": max_health += bonus
-					"max_mana": max_mana += bonus
+					"move_speed": _move_speed += base_move_speed * bonus
+					"max_health": max_health += base_max_health * bonus
+					"max_mana": max_mana += base_max_mana * bonus
 					"attack_damage": 
-						if hand: hand.attack_damage += bonus
-					"dash_mana_cost_reduction": dash_mana_cost -= bonus
-					"dash_cooldown_reduction": dash_cooldown_time -= bonus
+						if hand: hand.attack_damage += base_attack_damage * bonus
+					"dash_mana_cost_reduction": dash_mana_cost -= base_dash_mana * bonus
+					"dash_cooldown_reduction": dash_cooldown_time -= base_dash_cooldown * bonus
 					"sunlight_damage_reduction": sunlight_damage_reduction += bonus
+					"attack_range": attack_range_multiplier += bonus
+					"health_regen": passive_regen_percent += bonus
+					"dash_speed": _dash_speed += base_dash_speed * bonus
 	
 	health = min(health, max_health)
 	mana = min(mana, max_mana)
@@ -275,6 +281,13 @@ func _check_sunlight() -> void:
 
 func take_damage(amount: float) -> void:
 	if is_immortal or _is_dashing: return
+	
+	if amount > 0:
+		var indicator = damage_indicator_scene.instantiate()
+		get_parent().add_child(indicator)
+		indicator.global_position = global_position + Vector2(0, -20)
+		indicator.setup(str(int(amount)), Color(1, 0.2, 0.2)) # Vermelho para o jogador
+	
 	health = max(0, health - amount)
 	update_hud()
 	if amount > 0.5:

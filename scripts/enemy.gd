@@ -46,6 +46,7 @@ var _last_strafe_dir: Vector2 = Vector2.ZERO
 # --- Cenas ---
 var bone_scene = preload("res://scenes/bone_particles.tscn")
 var item_drop_scene = preload("res://scenes/item_drop.tscn")
+var damage_indicator_scene = preload("res://scenes/damage_indicator.tscn")
 
 # --- Ciclo de Vida ---
 
@@ -276,6 +277,12 @@ func _perform_attack():
 	attack_timer.start()
 
 func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0):
+	if amount > 0:
+		var indicator = damage_indicator_scene.instantiate()
+		get_parent().add_child(indicator)
+		indicator.global_position = global_position + Vector2(0, -20)
+		indicator.setup(str(int(amount)), Color(1, 1, 0.4)) # Amarelo claro para dano causado pelo jogador
+	
 	health -= amount
 	if current_state != State.ATTACK:
 		current_state = State.AGGRESSIVE
