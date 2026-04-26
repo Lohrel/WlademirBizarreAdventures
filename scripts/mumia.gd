@@ -31,7 +31,8 @@ func _perform_attack():
 	
 	if is_instance_valid(self):
 		_is_charging = false
-		if player:
+		var in_range = detection_area.overlaps_body(player)
+		if player and _check_line_of_sight(in_range):
 			var dir = (player.global_position - global_position).normalized()
 			var proj = projectile_scene.instantiate()
 			get_parent().add_child(proj)

@@ -62,6 +62,10 @@ func _perform_attack():
 	for i in range(shots_per_burst):
 		if not is_instance_valid(self) or not player: break
 		
+		# Verifica se ainda tem linha de visão antes de cada tiro da rajada
+		var in_range = detection_area.overlaps_body(player)
+		if not _check_line_of_sight(in_range): break
+		
 		_fire_bullet()
 		
 		# Pequeno coice visual

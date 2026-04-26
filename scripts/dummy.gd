@@ -21,11 +21,10 @@ var last_known_player_pos: Vector2
 var target_wander_pos: Vector2
 var wander_timer: float = 0.0
 var spawn_pos: Vector2
+var _last_strafe_dir: Vector2 = Vector2.ZERO
 
 @onready var sprite = $Sprite2D
 @onready var raycast = $RayCast2D
-@onready var ray_left = $RayLeft
-@onready var ray_right = $RayRight
 @onready var detection_area = $DetectionArea
 
 var blood_scene = preload("res://scenes/blood_particles.tscn")
@@ -44,9 +43,6 @@ func _physics_process(delta: float) -> void:
 	if not player: 
 		_find_player()
 		return
-	
-	# Precisamos atualizar as direções dos raios de desvio
-	_update_avoidance_rays()
 
 	var in_range = detection_area.overlaps_body(player)
 	var has_los = false
@@ -60,9 +56,6 @@ func _physics_process(delta: float) -> void:
 		
 		if has_los:
 			last_known_player_pos = player.global_position
-	
-	# DEBUG: Mostrar se está vendo o player
-	# if in_range: print("In Range! LoS: ", has_los)
 
 	match current_state:
 		State.IDLE, State.WANDER:
@@ -80,21 +73,20 @@ func _physics_process(delta: float) -> void:
 			_handle_aggressive(delta, in_range, has_los)
 
 	move_and_slide()
+	_handle_collision_avoidance()
+	_animate()
 
-func _update_avoidance_rays():
-	if velocity.length() > 0:
-		var dir = velocity.normalized()
-		# Ajusta os raios para apontar para a frente e lados da velocidade
-		ray_left.target_position = dir.rotated(-PI/4) * 30.0
-		ray_right.target_position = dir.rotated(PI/4) * 30.0
-
-func _get_avoidance_dir(base_dir: Vector2) -> Vector2:
-	var avoidance_dir = base_dir
-	if ray_left.is_colliding():
-		avoidance_dir += ray_left.get_collision_normal() * 0.5
-	if ray_right.is_colliding():
-		avoidance_dir += ray_right.get_collision_normal() * 0.5
-	return avoidance_dir.normalized()
+func _handle_collision_avoidance():
+	if get_slide_collision_count() > 0:
+		var col = get_slide_collision(0)
+		var normal = col.get_normal()
+		
+		# Empurra levemente para longe da colisão
+		velocity += normal * 10.0
+		
+		# Se estiver vagando e bater em algo, muda o destino imediatamente
+		if current_state == State.WANDER:
+			wander_timer = 0
 
 func _handle_alert(delta, in_range, has_los):
 	if in_range and has_los:
@@ -113,7 +105,6 @@ func _handle_alert(delta, in_range, has_los):
 		var dist = global_position.distance_to(last_known_player_pos)
 		if dist > 10:
 			var dir = (last_known_player_pos - global_position).normalized()
-			dir = _get_avoidance_dir(dir)
 			velocity = dir * move_speed
 		else:
 			velocity = velocity.move_toward(Vector2.ZERO, 10.0)
@@ -127,7 +118,25 @@ func _handle_aggressive(delta, in_range, has_los):
 		out_of_sight_timer += delta
 		if out_of_sight_timer >= aggro_loss_time:
 			current_state = State.ALERT
-		_chase_player()
+		
+		if not has_los and in_range:
+			_strafe_for_los(delta)
+		else:
+			_chase_player()
+
+func _strafe_for_los(_delta):
+	if raycast.is_colliding():
+		var normal = raycast.get_collision_normal()
+		var strafe_dir = Vector2(-normal.y, normal.x)
+		
+		if _last_strafe_dir != Vector2.ZERO and strafe_dir.dot(_last_strafe_dir) < 0:
+			strafe_dir = -strafe_dir
+			
+		_last_strafe_dir = strafe_dir
+		velocity = velocity.move_toward(strafe_dir * chase_speed, chase_speed * 0.1)
+	else:
+		var dir = (last_known_player_pos - global_position).normalized()
+		velocity = velocity.move_toward(dir * chase_speed, chase_speed * 0.1)
 
 func _handle_wandering(delta):
 	# Se estiver vagando (sem alerta), a suspeita deve estar em 0
@@ -147,13 +156,22 @@ func _handle_wandering(delta):
 			velocity = Vector2.ZERO
 		else:
 			var dir = (target_wander_pos - global_position).normalized()
-			dir = _get_avoidance_dir(dir) # Desvia de paredes
 			velocity = dir * move_speed
 
 func _chase_player():
+	_last_strafe_dir = Vector2.ZERO
 	var dir = (player.global_position - global_position).normalized()
-	dir = _get_avoidance_dir(dir) # Desvia de paredes
 	velocity = dir * chase_speed
+
+func _animate():
+	# Inverte o sprite baseado no movimento ou na posição do jogador
+	if current_state in [State.ALERT, State.AGGRESSIVE] and player:
+		var dir_to_player = player.global_position.x - global_position.x
+		if dir_to_player != 0:
+			sprite.flip_h = dir_to_player < 0
+	elif velocity.length() > 5:
+		if velocity.x != 0:
+			sprite.flip_h = velocity.x < 0
 
 func _visual_jump():
 	var tween = create_tween()

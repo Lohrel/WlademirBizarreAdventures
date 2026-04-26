@@ -9,7 +9,7 @@ signal enemy_died
 # --- Enums ---
 enum State { IDLE, WANDER, ALERT, AGGRESSIVE, ATTACK }
 
-# --- Atributos Exportados (para serem sobrescritos ou escalonados) ---
+# --- Atributos Exportados (para serem sobrescritas ou escalonados) ---
 @export_group("Base Stats")
 @export var health: float = 50.0
 @export var attack_damage: float = 15.0
@@ -33,13 +33,12 @@ var target_wander_pos: Vector2
 var wander_timer: float = 0.0
 var spawn_pos: Vector2
 var _is_charging: bool = false
+var _last_strafe_dir: Vector2 = Vector2.ZERO
 
 # --- Nós Onready ---
 @onready var sprite = $Sprite2D
 @onready var anim_player = $AnimationPlayer
 @onready var raycast = $RayCast2D
-@onready var ray_left = $RayLeft
-@onready var ray_right = $RayRight
 @onready var detection_area = $DetectionArea
 @onready var hitbox = $Hitbox
 @onready var attack_timer = $AttackTimer
@@ -68,10 +67,10 @@ func _physics_process(delta: float) -> void:
 		_find_player()
 		return
 	
-	_update_avoidance_rays()
 	_process_ai_state(delta)
 	
 	move_and_slide()
+	_handle_collision_avoidance()
 	_animate()
 
 # --- Lógica de IA ---
@@ -150,7 +149,6 @@ func _handle_alert(delta: float, in_range: bool, has_los: bool):
 		var dist = global_position.distance_to(last_known_player_pos)
 		if dist > 15:
 			var dir = (last_known_player_pos - global_position).normalized()
-			dir = _get_avoidance_dir(dir)
 			velocity = dir * move_speed
 		else:
 			velocity = velocity.move_toward(Vector2.ZERO, 10.0)
@@ -159,9 +157,9 @@ func _handle_alert(delta: float, in_range: bool, has_los: bool):
 func _handle_aggressive(delta: float, in_range: bool, has_los: bool):
 	var dist = global_position.distance_to(player.global_position)
 	
-	# Ataca se estiver ao alcance e o cooldown tiver acabado
+	# Ataca se estiver ao alcance, o cooldown tiver acabado e tiver linha de visão
 	var attack_range = _get_attack_range()
-	if dist < attack_range and attack_timer.is_stopped() and not _is_charging:
+	if dist < attack_range and has_los and attack_timer.is_stopped() and not _is_charging:
 		current_state = State.ATTACK
 		_perform_attack()
 		return
@@ -173,7 +171,30 @@ func _handle_aggressive(delta: float, in_range: bool, has_los: bool):
 		out_of_sight_timer += delta
 		if out_of_sight_timer >= aggro_loss_time:
 			current_state = State.ALERT
-		_chase_player()
+		
+		if not has_los and in_range:
+			_strafe_for_los(delta)
+		else:
+			_chase_player()
+
+## Tenta contornar obstáculos quando perde a visão do jogador.
+func _strafe_for_los(_delta: float):
+	if raycast.is_colliding():
+		var normal = raycast.get_collision_normal()
+		# Direção perpendicular à colisão para "espiar" na esquina
+		var strafe_dir = Vector2(-normal.y, normal.x)
+		
+		# Mantém a direção de strafe anterior se for similar para evitar oscilação
+		if _last_strafe_dir != Vector2.ZERO and strafe_dir.dot(_last_strafe_dir) < 0:
+			strafe_dir = -strafe_dir
+			
+		_last_strafe_dir = strafe_dir
+		velocity = velocity.move_toward(strafe_dir * chase_speed, chase_speed * 0.1)
+	else:
+		# Se o raio não está colidindo mas não temos LoS (ex: fora do alcance do raio),
+		# move-se para a última posição conhecida.
+		var dir = (last_known_player_pos - global_position).normalized()
+		velocity = velocity.move_toward(dir * chase_speed, chase_speed * 0.1)
 
 ## Lógica para os estados IDLE/WANDER: move-se aleatoriamente ao redor do ponto de spawn.
 func _handle_wandering(delta: float):
@@ -194,11 +215,11 @@ func _handle_wandering(delta: float):
 			velocity = Vector2.ZERO
 		else:
 			var dir = (target_wander_pos - global_position).normalized()
-			dir = _get_avoidance_dir(dir)
 			velocity = dir * move_speed
 
 ## Persegue o jogador mantendo uma pequena distância.
 func _chase_player():
+	_last_strafe_dir = Vector2.ZERO
 	var dist = global_position.distance_to(player.global_position)
 	var target_dir = (player.global_position - global_position).normalized()
 	
@@ -213,8 +234,7 @@ func _chase_player():
 		velocity = velocity.move_toward(Vector2.ZERO, chase_speed * 0.1)
 	else:
 		# Aproxima-se
-		var dir = _get_avoidance_dir(target_dir)
-		velocity = velocity.move_toward(dir * chase_speed, chase_speed * 0.1)
+		velocity = velocity.move_toward(target_dir * chase_speed, chase_speed * 0.1)
 
 # --- Visuais e Animações ---
 
@@ -334,22 +354,17 @@ func _get_bone_particle_scale() -> Vector2: return Vector2(1, 1)
 
 # --- Desvio de Obstáculos ---
 
-func _update_avoidance_rays():
-	if velocity.length() > 0:
-		var dir = velocity.normalized()
-		var ray_len = _get_ray_length()
-		ray_left.target_position = dir.rotated(-PI/4) * ray_len
-		ray_right.target_position = dir.rotated(PI/4) * ray_len
-
-func _get_avoidance_dir(base_dir: Vector2) -> Vector2:
-	var avoidance_dir = base_dir
-	if ray_left.is_colliding():
-		avoidance_dir += ray_left.get_collision_normal() * 0.5
-	if ray_right.is_colliding():
-		avoidance_dir += ray_right.get_collision_normal() * 0.5
-	return avoidance_dir.normalized()
-
-func _get_ray_length() -> float: return 30.0
+func _handle_collision_avoidance():
+	if get_slide_collision_count() > 0:
+		var col = get_slide_collision(0)
+		var normal = col.get_normal()
+		
+		# Empurra levemente para longe da colisão
+		velocity += normal * 10.0
+		
+		# Se estiver vagando e bater em algo, muda o destino imediatamente
+		if current_state == State.WANDER:
+			wander_timer = 0
 
 # --- Manipuladores de Sinais ---
 
