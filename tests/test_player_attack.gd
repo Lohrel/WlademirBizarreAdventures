@@ -41,4 +41,4 @@ func test_attack_damage_calculation():
 	# Manually trigger the hit
 	_hand._on_hitbox_area_entered(hurtbox)
 	
-	assert_called(mock_enemy, "take_damage", [10.0, _hand.global_position, 300.0, false])
+	assert_called(mock_enemy, "take_damage", [10.0, _hand.global_position, 0.0, false])

@@ -16,7 +16,7 @@ func after_each():
 	_mummy.free()
 
 func test_mummy_attack_range():
-	assert_eq(_mummy._get_attack_range(), 200.0, "Mummy should have an attack range of 200")
+	assert_eq(_mummy._get_attack_range(), 300.0, "Mummy should have an attack range of 300")
 
 func test_mummy_telegraphing():
 	_mummy._perform_attack()

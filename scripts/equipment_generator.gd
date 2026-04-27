@@ -5,7 +5,7 @@ const Equipment = preload("res://scripts/equipment.gd")
 ## Slot to potential stats mapping
 const SLOT_STATS = {
 	Equipment.Slot.BOOTS: ["move_speed", "quicksand_speed", "dash_mana_cost_reduction", "dash_cooldown_reduction"],
-	Equipment.Slot.GLOVES: ["attack_damage", "crit_chance", "attack_range"],
+	Equipment.Slot.GLOVES: ["attack_damage", "crit_chance", "attack_range", "crit_multiplier", "life_steal", "knockback_increase"],
 	Equipment.Slot.TUNIC: ["max_health", "health_regen", "max_mana"],
 	Equipment.Slot.HAT: ["sunlight_damage_reduction"],
 	Equipment.Slot.RING: ["dash_mastery"]
@@ -89,6 +89,22 @@ static func _generate_random_stats(slot: int, level: int, rarity: int) -> Dictio
 		# Balanço específico para dano de ataque: aumentado (5% a 15% por nível base)
 		if stat_name == "attack_damage":
 			base_boost = randf_range(0.05, 0.15) * level * rarity_mult
+			
+		# Balanço específico para alcance de ataque: aumentado (10% a 25% por nível base)
+		if stat_name == "attack_range":
+			base_boost = randf_range(0.10, 0.25) * level * rarity_mult
+			
+		# Balanço para crit_multiplier: 0.05 a 0.2 por nível
+		if stat_name == "crit_multiplier":
+			base_boost = randf_range(0.05, 0.2) * level * rarity_mult
+			
+		# Balanço para life_steal: 0.01 a 0.05 por nível (1% a 5%)
+		if stat_name == "life_steal":
+			base_boost = randf_range(0.01, 0.05) * level * rarity_mult
+			
+		# Balanço para knockback_increase: 0.1 a 0.3 por nível (10% a 30%)
+		if stat_name == "knockback_increase":
+			base_boost = randf_range(0.1, 0.3) * level * rarity_mult
 			
 		stats[stat_name] = base_boost
 		

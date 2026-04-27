@@ -15,6 +15,7 @@ enum State { IDLE, WANDER, ALERT, AGGRESSIVE, ATTACK }
 @export var attack_damage: float = 15.0
 @export var move_speed: float = 80.0
 @export var chase_speed: float = 150.0
+@export var is_living: bool = true
 
 @export_group("AI Config")
 @export var wander_radius: float = 80.0

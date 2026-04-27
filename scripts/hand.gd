@@ -35,9 +35,9 @@ func _physics_process(_delta: float) -> void:
 	rotation_degrees = wrap(rotation_degrees, 0, 360)
 	if not player._is_attacking:
 		if rotation_degrees > 90 and rotation_degrees < 270:
-			scale.y = -1
+			scale.y = -abs(scale.y)
 		else:
-			scale.y = 1
+			scale.y = abs(scale.y)
 
 # --- Lógica de Ataque ---
 
@@ -82,13 +82,23 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 					damage_to_deal *= player.crit_multiplier
 			
 			# Aplica dano e knockback usando a posição da garra
-			area.owner.take_damage(damage_to_deal, global_position, 300.0, is_crit)
+			var knockback = player.knockback_strength if player and "knockback_strength" in player else 300.0
+			area.owner.take_damage(damage_to_deal, global_position, knockback, is_crit)
+			
+			# Lógica de Roubo de Vida (apenas em inimigos vivos)
+			if player and "life_steal" in player and player.life_steal > 0:
+				var enemy = area.owner
+				if enemy.get("is_living") == true:
+					var heal_amount = damage_to_deal * player.life_steal
+					player.health = min(player.health + heal_amount, player.max_health)
+					player.update_hud()
 			
 			# Feedback visual na garra
 			var tween = create_tween()
+			var base_scale = scale
 			var scale_mult = 2.0 if is_crit else 1.5
-			tween.tween_property(self, "scale", Vector2(scale_mult, scale_mult), 0.05)
-			tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1)
+			tween.tween_property(self, "scale", base_scale * scale_mult, 0.05)
+			tween.tween_property(self, "scale", base_scale, 0.1)
 			
 			# Shake da câmera
 			var cam = get_viewport().get_camera_2d()

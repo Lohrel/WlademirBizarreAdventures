@@ -81,3 +81,21 @@ func test_stat_recalculation_skill_modifier():
 	# _dash_speed *= 1.2, dash_mana_cost /= 1.2
 	assert_eq(_player._dash_speed, initial_dash_speed * 1.2, "Dash speed should be increased by dash mastery")
 	assert_almost_eq(_player.dash_mana_cost, initial_mana_cost / 1.2, 0.01, "Dash mana cost should be divided by dash mastery")
+
+func test_new_gloves_stats():
+	var initial_crit_mult = _player.crit_multiplier
+	var initial_life_steal = _player.life_steal
+	# Base knockback is now 0.0
+	assert_eq(_player.knockback_strength, 0.0, "Base knockback should be 0.0")
+	
+	var gloves = Equipment.new("Vampire Wraps", Equipment.Slot.GLOVES, {
+		"crit_multiplier": 0.5,
+		"life_steal": 0.1,
+		"knockback_increase": 0.5
+	})
+	_player.equip_item(gloves)
+	
+	assert_eq(_player.crit_multiplier, initial_crit_mult + 0.5, "Crit multiplier should increase by flat 0.5")
+	assert_eq(_player.life_steal, initial_life_steal + 0.1, "Life steal should increase by flat 0.1")
+	# 300.0 * 0.5 = 150.0
+	assert_eq(_player.knockback_strength, 150.0, "Knockback should be 150.0 (300 * 0.5)")

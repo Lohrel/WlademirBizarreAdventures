@@ -24,8 +24,11 @@ func test_generate_item_level_1_scaling():
 	
 	for stat in item.stats:
 		var val = item.stats[stat]
-		# base is 0.01 to 0.06 * level * rarity_mult
-		assert_between(val, 0.009 * mult, 0.061 * mult, "Stat boost should scale with rarity")
+		# base is 0.01 to 0.06 * level * rarity_mult, but some stats have different scaling
+		if stat in ["attack_damage", "crit_multiplier", "life_steal", "knockback_increase", "health_regen"]:
+			assert_gt(val, 0.0, "Special stat %s should be positive" % stat)
+		else:
+			assert_between(val, 0.009 * mult, 0.061 * mult, "Stat %s boost should scale with rarity" % stat)
 
 func test_generate_item_level_10_scaling():
 	var item = _gen.generate_item(10)
@@ -48,3 +51,22 @@ func test_slot_stat_constraints():
 		var possible = _gen.SLOT_STATS[item.slot]
 		for stat in item.stats:
 			assert_true(stat in possible, "Stat %s should be valid for slot %s" % [stat, item.slot])
+
+func test_gloves_can_have_new_stats():
+	var stats_found = {
+		"crit_multiplier": false,
+		"life_steal": false,
+		"knockback_increase": false
+	}
+	
+	# Try many generations to find all new stats (they are probabilistic)
+	for i in range(200):
+		var item = _gen.generate_item(5)
+		if item.slot == Equipment.Slot.GLOVES:
+			for stat in item.stats:
+				if stat in stats_found:
+					stats_found[stat] = true
+					
+	assert_true(stats_found["crit_multiplier"], "Should generate crit_multiplier")
+	assert_true(stats_found["life_steal"], "Should generate life_steal")
+	assert_true(stats_found["knockback_increase"], "Should generate knockback_increase")

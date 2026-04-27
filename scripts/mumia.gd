@@ -10,6 +10,7 @@ func _ready():
 	health = 60.0
 	move_speed = 60.0 # Mais lenta que o esqueleto
 	chase_speed = 100.0
+	is_living = false
 	super._ready()
 	# Dobra o tempo de recarga do ataque (o padrão no Enemy é 1.2s, definido no tscn)
 	attack_timer.wait_time = 2.4
@@ -51,6 +52,7 @@ func _perform_attack():
 			proj.source = self
 	
 	attack_timer.start()
+	current_state = State.AGGRESSIVE
 
 # Sobrescrita de métodos virtuais
 

@@ -2,6 +2,10 @@
 ## Inimigo padrão com atributos padrão.
 extends Enemy
 
+func _ready():
+	is_living = false
+	super._ready()
+
 func _perform_attack():
 	# O esqueleto prepara um ataque de investida
 	velocity = Vector2.ZERO

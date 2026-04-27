@@ -27,12 +27,15 @@ extends CharacterBody2D
 
 # --- Upgrades ---
 @export_group("Upgrades")
+@export var admin_mode: bool = true
 @export var attack_range_multiplier: float = 1.0
 @export var passive_regen_percent: float = 0.0 # ex: 0.02 para 2% por segundo
 @export var crit_chance: float = 0.05
 @export var crit_multiplier: float = 1.5
 @export var quicksand_speed_bonus: float = 0.0
 @export var dash_mastery: float = 1.0
+@export var life_steal: float = 0.0
+@export var knockback_strength: float = 0.0
 
 # --- Variáveis de Estado ---
 var speed_multiplier: float = 1.0
@@ -102,6 +105,7 @@ var blood_scene = preload("res://scenes/blood_particles.tscn")
 var death_screen_scene = preload("res://scenes/death_screen.tscn")
 var damage_indicator_scene = preload("res://scenes/damage_indicator.tscn")
 var item_drop_scene = preload("res://scenes/item_drop.tscn")
+const EquipmentGenerator = preload("res://scripts/equipment_generator.gd")
 
 # --- Stats de Base (Cópia dos exports para cálculo) ---
 var base_max_health: float
@@ -115,6 +119,8 @@ var base_crit_chance: float
 var base_crit_multiplier: float
 var base_quicksand_speed_bonus: float
 var base_dash_mastery: float
+var base_life_steal: float
+var base_knockback_strength: float
 
 func _ready() -> void:
 	# Inicializa valores base
@@ -128,6 +134,8 @@ func _ready() -> void:
 	base_crit_multiplier = crit_multiplier
 	base_quicksand_speed_bonus = quicksand_speed_bonus
 	base_dash_mastery = dash_mastery
+	base_life_steal = life_steal
+	base_knockback_strength = knockback_strength
 	
 	var hand = get_node_or_null("garra_player/hand")
 	if hand:
@@ -169,6 +177,8 @@ func recalculate_stats() -> void:
 	crit_multiplier = base_crit_multiplier
 	quicksand_speed_bonus = base_quicksand_speed_bonus
 	dash_mastery = base_dash_mastery
+	life_steal = base_life_steal
+	knockback_strength = base_knockback_strength
 	
 	var hand = get_node_or_null("garra_player/hand")
 	if hand:
@@ -192,6 +202,9 @@ func recalculate_stats() -> void:
 					"health_regen": passive_regen_percent += bonus
 					"dash_speed": _dash_speed += base_dash_speed * bonus
 					"crit_chance": crit_chance += bonus
+					"crit_multiplier": crit_multiplier += bonus
+					"life_steal": life_steal += bonus
+					"knockback_increase": knockback_strength += 300.0 * bonus
 					"quicksand_speed": quicksand_speed_bonus += bonus
 					"dash_mastery": dash_mastery += bonus
 	
@@ -255,18 +268,52 @@ func _physics_process(delta: float) -> void:
 	_animate()
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_F5:
-		get_tree().reload_current_scene()
-	if event is InputEventKey and event.pressed and event.keycode == KEY_F1:
-		is_immortal = !is_immortal
-		$Sprite2D.modulate = Color(2, 2, 0) if is_immortal else Color(1, 1, 1)
-	
-	# Tecla G para desequipar o primeiro item encontrado (já que não há inventário visual para escolher)
-	if event is InputEventKey and event.pressed and event.keycode == KEY_G:
-		for slot in equipment:
-			if equipment[slot] != null:
-				unequip_item(slot)
-				break
+	if event is InputEventKey and event.pressed:
+		# F5 - Recarregar cena
+		if event.keycode == KEY_F5:
+			get_tree().reload_current_scene()
+			return
+		
+		# F1 - Imortalidade
+		if event.keycode == KEY_F1:
+			is_immortal = !is_immortal
+			$Sprite2D.modulate = Color(2, 2, 0) if is_immortal else Color(1, 1, 1)
+			return
+			
+		# Tecla G - Desequipar
+		if event.keycode == KEY_G:
+			for slot in equipment:
+				if equipment[slot] != null:
+					unequip_item(slot)
+					break
+			return
+
+		# Admin Mode Hotkeys
+		if admin_mode:
+			var level = 1
+			var gen_node = get_tree().root.find_child("LevelGenerator", true, false)
+			if gen_node and "current_level" in gen_node:
+				level = gen_node.current_level
+				
+			match event.keycode:
+				KEY_F2: # Spawn aleatório
+					_spawn_debug_item(EquipmentGenerator.generate_item(level))
+				KEY_F3: # Spawn Luva Admin
+					var stats = {
+						"life_steal": 0.15,
+						"crit_multiplier": 1.0,
+						"knockback_increase": 0.8,
+						"crit_chance": 0.2,
+						"attack_range": 1.5
+					}
+					var item = Equipment.new("Admin Gauntlets", Equipment.Slot.GLOVES, stats, Equipment.Rarity.EPIC)
+					_spawn_debug_item(item)
+				KEY_F4: # Spawn Lendário
+					for i in range(100):
+						var item = EquipmentGenerator.generate_item(level + 5)
+						if item.rarity == Equipment.Rarity.LEGENDARY:
+							_spawn_debug_item(item)
+							break
 
 func _handle_movement() -> void:
 	_dash() 
@@ -320,12 +367,20 @@ func _attack() -> void:
 		_attack_timer.start()
 		_is_attacking = true
 		$garra_player/hand.start_attack()
+		# Escala a garra visualmente com o alcance
+		$garra_player/hand.scale = Vector2(1.0, 1.0) * attack_range_multiplier
+	
 	if _is_attacking:
-		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 60.0 * attack_range_multiplier, 350 * get_physics_process_delta_time())
+		# Aumenta a velocidade de projeção proporcionalmente ao alcance para não parecer "lento"
+		var projection_speed = 350.0 * attack_range_multiplier
+		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 60.0 * attack_range_multiplier, projection_speed * get_physics_process_delta_time())
 		$garra_player/hand/ShadowTrail.emitting = true
 	else:
 		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 25, 200 * get_physics_process_delta_time())
 		$garra_player/hand/ShadowTrail.emitting = false
+		# Reseta a escala gradualmente ou imediatamente
+		if $garra_player/hand.scale.x > 1.0:
+			$garra_player/hand.scale = $garra_player/hand.scale.move_toward(Vector2(1.0, 1.0), 2.0 * get_physics_process_delta_time())
 
 func _check_sunlight() -> void:
 	if not _current_room or not _current_room.get_node("DetectionArea").overlaps_body(self):
@@ -447,3 +502,9 @@ func _create_light_texture(size: int) -> GradientTexture2D:
 	tex.width = size
 	tex.height = size
 	return tex
+
+func _spawn_debug_item(item: Equipment) -> void:
+	var drop = item_drop_scene.instantiate()
+	drop.equipment_data = item
+	get_parent().add_child(drop)
+	drop.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
