@@ -56,18 +56,48 @@ var equipment: Dictionary = {
 	Equipment.Slot.RING: null
 }
 
-func equip_item(item: Equipment) -> void:
+func equip_item(item: Equipment) -> bool:
+	if equipment[item.slot] != null:
+		return false
 	equipment[item.slot] = item
 	recalculate_stats()
+	return true
 
 func unequip_item(slot: int) -> void:
+	var item = equipment[slot]
+	if item:
+		drop_item(item)
 	equipment[slot] = null
 	recalculate_stats()
+
+func drop_item(item: Equipment) -> void:
+	var drop = item_drop_scene.instantiate()
+	drop.equipment_data = item
+	get_parent().add_child(drop)
+	drop.global_position = global_position
+	
+	# Pulo simples para o lado
+	var jump_target = global_position + Vector2(randf_range(-30, 30), randf_range(-30, 30))
+	var sprite = drop.get_node("Sprite2D")
+	
+	var tween = drop.create_tween()
+	tween.tween_property(sprite, "position:y", -20, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(sprite, "position:y", 0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	
+	var move_tween = drop.create_tween()
+	var start_pos = global_position
+	move_tween.tween_method(func(t): 
+		if is_instance_valid(drop):
+			var target = start_pos.lerp(jump_target, t)
+			var diff = target - drop.global_position
+			drop.move_and_collide(diff)
+	, 0.0, 1.0, 0.3)
 
 # --- Cenas Pré-carregadas ---
 var blood_scene = preload("res://scenes/blood_particles.tscn")
 var death_screen_scene = preload("res://scenes/death_screen.tscn")
 var damage_indicator_scene = preload("res://scenes/damage_indicator.tscn")
+var item_drop_scene = preload("res://scenes/item_drop.tscn")
 
 # --- Stats de Base (Cópia dos exports para cálculo) ---
 var base_max_health: float
@@ -201,6 +231,13 @@ func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_F1:
 		is_immortal = !is_immortal
 		$Sprite2D.modulate = Color(2, 2, 0) if is_immortal else Color(1, 1, 1)
+	
+	# Tecla G para desequipar o primeiro item encontrado (já que não há inventário visual para escolher)
+	if event is InputEventKey and event.pressed and event.keycode == KEY_G:
+		for slot in equipment:
+			if equipment[slot] != null:
+				unequip_item(slot)
+				break
 
 func _handle_movement() -> void:
 	_dash() 

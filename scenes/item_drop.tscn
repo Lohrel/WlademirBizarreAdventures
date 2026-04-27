@@ -1,10 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/item_drop.gd" id="1_item_script"]
 [ext_resource type="FontFile" uid="uid://c6y7p2v8m3l2x" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_phys"]
+size = Vector2(8, 8)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_item"]
-size = Vector2(16, 16)
+size = Vector2(24, 24)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tooltip"]
 bg_color = Color(0.15, 0.08, 0.05, 0.9)
@@ -20,9 +23,10 @@ corner_radius_bottom_left = 2
 shadow_color = Color(0, 0, 0, 0.3)
 shadow_size = 2
 
-[node name="ItemDrop" type="Area2D"]
+[node name="ItemDrop" type="CharacterBody2D"]
 collision_layer = 0
-collision_mask = 2
+collision_mask = 1
+motion_mode = 1
 script = ExtResource("1_item_script")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
@@ -35,6 +39,13 @@ offset_bottom = 8.0
 color = Color(1, 1, 1, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_phys")
+
+[node name="PickupArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
 shape = SubResource("RectangleShape2D_item")
 
 [node name="Tooltip" type="PanelContainer" parent="."]

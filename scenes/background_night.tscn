@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://c8l7p8m4n5p2x"]
+
+[sub_resource type="Curve" id="Curve_stars"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.5, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 3
+
+[node name="BackgroundNight" type="CanvasLayer"]
+layer = -100
+
+[node name="Sky" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.05, 1)
+
+[node name="NebulaGlow" type="ColorRect" parent="."]
+modulate = Color(0.2, 0.1, 0.4, 0.15)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Stars" type="CPUParticles2D" parent="."]
+position = Vector2(320, 180)
+amount = 100
+lifetime = 4.0
+preprocess = 4.0
+emission_shape = 3
+emission_rect_extents = Vector2(320, 180)
+gravity = Vector2(0, 0)
+scale_amount_min = 1.0
+scale_amount_max = 2.0
+scale_amount_curve = SubResource("Curve_stars")
+color = Color(1, 1, 1, 0.8)
+
+[node name="TwinklingStars" type="CPUParticles2D" parent="."]
+position = Vector2(320, 180)
+amount = 40
+lifetime = 2.0
+preprocess = 2.0
+emission_shape = 3
+emission_rect_extents = Vector2(320, 180)
+gravity = Vector2(0, 0)
+scale_amount_min = 1.0
+scale_amount_max = 3.0
+scale_amount_curve = SubResource("Curve_stars")
+color = Color(0.8, 0.9, 1, 1)

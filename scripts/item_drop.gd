@@ -1,4 +1,4 @@
-extends Area2D
+extends CharacterBody2D
 
 @export var item_name: String = "Placeholder Item"
 @export var heal_amount: float = 20.0
@@ -14,16 +14,29 @@ func _ready() -> void:
 		if equipment_data.icon:
 			$Sprite2D.texture = equipment_data.icon
 	else:
-		$Tooltip.queue_free() # Sem tooltip para itens de cura
+		if has_node("Tooltip"):
+			$Tooltip.queue_free() # Sem tooltip para itens de cura
 	
-	# Conecta os sinais de entrada e saída
-	body_entered.connect(_on_body_entered)
-	body_exited.connect(_on_body_exited)
+	# Conecta os sinais de entrada e saída da área de pickup
+	$PickupArea.body_entered.connect(_on_body_entered)
+	$PickupArea.body_exited.connect(_on_body_exited)
 	
 	# Pequena animação de flutuar
 	var tween = create_tween().set_loops()
 	tween.tween_property($Sprite2D, "position:y", -5, 0.6).set_trans(Tween.TRANS_SINE)
 	tween.tween_property($Sprite2D, "position:y", 5, 0.6).set_trans(Tween.TRANS_SINE)
+	
+	# Garante que não spawne dentro de paredes
+	_push_out_of_walls()
+
+func _push_out_of_walls():
+	for i in range(4):
+		var collision = move_and_collide(Vector2.ZERO, true)
+		if collision:
+			var push_dir = collision.get_normal()
+			global_position += push_dir * 2.0
+		else:
+			break
 
 func _setup_rarity_visuals() -> void:
 	var rarity_colors = {
@@ -34,9 +47,8 @@ func _setup_rarity_visuals() -> void:
 		Equipment.Rarity.LEGENDARY: Color(1, 0.8, 0.2)
 	}
 	var color = rarity_colors[equipment_data.rarity]
-	self_modulate = color * 1.5 # Brilho HDR
+	self_modulate = color * 1.5 
 	
-	# Adiciona uma luz com a cor da raridade
 	var light = PointLight2D.new()
 	light.color = color
 	light.energy = 0.6
@@ -102,7 +114,13 @@ func _on_body_exited(body: Node2D) -> void:
 func _collect(player: Node2D) -> void:
 	if equipment_data:
 		if player.has_method("equip_item"):
-			player.equip_item(equipment_data)
+			if player.equip_item(equipment_data):
+				# Sucesso ao equipar
+				pass
+			else:
+				# Slot cheio - Mostra mensagem
+				_show_full_message(player)
+				return
 	else:
 		if player.has_method("heal"):
 			player.heal(heal_amount)
@@ -117,3 +135,15 @@ func _collect(player: Node2D) -> void:
 	tween.tween_property(self, "scale", Vector2.ZERO, 0.2)
 	tween.tween_property(self, "modulate:a", 0.0, 0.2)
 	tween.chain().tween_callback(queue_free)
+
+func _show_full_message(player: Node2D) -> void:
+	if "damage_indicator_scene" in player:
+		var indicator = player.damage_indicator_scene.instantiate()
+		player.get_parent().add_child(indicator)
+		indicator.global_position = player.global_position + Vector2(0, -30)
+		indicator.setup("INVENTORY FULL", Color(1, 0.5, 0))
+	
+	# Feedback visual no item
+	var tween = create_tween()
+	tween.tween_property(self, "modulate", Color(2, 0, 0), 0.1)
+	tween.tween_property(self, "modulate", Color(1, 1, 1), 0.1)

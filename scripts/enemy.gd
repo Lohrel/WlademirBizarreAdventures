@@ -345,11 +345,23 @@ func _spawn_drop():
 
 	var jump_target = global_position + Vector2(randf_range(-25, 25), randf_range(-25, 25))
 
-
+	# Animação de pulo que respeita colisões
 	var tween = drop.create_tween()
-	tween.tween_property(drop, "global_position:y", global_position.y - 20, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
-	tween.tween_property(drop, "global_position:y", jump_target.y, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
-	tween.parallel().tween_property(drop, "global_position:x", jump_target.x, 0.3)
+	# Arco de altura (Y relativo ao sprite para não interferir na física global_position)
+	var sprite = drop.get_node("Sprite2D")
+	tween.tween_property(sprite, "position:y", -20, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(sprite, "position:y", 0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	
+	# Movimento horizontal/vertical com colisão
+	var move_tween = drop.create_tween()
+	var total_time = 0.3
+	var start_pos = drop.global_position
+	move_tween.tween_method(func(t): 
+		if is_instance_valid(drop):
+			var target = start_pos.lerp(jump_target, t)
+			var diff = target - drop.global_position
+			drop.move_and_collide(diff)
+	, 0.0, 1.0, total_time)
 
 # --- Métodos Virtuais para Customização ---
 
