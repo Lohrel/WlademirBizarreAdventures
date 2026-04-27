@@ -17,7 +17,7 @@ signal map_updated
 # --- Configuração ---
 @export_group("Level Config")
 @export var max_rooms: int = 15 
-@export var day_speed: float = 0.01
+@export var day_speed: float = 0.05
 const ROOM_SIZE = Vector2(400, 400)
 
 # --- Variáveis de Tempo de Execução ---
