@@ -8,22 +8,43 @@ extends Area2D
 var direction: Vector2 = Vector2.RIGHT
 var source: Node2D = null
 var animation_timer: float = 0.0
+var _time_alive: float = 0.0
+
+@onready var sprite: Sprite2D = $Sprite2D
+
+static var _explosion_texture: GradientTexture2D = null
+static var _explosion_points: PackedVector2Array = []
+static var _explosion_shape: CircleShape2D = null
+static var _projectile_light_tex: GradientTexture2D = null
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
-	# Auto-destruction after some time
-	get_tree().create_timer(lifetime).timeout.connect(queue_free)
+	
+	# Add a small blue light to the projectile
+	var light = PointLight2D.new()
+	light.color = Color(0.2, 0.5, 1.0) # Light blue
+	light.energy = 0.8
+	if _projectile_light_tex == null:
+		_projectile_light_tex = _create_radial_texture(64)
+	light.texture = _projectile_light_tex
+	light.texture_scale = 0.5
+	add_child(light)
 
 func _physics_process(delta: float) -> void:
+	_time_alive += delta
+	if _time_alive >= lifetime:
+		queue_free()
+		return
+		
 	position += direction * speed * delta
 	# Rotate the sprite to face movement direction
 	rotation = direction.angle()
 	
 	# Simple frame animation
 	animation_timer += delta * 10.0
-	var total_frames = $Sprite2D.hframes * $Sprite2D.vframes
-	$Sprite2D.frame = int(animation_timer) % total_frames
+	var total_frames = sprite.hframes * sprite.vframes
+	sprite.frame = int(animation_timer) % total_frames
 
 func _on_body_entered(body: Node2D) -> void:
 	if body == source:
@@ -49,9 +70,10 @@ func _explode():
 	
 	# Detect entities in range using an Area2D-like approach but manually
 	var query = PhysicsShapeQueryParameters2D.new()
-	var shape = CircleShape2D.new()
-	shape.radius = explosion_radius
-	query.shape = shape
+	if _explosion_shape == null:
+		_explosion_shape = CircleShape2D.new()
+		_explosion_shape.radius = explosion_radius
+	query.shape = _explosion_shape
 	query.transform = global_transform
 	query.collision_mask = 3 # Player (2) + Wall/Box (1)
 	
@@ -88,12 +110,12 @@ func _create_explosion_effect():
 	
 	# Circular explosion visual using a Polygon2D
 	var circle = Polygon2D.new()
-	var points = PackedVector2Array()
-	var num_points = 16
-	for i in range(num_points):
-		var angle = i * TAU / num_points
-		points.append(Vector2(cos(angle), sin(angle)) * 10)
-	circle.polygon = points
+	if _explosion_points.size() == 0:
+		var num_points = 16
+		for i in range(num_points):
+			var angle = i * TAU / num_points
+			_explosion_points.append(Vector2(cos(angle), sin(angle)) * 10)
+	circle.polygon = _explosion_points
 	circle.color = Color(1.0, 0.4, 0.0, 0.8) # Bright Orange
 	visual.add_child(circle)
 	
@@ -101,7 +123,9 @@ func _create_explosion_effect():
 	var light = PointLight2D.new()
 	light.color = Color(1.0, 0.6, 0.2) # Warm sun-like color
 	light.energy = 2.0
-	light.texture = _create_radial_texture(256)
+	if _explosion_texture == null:
+		_explosion_texture = _create_radial_texture(256)
+	light.texture = _explosion_texture
 	light.texture_scale = 0.5
 	visual.add_child(light)
 	

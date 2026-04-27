@@ -13,6 +13,15 @@ func _ready():
 	super._ready()
 	# Dobra o tempo de recarga do ataque (o padrão no Enemy é 1.2s, definido no tscn)
 	attack_timer.wait_time = 2.4
+	
+	# Aumenta o alcance de detecção
+	var detection_shape = detection_area.get_node("CollisionShape2D")
+	if detection_shape and detection_shape.shape:
+		detection_shape.shape = detection_shape.shape.duplicate()
+		if detection_shape.shape is CircleShape2D:
+			detection_shape.shape.radius = 350.0
+		elif detection_shape.shape is RectangleShape2D:
+			detection_shape.shape.size = Vector2(700, 700) # Dobro do raio pretendido
 
 func _perform_attack():
 	# A múmia para para lançar o projétil
@@ -21,7 +30,7 @@ func _perform_attack():
 	
 	# Telegraphing: Brilho antes de atirar
 	var tween = create_tween()
-	tween.tween_property(sprite, "modulate", Color(2, 2, 0), 0.4) # Amarelo brilhante
+	tween.tween_property(sprite, "modulate", Color(1.5, 1.5, 0.5), 0.4) # Amarelo visível mas menos agressivo
 	tween.tween_property(sprite, "modulate", Color(1, 1, 1), 0.1)
 	
 	_visual_jump()
@@ -46,10 +55,10 @@ func _perform_attack():
 # Sobrescrita de métodos virtuais
 
 func _get_attack_range() -> float:
-	return 200.0 # Alcance considerável para um arqueiro/mago
+	return 300.0 # Aumentado para maior perigo à distância
 
 func _get_min_chase_dist() -> float:
-	return 120.0 # Tenta manter distância do jogador
+	return 180.0 # Tenta manter uma distância maior do jogador
 
 func _on_attack_timer_timeout():
 	if current_state == State.ATTACK:
