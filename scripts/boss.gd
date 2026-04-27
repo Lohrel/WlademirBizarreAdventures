@@ -135,5 +135,6 @@ func _get_lunge_dist() -> float:
 func _get_bone_particle_scale() -> Vector2: 
 	return Vector2(2, 2) # Fragmentos de osso maiores
 
-func _get_ray_length() -> float: 
-	return 60.0 # Raios de desvio mais longos
+func die():
+	boss_died.emit()
+	super.die()

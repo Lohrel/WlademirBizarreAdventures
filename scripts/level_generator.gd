@@ -9,11 +9,12 @@ extends Node2D
 @export var player_scene: PackedScene
 @export var boss_scene: PackedScene 
 @export var upgrade_screen_scene: PackedScene
+@export var staircase_scene: PackedScene
 
 # --- Configuração ---
 @export_group("Level Config")
 @export var max_rooms: int = 15 
-@export var day_speed: float = 0.15 
+@export var day_speed: float = 0.01
 const ROOM_SIZE = Vector2(400, 400)
 
 # --- Variáveis de Tempo de Execução ---
@@ -21,6 +22,8 @@ var map_data = {} # Chave: Vector2i (pos. da grade), Valor: Dictionary (tipo e t
 var current_level: int = 1
 var sun_time: float = 0.0
 var player_node: Node2D = null
+var locked_exit_doors: Array[Node2D] = []
+var map_container: Node2D = null
 
 # Armazena as dimensões de cada coluna e linha para manter a grade alinhada
 var col_widths = {}
@@ -43,21 +46,45 @@ func generate_new_level() -> void:
 	if map_data.size() > 0:
 		current_level += 1
 	
-	# Limpa as salas existentes
+	# 1. Limpeza Robusta: Deleta tudo que não for o Jogador, Câmera ou Background
+	if map_container:
+		map_container.queue_free()
+		remove_child(map_container)
+		map_container = null
+	
+	# Fallback para garantir que nada sobrou (especialmente nós orfãos com nomes Room ou @Room)
 	for child in get_children():
-		if child.name.begins_with("Room"):
+		if child.name.begins_with("Room") or "@Room" in child.name or child is Enemy or child is ItemDrop or child is Staircase:
 			child.queue_free()
+	
+	# 2. Cria novo container
+	map_container = Node2D.new()
+	map_container.name = "MapContainer"
+	add_child(map_container)
 	
 	map_data.clear()
 	col_widths.clear()
 	row_heights.clear()
+	locked_exit_doors.clear()
 	
-	# Gera o layout do andar e constrói o visual
+	# 3. Gera novo layout e visuais
 	_generate_map_layout()
 	_build_world_visuals()
 	
-	# Redefine o jogador para a posição inicial
+	# 4. Posiciona Jogador
 	_spawn_or_reset_player()
+	
+	# 5. Reset TOTAL de visibilidade (várias camadas para garantir)
+	if player_node:
+		player_node.modulate = Color(1, 1, 1, 1)
+		var p_char = player_node.get_node_or_null("player")
+		if p_char:
+			p_char.modulate = Color(1, 1, 1, 1)
+			var sprite = p_char.get_node_or_null("Sprite2D")
+			if sprite:
+				sprite.modulate = Color(1, 1, 1, 1)
+			if p_char.has_method("update_hud"):
+				p_char.update_hud()
 
 ## Usa um algoritmo de "Corridor Skeleton" para gerar o layout.
 ## Corredores formam uma rede (em coordenadas ímpares) e salas surgem como "apêndices" (dead ends).
@@ -134,7 +161,27 @@ func _generate_map_layout() -> void:
 			furthest_pos = pos
 	map_data[furthest_pos]["type"] = "boss"
 	
-	# 5. Define dimensões dinâmicas baseadas na presença de salas
+	# 5. Adiciona sala de Saída conectada ao Chefe
+	var exit_pos = Vector2i.ZERO
+	for d in directions:
+		var p = furthest_pos + d * 2
+		if not map_data.has(p):
+			# Cria corredor e sala de saída
+			map_data[furthest_pos + d] = {"type": "corridor"}
+			map_data[p] = {"type": "exit"}
+			exit_pos = p
+			break
+	
+	# Se não achou espaço, força em algum lugar
+	if exit_pos == Vector2i.ZERO:
+		for d in directions:
+			var p = furthest_pos + d * 2
+			map_data[furthest_pos + d] = {"type": "corridor"}
+			map_data[p] = {"type": "exit"}
+			exit_pos = p
+			break
+
+	# 6. Define dimensões dinâmicas baseadas na presença de salas
 	var room_cols = {}
 	var room_rows = {}
 	var min_x = 0
@@ -175,7 +222,7 @@ func _build_world_visuals() -> void:
 		
 		# Calcula a posição física acumulando larguras/alturas
 		room_instance.position = _get_physical_position(grid_pos)
-		add_child(room_instance)
+		map_container.add_child(room_instance)
 		
 		# Verificação de vizinhos
 		var n_pos = grid_pos + Vector2i.UP
@@ -205,19 +252,21 @@ func _build_world_visuals() -> void:
 		
 		# Salas de início e corredores (opcional) não devem ter inimigos ou ter quantidade reduzida
 		if room_info["type"] == "normal" or room_info["type"] == "boss":
-			min_enemies = clampi(current_level - 1, 0, 5)
-			max_enemies = clampi(current_level + 1, 1, 8)
+			min_enemies = clampi(current_level, 1, 10)
+			max_enemies = clampi(current_level + 2, 2, 15)
 		elif room_info["type"] == "corridor":
 			min_enemies = 0
 			max_enemies = 1 # Lightly populated corridors
-		elif room_info["type"] == "start":
+		elif room_info["type"] == "start" or room_info["type"] == "exit":
 			min_enemies = 0
-			max_enemies = 0 # No enemies in start room
+			max_enemies = 0 # No enemies in start/exit room
 
 		# Configura o tamanho, visuais, conexões e inimigos da sala
 		room_instance.setup_room_ext(room_info["size"], has_n, has_s, has_e, has_w, is_open, 
 				spawn_n, spawn_s, spawn_e, spawn_w, min_enemies, max_enemies)
 
+		# Se for uma porta de saída (conectada à sala de saída), rastreia para trancar
+		_track_exit_doors(room_instance, grid_pos)
 		
 		# Gerencia a configuração específica da sala do Chefe
 		if room_info["type"] == "boss":
@@ -226,7 +275,34 @@ func _build_world_visuals() -> void:
 				var boss = boss_scene.instantiate()
 				boss.position = room_instance.position
 				boss.boss_died.connect(_on_boss_died)
-				add_child(boss)
+				map_container.add_child(boss)
+				
+		# Gerencia a configuração específica da sala de Saída
+		if room_info["type"] == "exit":
+			room_instance.modulate = Color(0.5, 1, 0.5) # Dica visual para a Saída
+			if staircase_scene:
+				var stairs = staircase_scene.instantiate()
+				stairs.position = room_instance.position
+				map_container.add_child(stairs)
+
+func _track_exit_doors(room_instance: Room, grid_pos: Vector2i) -> void:
+	var directions = [Vector2i.UP, Vector2i.DOWN, Vector2i.LEFT, Vector2i.RIGHT]
+	var current_type = map_data[grid_pos]["type"]
+	
+	for d in directions:
+		var neighbor_pos = grid_pos + d
+		if map_data.has(neighbor_pos):
+			var neighbor_type = map_data[neighbor_pos]["type"]
+			# Tranca se a porta leva para uma saída OU se estamos na saída e leva para uma sala normal/chefe
+			if neighbor_type == "exit" or (current_type == "exit" and neighbor_type != "corridor"):
+				for child in room_instance.get_children():
+					if child is InteractiveDoor:
+						# Se a porta está na direção do vizinho relevante, tranca
+						var to_door = child.position.normalized()
+						var to_neighbor = Vector2(d).normalized()
+						if to_door.dot(to_neighbor) > 0.8:
+							child.lock()
+							locked_exit_doors.append(child)
 
 ## Calcula a posição física baseada na soma das larguras e alturas da grade.
 func _get_physical_position(grid_pos: Vector2i) -> Vector2:
@@ -260,13 +336,19 @@ func _should_spawn_door(pos_a: Vector2i, pos_b: Vector2i, exists: bool, record: 
 	connection.sort()
 	var key = str(connection)
 	
-	if not record.has(key):
-		# 35% de chance de colocar uma porta se ela ainda não existir
-		var spawn = randf() < 0.35
-		record[key] = spawn
-		return spawn
+	# Se já decidimos sobre esta conexão (por um vizinho), não spawna outra porta duplicada
+	if record.has(key):
+		return false
+
+	# Regra: Sempre gera porta se uma das salas for a Saída (Exit)
+	if map_data[pos_a]["type"] == "exit" or map_data[pos_b]["type"] == "exit":
+		record[key] = true
+		return true
 	
-	return false
+	# 35% de chance de colocar uma porta para outras salas
+	var spawn = randf() < 0.35
+	record[key] = spawn
+	return spawn
 
 # --- Gerenciamento do Jogador ---
 
@@ -291,6 +373,8 @@ func _spawn_or_reset_player() -> void:
 	# Redefine a posição interna do CharacterBody2D
 	if player_node.has_node("player"):
 		player_node.get_node("player").position = Vector2.ZERO
+		# Garante que o jogador esteja visível (caso tenha vindo de uma transição de nível)
+		player_node.get_node("player").modulate.a = 1.0
 		
 	# Avisa a câmera para dar "snap" e evitar o deslizamento inicial
 	var cam = get_node_or_null("Camera2D")
@@ -300,6 +384,11 @@ func _spawn_or_reset_player() -> void:
 # --- Manipuladores de Sinais ---
 
 func _on_boss_died() -> void:
+	# Desbloqueia as portas para a saída
+	for door in locked_exit_doors:
+		if is_instance_valid(door):
+			door.unlock()
+	
 	# Breve pausa cinematográfica antes de mostrar a tela de upgrade
 	await get_tree().create_timer(1.5).timeout
 	

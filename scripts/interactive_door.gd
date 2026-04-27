@@ -6,6 +6,7 @@ extends StaticBody2D
 # --- Variáveis de Estado ---
 var is_player_near: bool = false
 var is_open: bool = false
+var is_locked: bool = false
 
 # --- Nós Onready ---
 @onready var animation_player = $AnimationPlayer
@@ -24,20 +25,35 @@ func _ready() -> void:
 func _input(event: InputEvent) -> void:
 	# Só processa a entrada se o jogador estiver perto e a porta estiver fechada
 	if is_player_near and not is_open:
-		var is_e_pressed = false
-		if event is InputEventKey:
-			if event.pressed and not event.is_echo() and event.keycode == KEY_E:
-				is_e_pressed = true
-		
-		# Permite tanto o 'E' fixo quanto a ação mapeada 'interact'
 		var is_interact_pressed = false
-		if InputMap.has_action("interact"):
-			is_interact_pressed = event.is_action_pressed("interact")
+		if event.is_action_pressed("interact") or (event is InputEventKey and event.pressed and not event.is_echo() and event.keycode == KEY_E):
+			is_interact_pressed = true
 			
-		if is_e_pressed or is_interact_pressed:
-			_open_door()
+		if is_interact_pressed:
+			if is_locked:
+				_show_locked_message()
+			else:
+				_open_door()
 
 # --- Lógica de Interação ---
+
+func lock() -> void:
+	is_locked = true
+	modulate = Color(0.5, 0.5, 0.5)
+
+func unlock() -> void:
+	is_locked = false
+	modulate = Color(1, 1, 1)
+	if is_player_near:
+		interaction_label.text = "[E] Open"
+		interaction_label.visible = true
+
+func _show_locked_message() -> void:
+	interaction_label.text = "Locked"
+	interaction_label.visible = true
+	var tween = create_tween()
+	tween.tween_property(interaction_label, "modulate", Color(1, 0, 0), 0.1)
+	tween.tween_property(interaction_label, "modulate", Color(1, 1, 1), 0.1)
 
 ## Verifica se o jogador já está sobreposto à área de detecção no início.
 func _check_initial_overlap() -> void:
@@ -72,6 +88,7 @@ func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player") or body.name.to_lower() == "player":
 		is_player_near = true
 		if not is_open:
+			interaction_label.text = "Locked" if is_locked else "[E] Open"
 			interaction_label.visible = true
 
 func _on_detection_area_body_exited(body: Node2D) -> void:

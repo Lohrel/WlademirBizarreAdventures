@@ -227,6 +227,12 @@ func update_hud() -> void:
 		_update_equipment_slot_ui("Tunic", Equipment.Slot.TUNIC)
 		_update_equipment_slot_ui("Hat", Equipment.Slot.HAT)
 		_update_equipment_slot_ui("Ring", Equipment.Slot.RING)
+		
+		# Atualiza o contador de andar buscando o gerador
+		var gen = get_tree().root.find_child("LevelGenerator", true, false)
+		var floor_label = _hud_node.get_node_or_null("Control/FloorLabel")
+		if floor_label and gen and "current_level" in gen:
+			floor_label.text = "Floor: " + str(gen.current_level)
 
 func _update_equipment_slot_ui(slot_name: String, slot_enum: int) -> void:
 	if _hud_node:

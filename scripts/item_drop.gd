@@ -1,3 +1,4 @@
+class_name ItemDrop
 extends CharacterBody2D
 
 @export var item_name: String = "Placeholder Item"
