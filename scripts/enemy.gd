@@ -276,12 +276,18 @@ func _perform_attack():
 	
 	attack_timer.start()
 
-func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0):
+func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0, is_crit: bool = false):
 	if amount > 0:
 		var indicator = damage_indicator_scene.instantiate()
 		get_parent().add_child(indicator)
 		indicator.global_position = global_position + Vector2(0, -20)
-		indicator.setup(str(int(amount)), Color(1, 1, 0.4)) # Amarelo claro para dano causado pelo jogador
+		
+		var color = Color(1, 1, 0.4) # Amarelo padrão
+		if is_crit:
+			color = Color(1, 0.5, 0.1) # Laranja para crítico
+			indicator.scale = Vector2(1.5, 1.5)
+			
+		indicator.setup(str(int(amount)), color)
 	
 	health -= amount
 	if current_state != State.ATTACK:

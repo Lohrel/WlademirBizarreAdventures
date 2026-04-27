@@ -71,20 +71,33 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 		# Se atingir a área de dano de um inimigo
 		if area.name == "Hurtbox" and area.owner.has_method("take_damage"):
 			_already_hit_areas.append(area)
+			
+			var damage_to_deal = attack_damage
+			var is_crit = false
+			
+			var player = get_parent().get_parent()
+			if player and "crit_chance" in player:
+				if randf() < player.crit_chance:
+					is_crit = true
+					damage_to_deal *= player.crit_multiplier
+			
 			# Aplica dano e knockback usando a posição da garra
-			area.owner.take_damage(attack_damage, global_position)
+			area.owner.take_damage(damage_to_deal, global_position, 300.0, is_crit)
 			
 			# Feedback visual na garra
 			var tween = create_tween()
-			tween.tween_property(self, "scale", Vector2(1.5, 1.5), 0.05)
+			var scale_mult = 2.0 if is_crit else 1.5
+			tween.tween_property(self, "scale", Vector2(scale_mult, scale_mult), 0.05)
 			tween.tween_property(self, "scale", Vector2(1.0, 1.0), 0.1)
 			
 			# Shake da câmera
 			var cam = get_viewport().get_camera_2d()
 			if cam and cam.has_method("shake"):
-				cam.shake(3.0)
+				var shake_intensity = 6.0 if is_crit else 3.0
+				cam.shake(shake_intensity)
 				
 			# Hit Stop (Freeze frame)
+			var stop_time = 0.1 if is_crit else 0.05
 			Engine.time_scale = 0.05
-			await get_tree().create_timer(0.05, true, false, true).timeout
+			await get_tree().create_timer(stop_time, true, false, true).timeout
 			Engine.time_scale = 1.0

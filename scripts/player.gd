@@ -21,14 +21,18 @@ extends CharacterBody2D
 # --- Configuração de Habilidades ---
 @export_group("Skills Config")
 @export var _move_speed: float = 200.0
-@export var _dash_speed: float = 600.0
+@export var _dash_speed: float = 450.0
 @export var dash_mana_cost: float = 25.0
-@export var dash_cooldown_time: float = 0.5
+@export var dash_cooldown_time: float = 2.0
 
 # --- Upgrades ---
 @export_group("Upgrades")
 @export var attack_range_multiplier: float = 1.0
 @export var passive_regen_percent: float = 0.0 # ex: 0.02 para 2% por segundo
+@export var crit_chance: float = 0.05
+@export var crit_multiplier: float = 1.5
+@export var quicksand_speed_bonus: float = 0.0
+@export var dash_mastery: float = 1.0
 
 # --- Variáveis de Estado ---
 var speed_multiplier: float = 1.0
@@ -107,6 +111,10 @@ var base_dash_speed: float
 var base_dash_mana: float
 var base_dash_cooldown: float
 var base_attack_damage: float
+var base_crit_chance: float
+var base_crit_multiplier: float
+var base_quicksand_speed_bonus: float
+var base_dash_mastery: float
 
 func _ready() -> void:
 	# Inicializa valores base
@@ -116,6 +124,10 @@ func _ready() -> void:
 	base_dash_speed = _dash_speed
 	base_dash_mana = dash_mana_cost
 	base_dash_cooldown = dash_cooldown_time
+	base_crit_chance = crit_chance
+	base_crit_multiplier = crit_multiplier
+	base_quicksand_speed_bonus = quicksand_speed_bonus
+	base_dash_mastery = dash_mastery
 	
 	var hand = get_node_or_null("garra_player/hand")
 	if hand:
@@ -153,6 +165,10 @@ func recalculate_stats() -> void:
 	sunlight_damage_reduction = 0.0
 	attack_range_multiplier = 1.0
 	passive_regen_percent = 0.0
+	crit_chance = base_crit_chance
+	crit_multiplier = base_crit_multiplier
+	quicksand_speed_bonus = base_quicksand_speed_bonus
+	dash_mastery = base_dash_mastery
 	
 	var hand = get_node_or_null("garra_player/hand")
 	if hand:
@@ -175,6 +191,13 @@ func recalculate_stats() -> void:
 					"attack_range": attack_range_multiplier += bonus
 					"health_regen": passive_regen_percent += bonus
 					"dash_speed": _dash_speed += base_dash_speed * bonus
+					"crit_chance": crit_chance += bonus
+					"quicksand_speed": quicksand_speed_bonus += bonus
+					"dash_mastery": dash_mastery += bonus
+	
+	# Aplica dash_mastery para aumentar a eficiência do dash (velocidade maior e custo menor)
+	_dash_speed *= dash_mastery
+	dash_mana_cost /= dash_mastery
 	
 	health = min(health, max_health)
 	mana = min(mana, max_mana)

@@ -8,7 +8,7 @@ const SLOT_STATS = {
 	Equipment.Slot.GLOVES: ["attack_damage", "crit_chance", "attack_range"],
 	Equipment.Slot.TUNIC: ["max_health", "health_regen", "max_mana"],
 	Equipment.Slot.HAT: ["sunlight_damage_reduction"],
-	Equipment.Slot.RING: ["skill_modifier"]
+	Equipment.Slot.RING: ["dash_mastery"]
 }
 
 ## Generates a random equipment piece scaled by level.
@@ -79,8 +79,17 @@ static func _generate_random_stats(slot: int, level: int, rarity: int) -> Dictio
 	
 	for i in range(min(num_stats, possible_stats.size())):
 		var stat_name = possible_stats[i]
-		# Scaling: 1% to 6% per level * rarity multiplier
+		# Scaling base: 1% to 6% per level * rarity multiplier
 		var base_boost = randf_range(0.01, 0.06) * level * rarity_mult
+		
+		# Balanço específico para regeneração: max 3% no lvl 1 para lendários (0.01 * 1 * 3.0)
+		if stat_name == "health_regen":
+			base_boost = randf_range(0.005, 0.01) * level * rarity_mult
+		
+		# Balanço específico para dano de ataque: aumentado (5% a 15% por nível base)
+		if stat_name == "attack_damage":
+			base_boost = randf_range(0.05, 0.15) * level * rarity_mult
+			
 		stats[stat_name] = base_boost
 		
 	return stats

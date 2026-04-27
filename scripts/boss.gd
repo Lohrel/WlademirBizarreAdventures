@@ -11,8 +11,8 @@ func _ready():
 	# Atributos base elevados para o chefe
 	health = 200.0
 	attack_damage = 30.0
-	move_speed = 40.0 # Chefe é mais lento porém mais imponente
-	chase_speed = 120.0
+	move_speed = 80.0 # Chefe agora é mais rápido
+	chase_speed = 210.0 # Ligeiramente mais rápido que o jogador (200.0)
 	
 	super._ready()
 	
@@ -94,10 +94,14 @@ func _perform_throw_attack(box: RigidBody2D):
 	# 2. Arremessa em direção ao jogador
 	if is_instance_valid(box) and player:
 		var dir = (player.global_position - box.global_position).normalized()
-		box.throw(dir, 2000.0, attack_damage * 1.5)
+		box.throw(dir, 3500.0, attack_damage * 1.5)
 	
 	attack_timer.start()
 	current_state = State.AGGRESSIVE
+
+func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0, is_crit: bool = false):
+	# Reduz o knockback recebido pelo chefe (apenas 20% do normal)
+	super.take_damage(amount, source_pos, knockback_strength * 0.2, is_crit)
 
 func _find_nearby_box() -> RigidBody2D:
 	var query = PhysicsShapeQueryParameters2D.new()

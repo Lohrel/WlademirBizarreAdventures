@@ -40,7 +40,10 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player") or body.name.to_lower() == "player":
 		# Garante que estamos modificando o nó do script PlayerController
 		if "speed_multiplier" in body:
-			body.speed_multiplier = slowdown_multiplier
+			var bonus = 0.0
+			if "quicksand_speed_bonus" in body:
+				bonus = body.quicksand_speed_bonus
+			body.speed_multiplier = clamp(slowdown_multiplier + bonus, 0.1, 1.0)
 
 func _on_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player") or body.name.to_lower() == "player":
