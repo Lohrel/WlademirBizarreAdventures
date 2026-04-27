@@ -40,6 +40,7 @@ func _perform_attack():
 				player.apply_poison(bleed_damage, bleed_duration)
 				
 		attack_timer.start()
+		current_state = State.AGGRESSIVE
 
 func _get_attack_range() -> float:
 	return 35.0

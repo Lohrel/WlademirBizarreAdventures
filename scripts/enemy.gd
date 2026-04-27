@@ -250,7 +250,9 @@ func _animate():
 			sprite.flip_h = velocity.x < 0
 
 	# Reproduz animações
-	if velocity.length() > 5:
+	if current_state == State.ATTACK and anim_player.has_animation("attack"):
+		anim_player.play("attack")
+	elif velocity.length() > 5:
 		anim_player.play("walk")
 	else:
 		anim_player.play("idle")
