@@ -407,12 +407,27 @@ func _push_objects() -> void:
 		if body is RigidBody2D: body.apply_central_impulse(col.get_normal() * -25.0)
 
 func _animate() -> void:
-	if velocity.length() > 5: _state_machine.travel("walk")
-	else: _state_machine.travel("idle")
+	if _is_dashing:
+		_state_machine.travel("dash")
+		$Sprite2D.rotation = _dash_direction.angle() + PI/2
+		$Sprite2D.flip_h = false
+		$garra_player.visible = false
+	else:
+		if $Sprite2D.rotation != 0:
+			$Sprite2D.rotation = 0
+		if not $garra_player.visible:
+			$garra_player.visible = true
+		
+		if velocity.length() > 5:
+			_state_machine.travel("walk")
+		else:
+			_state_machine.travel("idle")
 
 func _on_dash_timer_timeout() -> void:
 	_is_dashing = false
 	$DashSmoke.emitting = false
+	$Sprite2D.rotation = 0
+	$garra_player.visible = true
 
 func _on_cooldown_dash_timeout() -> void: _use_dash = true
 
