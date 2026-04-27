@@ -3,6 +3,9 @@
 class_name LevelGenerator
 extends Node2D
 
+# --- Sinais ---
+signal map_updated
+
 # --- Cenas Exportadas ---
 @export_group("Scenes")
 @export var room_scene: PackedScene
@@ -24,6 +27,7 @@ var sun_time: float = 0.0
 var player_node: Node2D = null
 var locked_exit_doors: Array[Node2D] = []
 var map_container: Node2D = null
+var player_grid_pos: Vector2i = Vector2i.ZERO
 
 # Armazena as dimensões de cada coluna e linha para manter a grade alinhada
 var col_widths = {}
@@ -218,7 +222,14 @@ func _build_world_visuals() -> void:
 	
 	for grid_pos in map_data.keys():
 		var room_info = map_data[grid_pos]
+		room_info["visited"] = false # Inicializa Fog of War
+		
+		# Marca a sala inicial como visitada imediatamente
+		if room_info["type"] == "start":
+			room_info["visited"] = true
+			
 		var room_instance = room_scene.instantiate()
+		room_instance.grid_pos = grid_pos # Informa a sala sua posição na grade
 		
 		# Calcula a posição física acumulando larguras/alturas
 		room_instance.position = _get_physical_position(grid_pos)
@@ -399,3 +410,13 @@ func _on_boss_died() -> void:
 		# Configura a lógica de upgrade
 		var control = screen.get_node("Control")
 		control.setup(player_node, self)
+
+func mark_room_visited(grid_pos: Vector2i) -> void:
+	if map_data.has(grid_pos) and not map_data[grid_pos].get("visited", false):
+		map_data[grid_pos]["visited"] = true
+		map_updated.emit()
+
+func notify_player_moved(grid_pos: Vector2i) -> void:
+	if player_grid_pos != grid_pos:
+		player_grid_pos = grid_pos
+		map_updated.emit()

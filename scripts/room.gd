@@ -25,6 +25,7 @@ var quicksand_scene = preload("res://scenes/quicksand.tscn")
 var pressure_plate_scene = preload("res://scenes/pressure_plate.tscn")
 
 # --- Configuração ---
+var grid_pos: Vector2i = Vector2i.ZERO
 var has_open_ceiling: bool = false
 var _disabled_occluders: Array[LightOccluder2D] = []
 
@@ -37,6 +38,8 @@ const ATLAS_WALL_INNER = Vector2i(1, 1)
 
 func _ready() -> void:
 	add_to_group("rooms")
+	
+	$DetectionArea.body_entered.connect(_on_detection_area_body_entered)
 	
 	# Gera texturas procedurais para luzes
 	sunlight.texture = _create_radial_texture(512, Color(1, 1, 1, 1))
@@ -441,6 +444,13 @@ func _check_light_collision(light: PointLight2D) -> void:
 			_disabled_occluders.append(occ)
 
 # --- Utilitários ---
+
+func _on_detection_area_body_entered(body: Node2D) -> void:
+	if body.is_in_group("player") or body.name.to_lower() == "player":
+		var gen = get_tree().root.find_child("LevelGenerator", true, false)
+		if gen and gen.has_method("mark_room_visited"):
+			gen.mark_room_visited(grid_pos)
+			gen.notify_player_moved(grid_pos)
 
 func _create_radial_texture(size: int, main_color: Color) -> GradientTexture2D:
 	var grad = Gradient.new()
