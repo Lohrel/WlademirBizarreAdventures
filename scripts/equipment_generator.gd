@@ -11,6 +11,15 @@ const SLOT_STATS = {
 	Equipment.Slot.RING: ["dash_mastery"]
 }
 
+## Slot to icon paths mapping
+const SLOT_ICONS = {
+	Equipment.Slot.BOOTS: preload("res://assets/itens/item_bota.png"),
+	Equipment.Slot.GLOVES: preload("res://assets/itens/item_luva.png"),
+	Equipment.Slot.TUNIC: preload("res://assets/itens/item_jaqueta.png"),
+	Equipment.Slot.HAT: preload("res://assets/itens/item_chapeu.png"),
+	Equipment.Slot.RING: preload("res://assets/itens/item_anel.png")
+}
+
 ## Generates a random equipment piece scaled by level.
 static func generate_item(level: int = 1) -> Equipment:
 	var rarity = _roll_rarity()
@@ -18,7 +27,9 @@ static func generate_item(level: int = 1) -> Equipment:
 	var item_name = _get_random_name(slot, rarity)
 	var stats = _generate_random_stats(slot, level, rarity)
 	
-	return Equipment.new(item_name, slot, stats, rarity)
+	var item = Equipment.new(item_name, slot, stats, rarity)
+	item.icon = SLOT_ICONS[slot]
+	return item
 
 static func _roll_rarity() -> int:
 	var roll = randf()

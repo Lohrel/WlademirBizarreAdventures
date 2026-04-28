@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bb0ceympf3p78"
-path="res://.godot/imported/item_bota.png-ed75254a306aa5c047d462756b189719.ctex"
+uid="uid://b6eeoqxr3opp3"
+path="res://.godot/imported/item_luva.png-a3484fb9d0b2109786625493aae45476.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/itens/item_bota.png"
-dest_files=["res://.godot/imported/item_bota.png-ed75254a306aa5c047d462756b189719.ctex"]
+source_file="res://assets/itens/item_luva.png"
+dest_files=["res://.godot/imported/item_luva.png-a3484fb9d0b2109786625493aae45476.ctex"]
 
 [params]
 

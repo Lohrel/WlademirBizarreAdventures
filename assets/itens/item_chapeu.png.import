@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dldsus7f3n6x3"
-path="res://.godot/imported/item_chapeu.png-9df86a604b435ce0f9211bd4be7c95cd.ctex"
+path="res://.godot/imported/item_chapeu.png-168659a2e02126cd2dc2e077ef6e6a47.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/itens/item_chapeu.png"
-dest_files=["res://.godot/imported/item_chapeu.png-9df86a604b435ce0f9211bd4be7c95cd.ctex"]
+source_file="res://assets/itens/item_chapeu.png"
+dest_files=["res://.godot/imported/item_chapeu.png-168659a2e02126cd2dc2e077ef6e6a47.ctex"]
 
 [params]
 

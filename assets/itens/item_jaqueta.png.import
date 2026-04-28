@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b6eeoqxr3opp3"
-path="res://.godot/imported/item_luva.png-e80f56b9eb7fae95e91096e568688165.ctex"
+uid="uid://cot8sr740e6cl"
+path="res://.godot/imported/item_jaqueta.png-3f63d3d4ce1f03e7a0e926b5515f17ff.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/itens/item_luva.png"
-dest_files=["res://.godot/imported/item_luva.png-e80f56b9eb7fae95e91096e568688165.ctex"]
+source_file="res://assets/itens/item_jaqueta.png"
+dest_files=["res://.godot/imported/item_jaqueta.png-3f63d3d4ce1f03e7a0e926b5515f17ff.ctex"]
 
 [params]
 

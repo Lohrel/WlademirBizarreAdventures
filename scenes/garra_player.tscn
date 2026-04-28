@@ -17,6 +17,7 @@ colors = PackedColorArray(0.247, 0, 0.651, 1, 0.12, 0, 0.32, 0.8, 0, 0, 0, 0)
 [node name="garra_player" type="Node2D" unique_id=1122780426]
 
 [node name="hand" type="Sprite2D" parent="." unique_id=390138523]
+z_index = -1
 position = Vector2(17, 0)
 texture = ExtResource("1_dyq0a")
 vframes = 2

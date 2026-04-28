@@ -2,8 +2,10 @@ class_name ItemDrop
 extends CharacterBody2D
 
 @export var item_name: String = "Placeholder Item"
-@export var heal_amount: float = 20.0
+@export var heal_amount: float = 25.0
 @export var equipment_data: Equipment = null
+
+const HEAL_ICON = preload("res://assets/itens/item_pocao_cura.png")
 
 var _player_in_range: Node2D = null
 
@@ -14,9 +16,23 @@ func _ready() -> void:
 		_setup_tooltip()
 		if equipment_data.icon:
 			$Sprite2D.texture = equipment_data.icon
+			if $Sprite2D.has_node("ColorRect"):
+				$Sprite2D/ColorRect.hide()
 	else:
-		if has_node("Tooltip"):
-			$Tooltip.queue_free() # Sem tooltip para itens de cura
+		item_name = "Healing Potion"
+		$Sprite2D.texture = HEAL_ICON
+		if $Sprite2D.has_node("ColorRect"):
+			$Sprite2D/ColorRect.hide()
+		
+		# Garante que a poção também seja visível no escuro
+		if not $Sprite2D.material:
+			var mat = CanvasItemMaterial.new()
+			mat.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+			$Sprite2D.material = mat
+		
+		# Adiciona luz vermelha para a poção
+		_setup_potion_visuals()
+		_setup_potion_tooltip()
 	
 	# Conecta os sinais de entrada e saída da área de pickup
 	$PickupArea.body_entered.connect(_on_body_entered)
@@ -48,7 +64,15 @@ func _setup_rarity_visuals() -> void:
 		Equipment.Rarity.LEGENDARY: Color(1, 0.8, 0.2)
 	}
 	var color = rarity_colors[equipment_data.rarity]
-	self_modulate = color * 1.5 
+	
+	# Faz o sprite ignorar a iluminação global (CanvasModulate) para ficar sempre visível
+	if not $Sprite2D.material:
+		var mat = CanvasItemMaterial.new()
+		mat.light_mode = CanvasItemMaterial.LIGHT_MODE_UNSHADED
+		$Sprite2D.material = mat
+	
+	# Aplica o filtro de cor ao sprite para combinar com a raridade
+	$Sprite2D.modulate = color * 1.2
 	
 	var light = PointLight2D.new()
 	light.color = color
@@ -80,8 +104,24 @@ func _setup_tooltip() -> void:
 	
 	%StatsLabel.text = stats_text.strip_edges() + "[/center]"
 
+func _setup_potion_visuals() -> void:
+	var color = Color(1, 0.2, 0.2) # Vermelho para poção
+	var light = PointLight2D.new()
+	light.color = color
+	light.energy = 0.6
+	light.texture_scale = 0.4
+	light.texture = _create_light_texture(128)
+	add_child(light)
+
+func _setup_potion_tooltip() -> void:
+	if has_node("Tooltip"):
+		%NameLabel.text = "Healing Potion"
+		%RarityLabel.text = "Consumable"
+		%RarityLabel.add_theme_color_override("font_color", Color(1, 0.5, 0.5))
+		%StatsLabel.text = "[center][color=red]+25 HP[/color][/center]"
+
 func _process(_delta: float) -> void:
-	if _player_in_range and equipment_data:
+	if _player_in_range:
 		if Input.is_action_just_pressed("interact"):
 			_collect(_player_in_range)
 
@@ -100,11 +140,9 @@ func _create_light_texture(size: int) -> GradientTexture2D:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		if equipment_data:
-			_player_in_range = body
+		_player_in_range = body
+		if has_node("Tooltip"):
 			$Tooltip.show()
-		else:
-			_collect(body)
 
 func _on_body_exited(body: Node2D) -> void:
 	if body == _player_in_range:

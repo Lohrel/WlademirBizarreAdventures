@@ -367,8 +367,8 @@ func _attack() -> void:
 		_attack_timer.start()
 		_is_attacking = true
 		$garra_player/hand.start_attack()
-		# Escala a garra visualmente com o alcance
-		$garra_player/hand.scale = Vector2(1.0, 1.0) * attack_range_multiplier
+		# Escala a garra visualmente com o alcance usando a nova propriedade visual_scale
+		$garra_player/hand.visual_scale = 1.0 * attack_range_multiplier
 	
 	if _is_attacking:
 		# Aumenta a velocidade de projeção proporcionalmente ao alcance para não parecer "lento"
@@ -378,9 +378,9 @@ func _attack() -> void:
 	else:
 		$garra_player/hand.distancia = move_toward($garra_player/hand.distancia, 25, 200 * get_physics_process_delta_time())
 		$garra_player/hand/ShadowTrail.emitting = false
-		# Reseta a escala gradualmente ou imediatamente
-		if $garra_player/hand.scale.x > 1.0:
-			$garra_player/hand.scale = $garra_player/hand.scale.move_toward(Vector2(1.0, 1.0), 2.0 * get_physics_process_delta_time())
+		# Reseta a escala visual gradualmente
+		if $garra_player/hand.visual_scale > 1.0:
+			$garra_player/hand.visual_scale = move_toward($garra_player/hand.visual_scale, 1.0, 2.0 * get_physics_process_delta_time())
 
 func _check_sunlight() -> void:
 	if not _current_room or not _current_room.get_node("DetectionArea").overlaps_body(self):

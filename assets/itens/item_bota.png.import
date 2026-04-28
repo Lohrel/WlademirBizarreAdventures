@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnhqu2rdp212v"
-path="res://.godot/imported/item_anel.png-26dd0c4e8175f201e24be560d1138e9d.ctex"
+uid="uid://bb0ceympf3p78"
+path="res://.godot/imported/item_bota.png-cda4f21bc8b182bd0e8c94915dc4f4a1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/itens/item_anel.png"
-dest_files=["res://.godot/imported/item_anel.png-26dd0c4e8175f201e24be560d1138e9d.ctex"]
+source_file="res://assets/itens/item_bota.png"
+dest_files=["res://.godot/imported/item_bota.png-cda4f21bc8b182bd0e8c94915dc4f4a1.ctex"]
 
 [params]
 

@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c3yudek8jww87"]
 
-[ext_resource type="Script" uid="uid://dq2ywovs2t2ve" path="res://scripts/mumia.gd" id="1_mumia_script"]
+[ext_resource type="Script" uid="uid://ds33nxcfgx7ww" path="res://scripts/mumia.gd" id="1_mumia_script"]
 [ext_resource type="Texture2D" uid="uid://cfxdhg6m8laqp" path="res://assets/sprites/múmia/mumia_spritesheet.png" id="2_uicjk"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
@@ -81,13 +81,13 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_phys"]
-radius = 8.0
+radius = 16.03122
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 18.0
+radius = 16.0
 
 [node name="Mumia" type="CharacterBody2D" unique_id=804358572]
 collision_mask = 3
@@ -103,7 +103,7 @@ libraries/ = SubResource("AnimationLibrary_skel")
 autoplay = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1558247494]
-visible = false
+position = Vector2(-3, 0)
 shape = SubResource("CircleShape2D_phys")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=910886390]
@@ -138,13 +138,13 @@ visible = false
 target_position = Vector2(20, -20)
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=1040153149]
-visible = false
 collision_layer = 16
 collision_mask = 2
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=327567472]
 visible = false
+position = Vector2(-3, 0)
 shape = SubResource("CircleShape2D_hitbox")
 
 [node name="AttackTimer" type="Timer" parent="." unique_id=264014608]

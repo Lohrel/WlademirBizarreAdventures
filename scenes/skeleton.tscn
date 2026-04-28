@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://b8o720cqn7asx"]
 
-[ext_resource type="Script" uid="uid://betig0wqo68w3" path="res://scripts/skeleton.gd" id="1_skeleton"]
+[ext_resource type="Script" uid="uid://dt7ruje87l4j" path="res://scripts/skeleton.gd" id="1_skeleton"]
 [ext_resource type="Texture2D" uid="uid://c8d3qa2mv0mpc" path="res://assets/sprites/skeleton/spritesheet_skeleton.png" id="2_tex"]
 
 [sub_resource type="Animation" id="Animation_idle"]
@@ -44,13 +44,13 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_phys"]
-radius = 8.0
+radius = 15.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 18.0
+radius = 15.0
 
 [node name="Skeleton" type="CharacterBody2D" unique_id=804358572]
 collision_mask = 3
@@ -74,6 +74,7 @@ collision_layer = 8
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=981760755]
+visible = false
 shape = SubResource("CircleShape2D_hurt")
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1851027474]

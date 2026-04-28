@@ -1,7 +1,7 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene format=3 uid="uid://bamkw7hb3jn7f"]
 
-[ext_resource type="Script" path="res://scripts/bandido_arma.gd" id="1_bandido_script"]
-[ext_resource type="Texture2D" path="res://assets/sprites/bandido_arma/bandido_arma_spritesheet.png" id="2_bandido_sprite"]
+[ext_resource type="Script" uid="uid://cqw2kmomvdykd" path="res://scripts/bandido_arma.gd" id="1_bandido_script"]
+[ext_resource type="Texture2D" uid="uid://sysq5q58jsb4" path="res://assets/sprites/bandido_arma/bandido_arma_spritesheet.png" id="2_bandido_sprite"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
 length = 0.001
@@ -62,7 +62,7 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_phys"]
-radius = 8.0
+radius = 17.0
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
@@ -76,17 +76,17 @@ texture = ExtResource("2_bandido_sprite")
 hframes = 3
 vframes = 2
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=3103828038]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=-1191139258]
 libraries/ = SubResource("AnimationLibrary_bandido")
 autoplay = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1658247494]
-visible = false
 shape = SubResource("CircleShape2D_phys")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=920886390]
 unique_name_in_owner = true
 visible = false
+position = Vector2(0, 4)
 collision_layer = 8
 collision_mask = 4
 
@@ -122,7 +122,7 @@ collision_mask = 2
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=427567472]
-visible = false
+shape = SubResource("CircleShape2D_hurt")
 
 [node name="AttackTimer" type="Timer" parent="." unique_id=364014608]
 wait_time = 4.0

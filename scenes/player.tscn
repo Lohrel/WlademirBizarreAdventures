@@ -301,6 +301,7 @@ metadata/_edit_horizontal_guides_ = [-2917.0]
 [node name="HUD" parent="." unique_id=123456789 instance=ExtResource("4_hud")]
 
 [node name="player" type="CharacterBody2D" parent="." unique_id=318862848 node_paths=PackedStringArray("_animation_tree", "_dash_timer", "_cooldown_dash", "_attack_timer")]
+z_index = 11
 collision_layer = 2
 script = ExtResource("1_g2els")
 _animation_tree = NodePath("AnimationTree")
@@ -383,7 +384,7 @@ scale_amount_curve = SubResource("Curve_Burn")
 color = Color(1, 0.4, 0.1, 1)
 
 [node name="garra_player" parent="player" unique_id=506683672 instance=ExtResource("3_qhqgy")]
-z_index = -1
+z_index = 0
 
 [connection signal="timeout" from="player/dash_timer" to="player" method="_on_dash_timer_timeout"]
 [connection signal="timeout" from="player/cooldown_dash" to="player" method="_on_cooldown_dash_timeout"]

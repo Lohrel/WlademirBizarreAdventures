@@ -6,6 +6,8 @@ extends Sprite2D
 @export var distancia: int = 25
 @export var attack_damage: float = 10.0
 
+var visual_scale: float = 1.0
+
 # --- Referências ---
 @onready var hitbox = $Hitbox
 
@@ -31,13 +33,15 @@ func _physics_process(_delta: float) -> void:
 	global_position = player.global_position + dir * distancia
 	look_at(target_pos)
 	
+	# Aplica escala base
+	scale.x = visual_scale
+	
 	# Corrige a orientação vertical (flip) para não ficar de cabeça para baixo
 	rotation_degrees = wrap(rotation_degrees, 0, 360)
-	if not player._is_attacking:
-		if rotation_degrees > 90 and rotation_degrees < 270:
-			scale.y = -abs(scale.y)
-		else:
-			scale.y = abs(scale.y)
+	if rotation_degrees > 90 and rotation_degrees < 270:
+		scale.y = -visual_scale
+	else:
+		scale.y = visual_scale
 
 # --- Lógica de Ataque ---
 
@@ -95,10 +99,10 @@ func _on_hitbox_area_entered(area: Area2D) -> void:
 			
 			# Feedback visual na garra
 			var tween = create_tween()
-			var base_scale = scale
+			var base_visual_scale = visual_scale
 			var scale_mult = 2.0 if is_crit else 1.5
-			tween.tween_property(self, "scale", base_scale * scale_mult, 0.05)
-			tween.tween_property(self, "scale", base_scale, 0.1)
+			tween.tween_property(self, "visual_scale", base_visual_scale * scale_mult, 0.05)
+			tween.tween_property(self, "visual_scale", base_visual_scale, 0.1)
 			
 			# Shake da câmera
 			var cam = get_viewport().get_camera_2d()

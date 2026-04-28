@@ -22,9 +22,10 @@ enum State { IDLE, WANDER, ALERT, AGGRESSIVE, ATTACK }
 @export var alert_to_aggro_time: float = 1.5
 @export var suspicion_drain_time: float = 8.0
 @export var aggro_loss_time: float = 5.0
-@export var drop_chance: float = 0.3
+@export var drop_chance: float = 0.35
 
 # --- Variáveis de Tempo de Execução ---
+
 var current_state: State = State.IDLE
 var suspicion: float = 0.0 # 0.0 a 1.0 (Nível de alerta)
 var out_of_sight_timer: float = 0.0
@@ -337,8 +338,8 @@ func die():
 func _spawn_drop():
 	var drop = item_drop_scene.instantiate()
 
-	# 100% de chance de ser um equipamento para testes
-	if randf() < 1.0:
+	# 50% chance for equipment, 50% for health potion
+	if randf() < 0.5:
 		var gen = get_tree().root.find_child("LevelGenerator", true, false)
 		var level = 1
 		if gen and "current_level" in gen:
@@ -348,6 +349,10 @@ func _spawn_drop():
 		var EquipmentGeneratorScript = load("res://scripts/equipment_generator.gd")
 		var item = EquipmentGeneratorScript.generate_item(level)
 		drop.equipment_data = item
+	else:
+		# Health potion is the default when equipment_data is null
+		drop.equipment_data = null
+		drop.heal_amount = 25.0
 
 	get_parent().add_child(drop)
 	drop.global_position = global_position
