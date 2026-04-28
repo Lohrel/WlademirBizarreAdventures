@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c3yudek8jww87"]
 
-[ext_resource type="Script" uid="uid://ds33nxcfgx7ww" path="res://scripts/mumia.gd" id="1_mumia_script"]
+[ext_resource type="Script" uid="uid://dq2ywovs2t2ve" path="res://scripts/mumia.gd" id="1_mumia_script"]
 [ext_resource type="Texture2D" uid="uid://cfxdhg6m8laqp" path="res://assets/sprites/múmia/mumia_spritesheet.png" id="2_uicjk"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
