@@ -149,6 +149,10 @@ func _ready() -> void:
 	_state_machine = _animation_tree["parameters/playback"]
 	add_to_group("player")
 	
+	# Configuração inicial de colisão
+	collision_layer = 2 # Layer 2 (Player)
+	collision_mask = 19 # Layer 1 (Walls) + Layer 2 (Player) + Layer 5 (Enemies)
+	
 	# Cache do HUD
 	if get_parent():
 		_hud_node = get_parent().get_node_or_null("HUD")
@@ -371,6 +375,8 @@ func _dash() -> void:
 		_dash_direction = dir.normalized()
 		_use_dash = false
 		_is_dashing = true
+		collision_layer = 0 # Temporariamente invisível para a física (inimigos não colidem)
+		collision_mask = 3 # Apenas Layer 1 (Walls) e Layer 2 (Player) - Ignora Layer 5 (Enemies)
 		mana -= dash_mana_cost
 		update_hud()
 		_cooldown_dash.start(dash_cooldown_time)
@@ -495,6 +501,8 @@ func _animate() -> void:
 
 func _on_dash_timer_timeout() -> void:
 	_is_dashing = false
+	collision_layer = 2 # Restaura Layer 2 (Player)
+	collision_mask = 19 # Restaura Layer 5 (Enemies)
 	$DashSmoke.emitting = false
 	$Sprite2D.rotation = 0
 	$garra_player.visible = true

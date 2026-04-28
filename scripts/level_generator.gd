@@ -266,15 +266,15 @@ func _build_world_visuals() -> void:
 		var max_enemies = 0
 		
 		# Salas de início e corredores (opcional) não devem ter inimigos ou ter quantidade reduzida
-		if room_info["type"] == "normal" or room_info["type"] == "boss":
+		if room_info["type"] == "normal":
 			min_enemies = clampi(current_level, 1, 10)
 			max_enemies = clampi(current_level + 2, 2, 15)
 		elif room_info["type"] == "corridor":
 			min_enemies = 0
 			max_enemies = 1 # Lightly populated corridors
-		elif room_info["type"] == "start" or room_info["type"] == "exit":
+		elif room_info["type"] == "start" or room_info["type"] == "exit" or room_info["type"] == "boss":
 			min_enemies = 0
-			max_enemies = 0 # No enemies in start/exit room
+			max_enemies = 0 # No extra enemies in start/exit/boss rooms
 
 		# Configura o tamanho, visuais, conexões e inimigos da sala
 		room_instance.setup_room_ext(room_info["size"], has_n, has_s, has_e, has_w, is_open, 

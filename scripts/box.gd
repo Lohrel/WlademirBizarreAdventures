@@ -4,6 +4,7 @@ var is_thrown = false
 var throw_damage = 25.0
 
 func _ready():
+	add_to_group("destructible")
 	# Habilita monitoramento de contatos para detectar o jogador quando arremessado
 	contact_monitor = true
 	max_contacts_reported = 1

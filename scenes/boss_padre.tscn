@@ -239,10 +239,7 @@ _data = {
 radius = 30.016663
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
-radius = 12.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
-radius = 18.0
+radius = 30.265491
 
 [node name="BossPadre" type="CharacterBody2D" unique_id=804358572]
 collision_mask = 3
@@ -263,12 +260,12 @@ shape = SubResource("CircleShape2D_phys")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=910886390]
 unique_name_in_owner = true
-visible = false
 position = Vector2(0, 6)
 collision_layer = 8
 collision_mask = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=981760755]
+position = Vector2(18, -4)
 shape = SubResource("CircleShape2D_hurt")
 
 [node name="DetectionArea" type="Area2D" parent="." unique_id=1851027474]

@@ -55,6 +55,8 @@ var damage_indicator_scene = preload("res://scenes/damage_indicator.tscn")
 func _ready():
 	# Configuração inicial
 	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
+	collision_layer = 16 # Layer 5 (Enemies)
+	collision_mask = 3   # Layer 1 (Walls) + Layer 2 (Player)
 	spawn_pos = global_position
 	target_wander_pos = spawn_pos
 	
