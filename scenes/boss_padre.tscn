@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cmlp6qiqopqc"]
 
-[ext_resource type="Script" uid="uid://dq2ywovs2t2ve" path="res://scripts/mumia.gd" id="1_w0701"]
+[ext_resource type="Script" uid="uid://bctradk1djy5b" path="res://scripts/boss_padre.gd" id="1_boss_padre"]
 [ext_resource type="Texture2D" uid="uid://b0wwjfglrfihk" path="res://assets/sprites/boss_padre/spritesheet_boss_padre.png" id="2_w0701"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
@@ -45,7 +45,6 @@ tracks/2/keys = {
 [sub_resource type="Animation" id="Animation_uicjk"]
 resource_name = "attack_1"
 length = 1.4
-loop_mode = 1
 step = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -87,7 +86,6 @@ tracks/2/keys = {
 [sub_resource type="Animation" id="Animation_3lckd"]
 resource_name = "attack_2"
 length = 1.6
-loop_mode = 1
 step = 0.2
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -129,7 +127,6 @@ tracks/2/keys = {
 [sub_resource type="Animation" id="Animation_rr57q"]
 resource_name = "attack_3"
 length = 0.8
-loop_mode = 1
 step = 0.4
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -239,7 +236,7 @@ _data = {
 }
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_phys"]
-radius = 8.0
+radius = 30.016663
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hurt"]
 radius = 12.0
@@ -247,9 +244,9 @@ radius = 12.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
 radius = 18.0
 
-[node name="Mumia" type="CharacterBody2D" unique_id=804358572]
+[node name="BossPadre" type="CharacterBody2D" unique_id=804358572]
 collision_mask = 3
-script = ExtResource("1_w0701")
+script = ExtResource("1_boss_padre")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=580403191]
 texture = ExtResource("2_w0701")
@@ -261,12 +258,13 @@ libraries/ = SubResource("AnimationLibrary_skel")
 autoplay = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1558247494]
-visible = false
+position = Vector2(18, 2)
 shape = SubResource("CircleShape2D_phys")
 
 [node name="Hurtbox" type="Area2D" parent="." unique_id=910886390]
 unique_name_in_owner = true
 visible = false
+position = Vector2(0, 6)
 collision_layer = 8
 collision_mask = 4
 
@@ -297,13 +295,13 @@ target_position = Vector2(20, -20)
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=1040153149]
 visible = false
+position = Vector2(0, 12)
 collision_layer = 16
 collision_mask = 2
 monitoring = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=327567472]
-visible = false
-shape = SubResource("CircleShape2D_hitbox")
+shape = SubResource("CircleShape2D_phys")
 
 [node name="AttackTimer" type="Timer" parent="." unique_id=264014608]
 wait_time = 1.2

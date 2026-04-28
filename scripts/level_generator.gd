@@ -11,6 +11,7 @@ signal map_updated
 @export var room_scene: PackedScene
 @export var player_scene: PackedScene
 @export var boss_scene: PackedScene 
+@export var boss_padre_scene: PackedScene
 @export var upgrade_screen_scene: PackedScene
 @export var staircase_scene: PackedScene
 
@@ -57,8 +58,11 @@ func generate_new_level() -> void:
 		map_container = null
 	
 	# Fallback para garantir que nada sobrou (especialmente nós orfãos com nomes Room ou @Room)
+	for drop in get_tree().get_nodes_in_group("drops"):
+		drop.queue_free()
+		
 	for child in get_children():
-		if child.name.begins_with("Room") or "@Room" in child.name or child is Enemy or child is ItemDrop or child is Staircase:
+		if child.name.begins_with("Room") or "@Room" in child.name or child is Enemy or child is Staircase:
 			child.queue_free()
 	
 	# 2. Cria novo container
@@ -282,10 +286,18 @@ func _build_world_visuals() -> void:
 		# Gerencia a configuração específica da sala do Chefe
 		if room_info["type"] == "boss":
 			room_instance.modulate = Color(1, 0.5, 0.5) # Dica visual para o Chefe
-			if boss_scene:
-				var boss = boss_scene.instantiate()
+			
+			var selected_boss_scene = boss_scene
+			if current_level == 2 and boss_padre_scene:
+				selected_boss_scene = boss_padre_scene
+				
+			if selected_boss_scene:
+				var boss = selected_boss_scene.instantiate()
 				boss.position = room_instance.position
-				boss.boss_died.connect(_on_boss_died)
+				if boss.has_signal("boss_died"):
+					boss.boss_died.connect(_on_boss_died)
+				elif boss.has_signal("enemy_died"):
+					boss.enemy_died.connect(_on_boss_died)
 				map_container.add_child(boss)
 				
 		# Gerencia a configuração específica da sala de Saída

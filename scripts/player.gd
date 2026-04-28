@@ -314,6 +314,21 @@ func _input(event: InputEvent) -> void:
 						if item.rarity == Equipment.Rarity.LEGENDARY:
 							_spawn_debug_item(item)
 							break
+				KEY_F6: # Teleporte para o Boss
+					var gen = get_tree().root.find_child("LevelGenerator", true, false)
+					if gen:
+						for grid_pos in gen.map_data:
+							if gen.map_data[grid_pos]["type"] == "boss":
+								var world_pos = gen._get_physical_position(grid_pos)
+								# Teleporta a raiz do jogador (CharacterBody2D)
+								global_position = world_pos
+								# Reseta velocidade para não "deslizar" ao chegar
+								velocity = Vector2.ZERO
+								# Ajusta a câmera imediatamente
+								var cam = get_viewport().get_camera_2d()
+								if cam and cam.has_method("snap_to_player"):
+									cam.snap_to_player()
+								break
 
 func _handle_movement() -> void:
 	_dash() 

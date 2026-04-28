@@ -10,6 +10,7 @@ const HEAL_ICON = preload("res://assets/itens/item_pocao_cura.png")
 var _player_in_range: Node2D = null
 
 func _ready() -> void:
+	add_to_group("drops")
 	if equipment_data:
 		item_name = equipment_data.name
 		_setup_rarity_visuals()
