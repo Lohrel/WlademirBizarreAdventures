@@ -1,7 +1,7 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3 uid="uid://u208sepywl0f"]
 
-[ext_resource type="Script" path="res://scripts/item_drop.gd" id="1_item_script"]
-[ext_resource type="FontFile" uid="uid://c6y7p2v8m3l2x" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
+[ext_resource type="Script" uid="uid://ddegkkmu65wlj" path="res://scripts/item_drop.gd" id="1_item_script"]
+[ext_resource type="FontFile" uid="uid://268nc7c4qwc3" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_phys"]
 size = Vector2(8, 8)
@@ -23,32 +23,30 @@ corner_radius_bottom_left = 2
 shadow_color = Color(0, 0, 0, 0.3)
 shadow_size = 2
 
-[node name="ItemDrop" type="CharacterBody2D"]
+[node name="ItemDrop" type="CharacterBody2D" unique_id=1046485457]
 collision_layer = 0
-collision_mask = 1
 motion_mode = 1
 script = ExtResource("1_item_script")
 
-[node name="Sprite2D" type="Sprite2D" parent="."]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1567152367]
 
-[node name="ColorRect" type="ColorRect" parent="Sprite2D"]
+[node name="ColorRect" type="ColorRect" parent="Sprite2D" unique_id=749777318]
 offset_left = -8.0
 offset_top = -8.0
 offset_right = 8.0
 offset_bottom = 8.0
-color = Color(1, 1, 1, 1)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1589927346]
 shape = SubResource("RectangleShape2D_phys")
 
-[node name="PickupArea" type="Area2D" parent="."]
+[node name="PickupArea" type="Area2D" parent="." unique_id=420033589]
 collision_layer = 0
 collision_mask = 2
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PickupArea" unique_id=721046033]
 shape = SubResource("RectangleShape2D_item")
 
-[node name="Tooltip" type="PanelContainer" parent="."]
+[node name="Tooltip" type="PanelContainer" parent="." unique_id=934133684]
 visible = false
 z_index = 10
 custom_minimum_size = Vector2(100, 0)
@@ -65,15 +63,15 @@ grow_horizontal = 2
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_tooltip")
 
-[node name="VBox" type="VBoxContainer" parent="Tooltip"]
+[node name="VBox" type="VBoxContainer" parent="Tooltip" unique_id=778950035]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="Header" type="VBoxContainer" parent="Tooltip/VBox"]
+[node name="Header" type="VBoxContainer" parent="Tooltip/VBox" unique_id=1254066982]
 layout_mode = 2
 theme_override_constants/separation = 2
 
-[node name="NameLabel" type="Label" parent="Tooltip/VBox/Header"]
+[node name="NameLabel" type="Label" parent="Tooltip/VBox/Header" unique_id=246270443]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
@@ -83,7 +81,7 @@ theme_override_font_sizes/font_size = 8
 text = "Item Name"
 horizontal_alignment = 1
 
-[node name="RarityLabel" type="Label" parent="Tooltip/VBox/Header"]
+[node name="RarityLabel" type="Label" parent="Tooltip/VBox/Header" unique_id=486335378]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/font = ExtResource("2_font")
@@ -91,10 +89,10 @@ theme_override_font_sizes/font_size = 8
 text = "Rarity"
 horizontal_alignment = 1
 
-[node name="HSeparator" type="HSeparator" parent="Tooltip/VBox"]
+[node name="HSeparator" type="HSeparator" parent="Tooltip/VBox" unique_id=737250913]
 layout_mode = 2
 
-[node name="StatsLabel" type="RichTextLabel" parent="Tooltip/VBox"]
+[node name="StatsLabel" type="RichTextLabel" parent="Tooltip/VBox" unique_id=552362871]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_fonts/normal_font = ExtResource("2_font")
@@ -105,10 +103,10 @@ fit_content = true
 scroll_active = false
 autowrap_mode = 0
 
-[node name="HSeparator2" type="HSeparator" parent="Tooltip/VBox"]
+[node name="HSeparator2" type="HSeparator" parent="Tooltip/VBox" unique_id=1912440320]
 layout_mode = 2
 
-[node name="InteractLabel" type="Label" parent="Tooltip/VBox"]
+[node name="InteractLabel" type="Label" parent="Tooltip/VBox" unique_id=881059438]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 0, 1)
 theme_override_fonts/font = ExtResource("2_font")
