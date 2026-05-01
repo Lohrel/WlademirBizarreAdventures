@@ -50,6 +50,8 @@ var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
 var sunlight_damage_reduction: float = 0.0
+var _dash_targets_hit: Array[Node2D] = []
+var _dash_boost: float = 1.0
 
 # --- Referências de HUD ---
 var _hud_node: Node = null
@@ -337,9 +339,49 @@ func _input(event: InputEvent) -> void:
 func _handle_movement() -> void:
 	_dash() 
 	if _is_dashing:
-		velocity = _dash_direction * _dash_speed
+		velocity = _dash_direction * (_dash_speed * _dash_boost)
+		_check_dash_collisions()
 	else:
 		_move()
+
+func _check_dash_collisions() -> void:
+	var space_state = get_world_2d().direct_space_state
+	var shape_query = PhysicsShapeQueryParameters2D.new()
+	shape_query.shape = $CollisionShape2D.shape
+	shape_query.transform = global_transform
+	shape_query.collision_mask = 16 # Layer 5 (Enemies)
+	
+	var results = space_state.intersect_shape(shape_query)
+	for result in results:
+		var enemy = result.collider
+		if enemy and enemy is Enemy and not _dash_targets_hit.has(enemy):
+			_dash_targets_hit.append(enemy)
+			_on_dash_enemy_hit(enemy)
+
+func _on_dash_enemy_hit(enemy: Enemy) -> void:
+	var hand = get_node_or_null("garra_player/hand")
+	var dmg = base_attack_damage * 1.5
+	if hand: dmg = hand.attack_damage * 1.5
+	
+	enemy.take_damage(dmg, global_position, knockback_strength * 2.0)
+	
+	# Bônus de Dash: Aumenta velocidade e estende a duração
+	_dash_boost *= 1.2
+	var new_time = _dash_timer.time_left + 0.1
+	_dash_timer.start(new_time)
+	
+	# Feedback visual no jogador
+	var tween = create_tween()
+	tween.tween_property($Sprite2D, "modulate", Color(2, 2, 2), 0.05)
+	tween.tween_property($Sprite2D, "modulate", Color(1, 1, 1), 0.05)
+	
+	# Efeito de Hit-stop (Frame Hit)
+	_apply_frame_hit()
+
+func _apply_frame_hit() -> void:
+	Engine.time_scale = 0.05
+	await get_tree().create_timer(0.05, true, false, true).timeout
+	Engine.time_scale = 1.0
 
 func _handle_combat() -> void:
 	_attack()
@@ -375,7 +417,9 @@ func _dash() -> void:
 		_dash_direction = dir.normalized()
 		_use_dash = false
 		_is_dashing = true
-		collision_layer = 0 # Temporariamente invisível para a física (inimigos não colidem)
+		_dash_targets_hit.clear()
+		_dash_boost = 1.0
+		collision_layer = 0 # Temporarily invisible to physics (enemies don't collide)
 		collision_mask = 3 # Apenas Layer 1 (Walls) e Layer 2 (Player) - Ignora Layer 5 (Enemies)
 		mana -= dash_mana_cost
 		update_hud()
@@ -384,6 +428,7 @@ func _dash() -> void:
 		$DashSmoke.emitting = true
 
 func _attack() -> void:
+
 	if Input.is_action_just_pressed("attack") and not _is_attacking:
 		_attack_timer.start()
 		_is_attacking = true
@@ -501,6 +546,7 @@ func _animate() -> void:
 
 func _on_dash_timer_timeout() -> void:
 	_is_dashing = false
+	_dash_boost = 1.0
 	collision_layer = 2 # Restaura Layer 2 (Player)
 	collision_mask = 19 # Restaura Layer 5 (Enemies)
 	$DashSmoke.emitting = false

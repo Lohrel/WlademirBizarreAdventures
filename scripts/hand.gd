@@ -4,6 +4,7 @@ extends Sprite2D
 
 # --- Atributos ---
 @export var distancia: int = 25
+@export var max_grab_distance: float = 100.0
 @export var attack_damage: float = 10.0
 
 var visual_scale: float = 1.0
@@ -12,6 +13,7 @@ var visual_scale: float = 1.0
 @onready var hitbox = $Hitbox
 
 var _already_hit_areas: Array[Area2D] = []
+var _grabbed_box: RigidBody2D = null
 
 # --- Ciclo de Vida ---
 
@@ -26,13 +28,75 @@ func _physics_process(_delta: float) -> void:
 	var player = get_parent().get_parent()
 	if not player: return
 	
-	# Faz a garra seguir a direção do mouse
 	var target_pos = get_global_mouse_position()
-	var dir = (target_pos - player.global_position).normalized()
 	
-	global_position = player.global_position + dir * distancia
-	look_at(target_pos)
-	
+	# Lógica de agarrar e mover caixas
+	var is_hovering_box = false
+	if not is_instance_valid(_grabbed_box):
+		var space_state = get_world_2d().direct_space_state
+		var query = PhysicsPointQueryParameters2D.new()
+		query.position = global_position
+		var results = space_state.intersect_point(query)
+		for result in results:
+			var collider = result.collider
+			if collider is RigidBody2D and collider.is_in_group("destructible"):
+				is_hovering_box = true
+				if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+					_grabbed_box = collider
+					_grabbed_box.freeze = true
+					_grabbed_box.add_collision_exception_with(player)
+				break
+				
+	if is_instance_valid(_grabbed_box) or is_hovering_box:
+		frame = 1
+	else:
+		frame = 0
+
+	if not Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+		if is_instance_valid(_grabbed_box):
+			_grabbed_box.freeze = false
+			_grabbed_box.remove_collision_exception_with(player)
+			_grabbed_box = null
+
+	# Faz a garra seguir a direção do mouse
+	if is_instance_valid(_grabbed_box):
+		var distance = player.global_position.distance_to(target_pos)
+		var desired_pos = target_pos
+		if distance > max_grab_distance:
+			var dir_to_target = (target_pos - player.global_position).normalized()
+			desired_pos = player.global_position + dir_to_target * max_grab_distance
+			
+		# Usa move_and_collide para impedir que a caixa atravesse paredes e empurre os inimigos sem atravessá-los
+		var motion = desired_pos - _grabbed_box.global_position
+		var collision = _grabbed_box.move_and_collide(motion)
+		
+		if collision:
+			var collider = collision.get_collider()
+			# Checa se é um inimigo (tem take_damage, não é o player, e é CharacterBody2D)
+			if collider is CharacterBody2D and collider != player and collider.has_method("take_damage"):
+				# Fator de resistência: 0.2 significa que a caixa empurra o inimigo com apenas 20% da velocidade
+				var resistance_factor = 0.2
+				var push_vector = collision.get_remainder() * resistance_factor
+				
+				# Empurra o inimigo
+				collider.move_and_collide(push_vector)
+				# Move a caixa acompanhando o empurrão
+				_grabbed_box.move_and_collide(push_vector)
+		
+		# A garra fica na mesma posição da caixa
+		global_position = _grabbed_box.global_position
+	else:
+		var dir = (target_pos - player.global_position).normalized()
+		global_position = player.global_position + dir * distancia
+		
+	# Apenas dá look_at se não estiver perfeitamente em cima do alvo para evitar erros
+	if global_position.distance_to(target_pos) > 0.1:
+		look_at(target_pos)
+	elif is_instance_valid(_grabbed_box):
+		# Opcional: faz a garra apontar para o player se estiver livre pelo mouse
+		var dir_to_player = (player.global_position - global_position).normalized()
+		rotation = dir_to_player.angle() + PI # Aponta no sentido inverso ao player, pra frente
+
 	# Aplica escala base
 	scale.x = visual_scale
 	

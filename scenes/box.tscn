@@ -10,6 +10,7 @@ size = Vector2(32, 32)
 polygon = PackedVector2Array(-16, -16, 16, -16, 16, 16, -16, 16)
 
 [node name="Box" type="RigidBody2D" unique_id=674304768]
+collision_mask = 11
 mass = 2.0
 gravity_scale = 0.0
 lock_rotation = true
