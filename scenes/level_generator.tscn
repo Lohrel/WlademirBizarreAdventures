@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://b8o720cqn7as0" path="res://scenes/boss.tscn" id="4_boss"]
 [ext_resource type="PackedScene" uid="uid://cmlp6qiqopqc" path="res://scenes/boss_padre.tscn" id="8_boss_padre"]
 [ext_resource type="Script" path="res://scripts/camera_2d.gd" id="5_camera"]
+[ext_resource type="AudioStream" uid="uid://cd2r0qsy4nvo3" path="res://assets/sounds/WindyNight.wav" id="6_ambient_music"]
 
 [ext_resource type="PackedScene" uid="uid://c8l7p8m4n5p2x" path="res://scenes/background_night.tscn" id="6_bg"]
 [ext_resource type="PackedScene" uid="uid://b8y8q8u4n8p4y" path="res://scenes/staircase.tscn" id="7_stairs"]

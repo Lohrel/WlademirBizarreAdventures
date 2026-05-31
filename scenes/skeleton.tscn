@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dt7ruje87l4j" path="res://scripts/skeleton.gd" id="1_skeleton"]
 [ext_resource type="Texture2D" uid="uid://c8d3qa2mv0mpc" path="res://assets/sprites/skeleton/spritesheet_skeleton.png" id="2_tex"]
+[ext_resource type="AudioStream" uid="uid://dhbs3id3s2yeh" path="res://assets/sounds/Ataque inimigo sm.wav" id="3_ataque"]
 
 [sub_resource type="Animation" id="Animation_idle"]
 resource_name = "idle"
@@ -105,3 +106,6 @@ shape = SubResource("CircleShape2D_hitbox")
 [node name="AttackTimer" type="Timer" parent="." unique_id=264014608]
 wait_time = 1.2
 one_shot = true
+
+[node name="AttackAudio" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_ataque")

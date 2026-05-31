@@ -25,6 +25,9 @@ func _ready():
 			detection_shape.shape.size = Vector2(700, 700) # Dobro do raio pretendido
 
 func _perform_attack():
+	if attack_audio:
+		attack_audio.stop()
+		attack_audio.play()
 	# A múmia para para lançar o projétil
 	velocity = Vector2.ZERO
 	_is_charging = true

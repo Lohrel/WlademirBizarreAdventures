@@ -44,6 +44,7 @@ var _last_strafe_dir: Vector2 = Vector2.ZERO
 @onready var detection_area = $DetectionArea
 @onready var hitbox = $Hitbox
 @onready var attack_timer = $AttackTimer
+@onready var attack_audio = get_node_or_null("AttackAudio")
 
 # --- Cenas ---
 var bone_scene = preload("res://scenes/bone_particles.tscn")
@@ -270,6 +271,8 @@ func _visual_jump():
 # --- Métodos de Combate (para serem sobrescritas para comportamentos específicos) ---
 
 func _perform_attack():
+	if attack_audio:
+		attack_audio.play()
 	# Ataque de investida padrão
 	var lunge_dist = _get_lunge_dist()
 	var tween = create_tween()

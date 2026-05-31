@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://ds33nxcfgx7ww" path="res://scripts/mumia.gd" id="1_mumia_script"]
 [ext_resource type="Texture2D" uid="uid://cfxdhg6m8laqp" path="res://assets/sprites/múmia/mumia_spritesheet.png" id="2_uicjk"]
+[ext_resource type="AudioStream" uid="uid://cekqr4wjbjchf" path="res://assets/sounds/Mumia_ataque sm.wav" id="3_ataque"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
 length = 0.001
@@ -150,3 +151,6 @@ shape = SubResource("CircleShape2D_hitbox")
 [node name="AttackTimer" type="Timer" parent="." unique_id=264014608]
 wait_time = 1.2
 one_shot = true
+
+[node name="AttackAudio" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_ataque")

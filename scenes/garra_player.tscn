@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://btry4vdo5qvce" path="res://assets/sprites/maos_vampiro.png" id="1_dyq0a"]
 [ext_resource type="Script" uid="uid://c06d3y85p4cqy" path="res://scripts/hand.gd" id="2_ojvbx"]
+[ext_resource type="AudioStream" uid="uid://cqu1lv6aufwk7" path="res://assets/sounds/Faca sm.wav" id="3_faca"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_hitbox"]
 radius = 14.0
@@ -23,6 +24,9 @@ texture = ExtResource("1_dyq0a")
 vframes = 2
 script = ExtResource("2_ojvbx")
 distancia = 25
+
+[node name="AttackAudio" type="AudioStreamPlayer2D" parent="hand"]
+stream = ExtResource("3_faca")
 
 [node name="Hitbox" type="Area2D" parent="hand" unique_id=998811]
 collision_layer = 4

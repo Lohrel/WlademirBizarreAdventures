@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://cqw2kmomvdykd" path="res://scripts/bandido_arma.gd" id="1_bandido_script"]
 [ext_resource type="Texture2D" uid="uid://sysq5q58jsb4" path="res://assets/sprites/bandido_arma/bandido_arma_spritesheet.png" id="2_bandido_sprite"]
+[ext_resource type="AudioStream" uid="uid://bvf4pewrbnhky" path="res://assets/sounds/Tiro_arma sm.wav" id="3_tiro"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
 length = 0.001
@@ -127,3 +128,7 @@ shape = SubResource("CircleShape2D_hurt")
 [node name="AttackTimer" type="Timer" parent="." unique_id=364014608]
 wait_time = 4.0
 one_shot = true
+
+[node name="AttackAudio" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_tiro")
+max_polyphony = 8

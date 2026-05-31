@@ -10,6 +10,9 @@ extends CharacterBody2D
 @export var _cooldown_dash: Timer = null
 @export var _attack_timer: Timer = null
 
+@onready var _walk_audio: AudioStreamPlayer2D = $WalkAudio
+@onready var _dash_audio: AudioStreamPlayer2D = $DashAudio
+
 # --- Atributos Base ---
 @export_group("Stats")
 @export var max_health: float = 100.0
@@ -425,6 +428,8 @@ func _dash() -> void:
 		update_hud()
 		_cooldown_dash.start(dash_cooldown_time)
 		_dash_timer.start()
+		_dash_audio.stop()
+		_dash_audio.play()
 		$DashSmoke.emitting = true
 
 func _attack() -> void:
@@ -533,6 +538,7 @@ func _animate() -> void:
 		$Sprite2D.rotation = _dash_direction.angle() + PI/2
 		$Sprite2D.flip_h = false
 		$garra_player.visible = false
+		_walk_audio.stop()
 	else:
 		if $Sprite2D.rotation != 0:
 			$Sprite2D.rotation = 0
@@ -541,8 +547,11 @@ func _animate() -> void:
 		
 		if velocity.length() > 5:
 			_state_machine.travel("walk")
+			if not _walk_audio.playing:
+				_walk_audio.play()
 		else:
 			_state_machine.travel("idle")
+			_walk_audio.stop()
 
 func _on_dash_timer_timeout() -> void:
 	_is_dashing = false

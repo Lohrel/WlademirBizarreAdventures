@@ -17,6 +17,9 @@ func _ready():
 	chase_speed = 120.0
 	super._ready()
 	
+	if not attack_audio:
+		attack_audio = get_node_or_null("AttackAudio")
+	
 	# Configura o tempo de recarga entre rajadas
 	attack_timer.wait_time = reload_time
 	
@@ -81,6 +84,9 @@ func _perform_attack():
 
 func _fire_bullet():
 	if not player: return
+	
+	if attack_audio:
+		attack_audio.play()
 	
 	# Muzzle flash visual
 	var flash = create_tween()

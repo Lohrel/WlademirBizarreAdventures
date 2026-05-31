@@ -11,6 +11,7 @@ var visual_scale: float = 1.0
 
 # --- Referências ---
 @onready var hitbox = $Hitbox
+@onready var _attack_audio: AudioStreamPlayer2D = $AttackAudio
 
 var _already_hit_areas: Array[Area2D] = []
 var _grabbed_box: RigidBody2D = null
@@ -112,6 +113,9 @@ func _physics_process(_delta: float) -> void:
 func start_attack() -> void:
 	distancia = 0
 	_already_hit_areas.clear()
+	if _attack_audio:
+		_attack_audio.stop()
+		_attack_audio.play()
 	if hitbox:
 		hitbox.monitoring = true
 		hitbox.monitorable = true

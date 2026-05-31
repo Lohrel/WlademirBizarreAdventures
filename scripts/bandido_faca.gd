@@ -13,6 +13,9 @@ func _ready():
 	super._ready()
 
 func _perform_attack():
+	if attack_audio:
+		attack_audio.stop()
+		attack_audio.play()
 	# O bandido avança rápido para esfaquear
 	velocity = Vector2.ZERO
 	_is_charging = true

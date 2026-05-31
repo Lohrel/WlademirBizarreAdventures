@@ -4,6 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://dsgqp0vwv7vuo" path="res://assets/sprites/player/vampiro_spritesheet.png" id="2_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://ctt3ybxltjmat" path="res://scenes/garra_player.tscn" id="3_qhqgy"]
 [ext_resource type="PackedScene" uid="uid://c8y8q8u4n8p4x" path="res://scenes/hud.tscn" id="4_hud"]
+[ext_resource type="AudioStream" uid="uid://b7wan2run3v0q" path="res://assets/sounds/Walk.wav" id="5_walk"]
+[ext_resource type="AudioStream" uid="uid://cpcr3emyo1wmr" path="res://assets/sounds/Dash.wav" id="6_dash"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_g2els"]
 radius = 13.0
@@ -385,6 +387,12 @@ color = Color(1, 0.4, 0.1, 1)
 
 [node name="garra_player" parent="player" unique_id=506683672 instance=ExtResource("3_qhqgy")]
 z_index = 0
+
+[node name="WalkAudio" type="AudioStreamPlayer2D" parent="player"]
+stream = ExtResource("5_walk")
+
+[node name="DashAudio" type="AudioStreamPlayer2D" parent="player"]
+stream = ExtResource("6_dash")
 
 [connection signal="timeout" from="player/dash_timer" to="player" method="_on_dash_timer_timeout"]
 [connection signal="timeout" from="player/cooldown_dash" to="player" method="_on_cooldown_dash_timeout"]
