@@ -371,8 +371,7 @@ func _spawn_interactive_door(pos: Vector2, rot: float) -> void:
 
 ## Atualiza os ciclos de sol/lua baseados no temporizador do LevelGenerator.
 func _update_environmental_cycle() -> void:
-	# O pai da sala é o MapContainer, e o pai do MapContainer é o LevelGenerator
-	var gen = get_parent().get_parent() if get_parent() else null
+	var gen = get_tree().root.find_child("LevelGenerator", true, false)
 	if not gen or not "sun_time" in gen: return
 	
 	# Se a sala não tem teto aberto, as luzes de sol/lua devem estar desligadas

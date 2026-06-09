@@ -18,7 +18,7 @@ signal map_updated
 # --- Configuração ---
 @export_group("Level Config")
 @export var max_rooms: int = 15 
-@export var day_speed: float = 0.05
+@export var day_speed: float = 0.1
 const ROOM_SIZE = Vector2(400, 400)
 
 # --- Variáveis de Tempo de Execução ---
@@ -42,6 +42,19 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	# Atualiza o ciclo solar do mundo
 	sun_time += delta * day_speed
+	
+	# Atualiza a iluminação global (CanvasModulate)
+	var st = fmod(sun_time, TAU)
+	var s_val = sin(st)
+	
+	# Transição suave entre noite (0.15) e dia (mais abafado)
+	# s_val vai de -1 (noite) a 1 (dia)
+	var light_factor = (s_val + 1.0) / 2.0
+	var base_night = Color(0.15, 0.15, 0.2)
+	var base_day = Color(0.4, 0.4, 0.45) # Dia mais escuro para manter clima de masmorra
+	
+	if has_node("Darkness"):
+		$Darkness.color = base_night.lerp(base_day, light_factor)
 
 # --- Geração de Nível ---
 
