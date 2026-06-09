@@ -38,7 +38,7 @@ extends CharacterBody2D
 @export var quicksand_speed_bonus: float = 0.0
 @export var dash_mastery: float = 1.0
 @export var life_steal: float = 0.0
-@export var knockback_strength: float = 0.0
+@export var knockback_strength: float = 120.0
 
 # --- Variáveis de Estado ---
 var speed_multiplier: float = 1.0
@@ -53,6 +53,7 @@ var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
 var sunlight_damage_reduction: float = 0.0
+var _sun_tick_timer: float = 0.0
 var _dash_targets_hit: Array[Node2D] = []
 var _dash_boost: float = 1.0
 
@@ -392,9 +393,14 @@ func _handle_combat() -> void:
 func _handle_environment(delta: float) -> void:
 	_check_sunlight()
 	if _in_sunlight:
-		var dmg = 15.0 * delta
-		dmg = max(0, dmg - (dmg * sunlight_damage_reduction))
-		take_damage(dmg)
+		_sun_tick_timer += delta
+		if _sun_tick_timer >= 1.0:
+			var base_dmg = 20.0
+			var dmg = max(0, base_dmg - (base_dmg * sunlight_damage_reduction))
+			take_damage(dmg)
+			_sun_tick_timer -= 1.0
+	else:
+		_sun_tick_timer = 0.0 # Reset timer when leaving sun
 	
 	if health < max_health and passive_regen_percent > 0:
 		health = min(health + (max_health * passive_regen_percent * delta), max_health)

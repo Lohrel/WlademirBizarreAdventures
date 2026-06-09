@@ -25,7 +25,7 @@ func test_generate_item_level_1_scaling():
 	for stat in item.stats:
 		var val = item.stats[stat]
 		# base is 0.01 to 0.06 * level * rarity_mult, but some stats have different scaling
-		if stat in ["attack_damage", "crit_multiplier", "life_steal", "knockback_increase", "health_regen"]:
+		if stat in ["attack_damage", "crit_multiplier", "life_steal", "knockback_increase", "health_regen", "attack_range"]:
 			assert_gt(val, 0.0, "Special stat %s should be positive" % stat)
 		else:
 			assert_between(val, 0.009 * mult, 0.061 * mult, "Stat %s boost should scale with rarity" % stat)
@@ -42,7 +42,10 @@ func test_generate_item_level_10_scaling():
 	for stat in item.stats:
 		var val = item.stats[stat]
 		# base is 0.01 to 0.06 * level * rarity_mult
-		assert_between(val, 0.09 * mult, 0.61 * mult, "Level 10 stat boost should scale with rarity")
+		if stat in ["attack_damage", "crit_multiplier", "life_steal", "knockback_increase", "health_regen", "attack_range"]:
+			assert_gt(val, 0.0, "Special stat %s should be positive" % stat)
+		else:
+			assert_between(val, 0.09 * mult, 0.61 * mult, "Level 10 stat boost should scale with rarity")
 
 func test_slot_stat_constraints():
 	# Test multiple items to ensure stats match slots

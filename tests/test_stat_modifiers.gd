@@ -85,8 +85,8 @@ func test_stat_recalculation_skill_modifier():
 func test_new_gloves_stats():
 	var initial_crit_mult = _player.crit_multiplier
 	var initial_life_steal = _player.life_steal
-	# Base knockback is now 0.0
-	assert_eq(_player.knockback_strength, 0.0, "Base knockback should be 0.0")
+	# Base knockback is now 120.0
+	assert_eq(_player.knockback_strength, 120.0, "Base knockback should be 120.0")
 	
 	var gloves = Equipment.new("Vampire Wraps", Equipment.Slot.GLOVES, {
 		"crit_multiplier": 0.5,
@@ -97,5 +97,5 @@ func test_new_gloves_stats():
 	
 	assert_eq(_player.crit_multiplier, initial_crit_mult + 0.5, "Crit multiplier should increase by flat 0.5")
 	assert_eq(_player.life_steal, initial_life_steal + 0.1, "Life steal should increase by flat 0.1")
-	# 300.0 * 0.5 = 150.0
-	assert_eq(_player.knockback_strength, 150.0, "Knockback should be 150.0 (300 * 0.5)")
+	# 120.0 (base) + (300.0 * 0.5) = 270.0
+	assert_eq(_player.knockback_strength, 270.0, "Knockback should be 270.0 (120 + 300 * 0.5)")

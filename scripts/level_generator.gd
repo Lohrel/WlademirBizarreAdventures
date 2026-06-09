@@ -259,7 +259,7 @@ func _build_world_visuals() -> void:
 		# Iluminação: Salas normais têm 30% de chance de teto aberto
 		var is_open = false
 		if room_info["type"] == "normal":
-			is_open = randf() < 0.3
+			is_open = randf() < 0.6
 
 		# Calcula a quantidade modular de inimigos baseada no nível
 		var min_enemies = 0

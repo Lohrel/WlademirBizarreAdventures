@@ -16,7 +16,7 @@ func after_each():
 	_skeleton.free()
 
 func test_skeleton_attack_range():
-	assert_eq(_skeleton._get_attack_range(), 25.0, "Skeleton should have a short melee attack range")
+	assert_eq(_skeleton._get_attack_range(), 40.0, "Skeleton should have a short melee attack range")
 
 func test_skeleton_telegraphing():
 	# Initially it has no charging logic, so this flag will be missing or false

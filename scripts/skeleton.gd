@@ -35,3 +35,5 @@ func _chase_player():
 		velocity = velocity.move_toward(dir * chase_speed, chase_speed * 0.2)
 	else:
 		super._chase_player()
+
+func _get_attack_range() -> float: return 40.0
