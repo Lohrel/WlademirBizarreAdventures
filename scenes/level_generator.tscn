@@ -1,17 +1,15 @@
 [gd_scene format=3 uid="uid://c4gxk13xwaei3"]
 
-[ext_resource type="Script" path="res://scripts/level_generator.gd" id="1_eyghq"]
+[ext_resource type="Script" uid="uid://dr7uirbkrsx8g" path="res://scripts/level_generator.gd" id="1_eyghq"]
 [ext_resource type="PackedScene" uid="uid://dq7vkqodlkx7a" path="res://scenes/room.tscn" id="2_ss8ix"]
 [ext_resource type="PackedScene" uid="uid://bls2nwi65cm7k" path="res://scenes/player.tscn" id="3_4rulu"]
 [ext_resource type="PackedScene" uid="uid://b8o720cqn7as0" path="res://scenes/boss.tscn" id="4_boss"]
-[ext_resource type="PackedScene" uid="uid://cmlp6qiqopqc" path="res://scenes/boss_padre.tscn" id="8_boss_padre"]
-[ext_resource type="Script" path="res://scripts/camera_2d.gd" id="5_camera"]
-[ext_resource type="AudioStream" uid="uid://cd2r0qsy4nvo3" path="res://assets/sounds/WindyNight.wav" id="6_ambient_music"]
-
+[ext_resource type="Script" uid="uid://bv1cgiu8j4vm4" path="res://scripts/camera_2d.gd" id="5_camera"]
 [ext_resource type="PackedScene" uid="uid://c8l7p8m4n5p2x" path="res://scenes/background_night.tscn" id="6_bg"]
 [ext_resource type="PackedScene" uid="uid://b8y8q8u4n8p4y" path="res://scenes/staircase.tscn" id="7_stairs"]
+[ext_resource type="PackedScene" uid="uid://cmlp6qiqopqc" path="res://scenes/boss_padre.tscn" id="8_boss_padre"]
 
-[node name="LevelGenerator" type="Node2D"]
+[node name="LevelGenerator" type="Node2D" unique_id=1053402345]
 script = ExtResource("1_eyghq")
 room_scene = ExtResource("2_ss8ix")
 player_scene = ExtResource("3_4rulu")
@@ -19,11 +17,10 @@ boss_scene = ExtResource("4_boss")
 boss_padre_scene = ExtResource("8_boss_padre")
 staircase_scene = ExtResource("7_stairs")
 
-[node name="BackgroundNight" parent="." instance=ExtResource("6_bg")]
+[node name="BackgroundNight" parent="." unique_id=1397628304 instance=ExtResource("6_bg")]
 
-[node name="Darkness" type="CanvasModulate" parent="."]
+[node name="Darkness" type="CanvasModulate" parent="." unique_id=1670486182]
 color = Color(0.15, 0.15, 0.2, 1)
 
-[node name="Camera2D" type="Camera2D" parent="."]
-enabled = true
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1207594221]
 script = ExtResource("5_camera")
