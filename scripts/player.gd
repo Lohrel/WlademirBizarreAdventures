@@ -49,6 +49,9 @@ var _dash_direction := Vector2.ZERO
 
 var _is_dashing: bool = false
 var _is_attacking: bool = false
+var _is_biting: bool = false
+var _can_bite: bool = true
+var _grabbed_enemy: Node2D = null
 var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
@@ -276,12 +279,21 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	_push_objects()
 	_animate()
+	
+	if _grabbed_enemy and is_instance_valid(_grabbed_enemy):
+		var mouth_offset = Vector2(30 if _last_direction.x >= 0 else -30, -5)
+		_grabbed_enemy.global_position = global_position + mouth_offset
 
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed:
 		# F5 - Recarregar cena
 		if event.keycode == KEY_F5:
 			get_tree().reload_current_scene()
+			return
+			
+		# Tecla V - Mordida Vampírica
+		if event.keycode == KEY_V:
+			_bite()
 			return
 		
 		# F1 - Imortalidade
@@ -438,6 +450,139 @@ func _dash() -> void:
 		_dash_audio.play()
 		$DashSmoke.emitting = true
 
+func _get_closest_enemy_in_range(radius: float) -> Node2D:
+	var space_state = get_world_2d().direct_space_state
+	var shape_query = PhysicsShapeQueryParameters2D.new()
+	var circle = CircleShape2D.new()
+	circle.radius = radius
+	shape_query.shape = circle
+	shape_query.transform = global_transform
+	# Tira a mascara pra pegar TUDO e a gente filtra manualmente
+	shape_query.collide_with_areas = true
+	shape_query.collide_with_bodies = true
+	
+	var results = space_state.intersect_shape(shape_query)
+	var closest: Node2D = null
+	var min_dist = INF
+	
+	var file = FileAccess.open("user://bite_log.txt", FileAccess.WRITE)
+	if file:
+		file.store_line("Bite executed! Found " + str(results.size()) + " colliders.")
+	
+	for result in results:
+		var col = result.collider
+		if file: file.store_line("Hit: " + str(col.name) + " | Type: " + str(col.get_class()))
+		
+		var enemy = col
+		if col is Area2D:
+			enemy = col.get_parent()
+			if file: file.store_line("  -> Is Area2D, checking parent: " + str(enemy.name))
+			
+		var has_td = false
+		if enemy: has_td = enemy.has_method("take_damage")
+		var is_boss = false
+		if enemy: is_boss = enemy.is_in_group("boss")
+		var is_self = (enemy == self)
+		
+		if file: file.store_line("  -> take_damage: " + str(has_td) + ", boss: " + str(is_boss) + ", self: " + str(is_self))
+		
+		if enemy and enemy is Enemy and not enemy.is_in_group("boss") and enemy != self:
+			var health = 1.0
+			if "health" in enemy:
+				health = enemy.get("health")
+				
+			if health > 0:
+				var dist = global_position.distance_to(enemy.global_position)
+				if dist < min_dist:
+					min_dist = dist
+					closest = enemy
+	
+	if file: 
+		file.store_line("Closest selected: " + (closest.name if closest else "NULL"))
+		file.close()
+		
+	return closest
+
+func _bite() -> void:
+	if not _can_bite or _is_biting or _is_dashing or _is_attacking: return
+	_is_biting = true
+	_can_bite = false
+	
+	# Start cooldown timer
+	var timer = get_tree().create_timer(15.0)
+	timer.timeout.connect(func(): _can_bite = true)
+	
+	var enemy = _get_closest_enemy_in_range(80.0)
+	if enemy:
+		_grabbed_enemy = enemy
+		enemy.set_physics_process(false)
+		enemy.set_process(false)
+		var anim = enemy.get_node_or_null("AnimationPlayer")
+		if anim: anim.stop()
+		var spr = enemy.get_node_or_null("Sprite2D")
+		if spr: spr.rotation = PI/2
+		
+		var col = enemy.get_node_or_null("CollisionShape2D")
+		if col: col.set_deferred("disabled", true)
+		var hitbox_col = enemy.get_node_or_null("Hitbox/CollisionShape2D")
+		if hitbox_col: hitbox_col.set_deferred("disabled", true)
+	
+	_animation_tree.active = false
+	var anim_name = "mordida_left" if _last_direction.x < 0 else "mordida_right"
+	$AnimationPlayer.play(anim_name)
+	
+	await $AnimationPlayer.animation_finished
+	
+	if _is_biting:
+		if _grabbed_enemy and is_instance_valid(_grabbed_enemy):
+			var col = _grabbed_enemy.get_node_or_null("CollisionShape2D")
+			if col: col.set_deferred("disabled", false)
+			var hitbox_col = _grabbed_enemy.get_node_or_null("Hitbox/CollisionShape2D")
+			if hitbox_col: hitbox_col.set_deferred("disabled", false)
+			
+			_spawn_blood_explosion(_grabbed_enemy.global_position)
+			
+			# Curar o player se o inimigo for vivo (Bandidos)
+			var living = false
+			if "is_living" in _grabbed_enemy:
+				living = _grabbed_enemy.get("is_living")
+				
+			if living:
+				health = min(health + 25.0, max_health)
+				update_hud()
+			
+			_grabbed_enemy.set_physics_process(true)
+			_grabbed_enemy.take_damage(99999, global_position, 0)
+			_grabbed_enemy = null
+			
+		_is_biting = false
+		_animation_tree.active = true
+
+func _spawn_blood_explosion(pos: Vector2) -> void:
+	var blood = CPUParticles2D.new()
+	blood.emitting = false
+	blood.one_shot = true
+	blood.explosiveness = 0.9
+	blood.amount = 50
+	blood.lifetime = 0.6
+	blood.direction = Vector2.UP
+	blood.spread = 180.0
+	blood.gravity = Vector2(0, 300) # Falls down quickly
+	blood.initial_velocity_min = 80.0
+	blood.initial_velocity_max = 160.0
+	blood.scale_amount_min = 2.0
+	blood.scale_amount_max = 5.0
+	blood.color = Color(0.6, 0.0, 0.0, 1.0) # Deep blood red
+	
+	# Adiciona à cena (na raiz, para não seguir o player)
+	blood.global_position = pos
+	get_tree().current_scene.add_child(blood)
+	blood.emitting = true
+	
+	# Remove os particulas depois que acabarem
+	var timer = get_tree().create_timer(1.0)
+	timer.timeout.connect(blood.queue_free)
+
 func _attack() -> void:
 
 	if Input.is_action_just_pressed("attack") and not _is_attacking:
@@ -545,6 +690,12 @@ func _animate() -> void:
 		$Sprite2D.flip_h = false
 		$Sprite2D.flip_v = _dash_direction.x < 0
 		$garra_player.visible = false
+		_walk_audio.stop()
+	elif _is_biting:
+		if $Sprite2D.rotation != 0:
+			$Sprite2D.rotation = 0
+		if $Sprite2D.flip_v:
+			$Sprite2D.flip_v = false
 		_walk_audio.stop()
 	else:
 		if $Sprite2D.rotation != 0:

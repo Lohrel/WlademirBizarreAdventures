@@ -169,7 +169,6 @@ tracks/2/keys = {
 [sub_resource type="Animation" id="Animation_fjrip"]
 resource_name = "mordida_left"
 length = 0.9
-loop_mode = 1
 step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -211,7 +210,6 @@ tracks/2/keys = {
 [sub_resource type="Animation" id="Animation_ur7pv"]
 resource_name = "mordida_right"
 length = 0.7
-loop_mode = 1
 step = 0.05
 tracks/0/type = "value"
 tracks/0/imported = false
