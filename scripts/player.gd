@@ -541,13 +541,16 @@ func _push_objects() -> void:
 func _animate() -> void:
 	if _is_dashing:
 		_state_machine.travel("dash")
-		$Sprite2D.rotation = _dash_direction.angle() + PI/2
+		$Sprite2D.rotation = _dash_direction.angle()
 		$Sprite2D.flip_h = false
+		$Sprite2D.flip_v = _dash_direction.x < 0
 		$garra_player.visible = false
 		_walk_audio.stop()
 	else:
 		if $Sprite2D.rotation != 0:
 			$Sprite2D.rotation = 0
+		if $Sprite2D.flip_v:
+			$Sprite2D.flip_v = false
 		if not $garra_player.visible:
 			$garra_player.visible = true
 		
@@ -566,6 +569,7 @@ func _on_dash_timer_timeout() -> void:
 	collision_mask = 19 # Restaura Layer 5 (Enemies)
 	$DashSmoke.emitting = false
 	$Sprite2D.rotation = 0
+	$Sprite2D.flip_v = false
 	$garra_player.visible = true
 
 func _on_cooldown_dash_timeout() -> void: _use_dash = true
