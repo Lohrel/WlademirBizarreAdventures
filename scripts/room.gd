@@ -276,7 +276,7 @@ func _spawn_procedural_content(room_size: Vector2, is_sunlight_room: bool, min_e
 			p.position = corners[i]
 			add_child(p)
 			occupied_positions.append(p.position)
-			if randf() < 0.4: p.setup_torch(corners[i].y < 0)
+			p.setup_torch(corners[i].y < 0)
 	
 	# 2. Caixas (Pulado em corredores)
 	var num_boxes = 0 if is_corridor else randi_range(3, 8)

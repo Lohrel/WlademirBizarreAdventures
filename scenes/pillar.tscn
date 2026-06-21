@@ -29,6 +29,7 @@ shape = SubResource("RectangleShape2D_1")
 occluder = SubResource("OccluderPolygon2D_1")
 
 [node name="Torch" type="Node2D" parent="." unique_id=1317308671]
+z_index = 13
 visible = false
 
 [node name="TorchLight" type="PointLight2D" parent="Torch" unique_id=1916431349]
@@ -57,6 +58,6 @@ autoplay = true
 max_distance = 200.0
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2032534197]
-z_index = 2
+z_index = 12
 position = Vector2(0, -37)
 texture = ExtResource("3_q1crh")

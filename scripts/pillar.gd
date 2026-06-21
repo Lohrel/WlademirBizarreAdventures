@@ -10,12 +10,24 @@ func setup_torch(is_on_top: bool):
 	if torch_audio:
 		torch_audio.play() # Som apenas se houver tocha
 		
-	if is_on_top:
-		# Tocha embaixo do pilar (Sul)
-		torch.position = Vector2(0, 18)
-	else:
-		# Tocha em cima do pilar (Norte)
-		torch.position = Vector2(0, -18)
+	# Tocha sempre embaixo do pilar (Sul)
+	torch.position = Vector2(0, -45)
+	torch.z_index = 13
+	
+	# Adiciona uma segunda luz abaixo do pilar (Sul) para espelhar a luz de cima (Norte)
+	var bottom_light = torch_light.duplicate()
+	add_child(bottom_light)
+	bottom_light.position = Vector2(0, 45)
+	
+	# Adiciona uma terceira luz exatamente na tocha (-45) para iluminar apenas o pilar
+	var pillar_light = torch_light.duplicate()
+	add_child(pillar_light)
+	pillar_light.position = Vector2(0, -45)
+	pillar_light.shadow_enabled = false
+	pillar_light.range_item_cull_mask = 2 # Layer 2
+	
+	# Faz o Sprite2D do pilar reagir APENAS à Layer 2 (luz exclusiva) para não receber sombras das outras luzes
+	$Sprite2D.light_mask = 2
 	
 	# Partículas nascem exatamente na posição da tocha
 	torch_particles.position = Vector2.ZERO

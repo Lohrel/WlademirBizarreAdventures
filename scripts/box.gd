@@ -18,6 +18,7 @@ func destroy():
 	if is_thrown:
 		_explode()
 	else:
+		_play_explosion_sound()
 		# Visual effect for normal destruction
 		var tween = create_tween()
 		tween.tween_property(self, "modulate:a", 0.0, 0.2)
@@ -29,6 +30,8 @@ func _explode():
 	var cam = get_viewport().get_camera_2d()
 	if cam and cam.has_method("shake"):
 		cam.shake(6.0)
+		
+	_play_explosion_sound()
 		
 	# Visual explosion effect
 	var visual = Node2D.new()
@@ -67,6 +70,15 @@ func _create_radial_texture(size: int) -> GradientTexture2D:
 	tex.width = size
 	tex.height = size
 	return tex
+
+func _play_explosion_sound():
+	var audio_player = AudioStreamPlayer2D.new()
+	audio_player.stream = load("res://assets/sounds/BoxExplosion.wav")
+	# Bus principal ou sfx, se houver, pode ser setado aqui, assumindo bus padrão
+	get_parent().add_child(audio_player)
+	audio_player.global_position = global_position
+	audio_player.play()
+	audio_player.finished.connect(audio_player.queue_free)
 
 func throw(direction: Vector2, speed: float, damage: float):
 	is_thrown = true
