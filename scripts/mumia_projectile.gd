@@ -17,6 +17,8 @@ static var _explosion_points: PackedVector2Array = []
 static var _explosion_shape: CircleShape2D = null
 static var _projectile_light_tex: GradientTexture2D = null
 
+var _explosion_audio_stream = preload("res://assets/sounds/BoxExplosion.wav")
+
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	area_entered.connect(_on_area_entered)
@@ -64,6 +66,13 @@ func _explode():
 	var cam = get_viewport().get_camera_2d()
 	if cam and cam.has_method("shake"):
 		cam.shake(10.0)
+		
+	var audio = AudioStreamPlayer2D.new()
+	audio.stream = _explosion_audio_stream
+	get_parent().add_child(audio)
+	audio.global_position = global_position
+	audio.play()
+	audio.finished.connect(audio.queue_free)
 		
 	# Create a visual explosion effect
 	_create_explosion_effect()

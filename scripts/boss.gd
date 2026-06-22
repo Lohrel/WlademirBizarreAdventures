@@ -99,7 +99,16 @@ func _perform_throw_attack(box: RigidBody2D):
 	attack_timer.start()
 	current_state = State.AGGRESSIVE
 
+var _damage_audio_stream = preload("res://assets/sounds/SkeletonTakesDamage.wav")
+
 func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0, is_crit: bool = false):
+	if amount > 0:
+		var audio = AudioStreamPlayer2D.new()
+		audio.stream = _damage_audio_stream
+		get_parent().add_child(audio)
+		audio.global_position = global_position
+		audio.play()
+		audio.finished.connect(audio.queue_free)
 	# Reduz o knockback recebido pelo chefe (apenas 20% do normal)
 	super.take_damage(amount, source_pos, knockback_strength * 0.2, is_crit)
 

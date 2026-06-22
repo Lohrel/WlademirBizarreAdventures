@@ -12,8 +12,21 @@ func _ready():
 	chase_speed = 100.0
 	is_living = false
 	super._ready()
+	
 	# Dobra o tempo de recarga do ataque (o padrão no Enemy é 1.2s, definido no tscn)
 	attack_timer.wait_time = 2.4
+
+var _damage_audio_stream = preload("res://assets/sounds/MummyTakingDamage.wav")
+
+func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0, is_crit: bool = false):
+	if amount > 0:
+		var audio = AudioStreamPlayer2D.new()
+		audio.stream = _damage_audio_stream
+		get_parent().add_child(audio)
+		audio.global_position = global_position
+		audio.play()
+		audio.finished.connect(audio.queue_free)
+	super.take_damage(amount, source_pos, knockback_strength, is_crit)
 	
 	# Aumenta o alcance de detecção
 	var detection_shape = detection_area.get_node("CollisionShape2D")

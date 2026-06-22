@@ -13,6 +13,18 @@ extends CharacterBody2D
 @onready var _walk_audio: AudioStreamPlayer2D = $WalkAudio
 @onready var _dash_audio: AudioStreamPlayer2D = $DashAudio
 
+var _bite_audio_stream = preload("res://assets/sounds/BiteSound.wav")
+var _active_burn_audio: AudioStreamPlayer2D = null
+var _player_damage_audio_streams = [
+	preload("res://assets/sounds/PlayerTakesDamage1.wav"),
+	preload("res://assets/sounds/PlayerTakesDamage2.wav")
+]
+var _attack_audio_stream = preload("res://assets/sounds/PlayerAttack.wav")
+
+var _walk_fade_tween: Tween
+var _base_walk_volume: float = 0.0
+var _walk_particles: CPUParticles2D
+
 # --- Atributos Base ---
 @export_group("Stats")
 @export var max_health: float = 100.0
@@ -132,6 +144,19 @@ var base_life_steal: float
 var base_knockback_strength: float
 
 func _ready() -> void:
+	if _walk_audio: _base_walk_volume = _walk_audio.volume_db
+	
+	if has_node("DashSmoke"):
+		_walk_particles = $DashSmoke.duplicate()
+		_walk_particles.name = "WalkSmoke"
+		_walk_particles.amount = 15
+		_walk_particles.lifetime = 0.4
+		_walk_particles.color = Color(0.6, 0.5, 0.4, 0.5) # Poeira marrom/cinza
+		_walk_particles.scale_amount_min = 1.0
+		_walk_particles.scale_amount_max = 3.0
+		_walk_particles.emitting = false
+		add_child(_walk_particles)
+	
 	# Inicializa valores base
 	base_max_health = max_health
 	base_max_mana = max_mana
@@ -275,6 +300,24 @@ func _physics_process(delta: float) -> void:
 	_handle_movement()
 	_handle_combat()
 	_handle_environment(delta)
+	if $BurnParticles.emitting:
+		if not is_instance_valid(_active_burn_audio):
+			_active_burn_audio = AudioStreamPlayer2D.new()
+			_active_burn_audio.stream = preload("res://assets/sounds/Burning.wav")
+			_active_burn_audio.volume_db = 5.0
+			add_child(_active_burn_audio)
+			_active_burn_audio.play()
+			_active_burn_audio.finished.connect(func():
+				if is_instance_valid(_active_burn_audio) and $BurnParticles.emitting:
+					_active_burn_audio.play()
+			)
+	else:
+		if is_instance_valid(_active_burn_audio):
+			var audio_to_fade = _active_burn_audio
+			_active_burn_audio = null # Remove reference so a new one can spawn if needed
+			var tween = create_tween()
+			tween.tween_property(audio_to_fade, "volume_db", -40.0, 0.5).set_trans(Tween.TRANS_LINEAR)
+			tween.tween_callback(audio_to_fade.queue_free)
 	
 	move_and_slide()
 	_push_objects()
@@ -423,6 +466,9 @@ func _handle_environment(delta: float) -> void:
 
 func _move() -> void:
 	if _is_dashing: return
+	if _is_biting:
+		velocity = Vector2.ZERO
+		return
 	var iv = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if iv != Vector2.ZERO:
 		_last_direction = iv.normalized()
@@ -531,6 +577,12 @@ func _bite() -> void:
 	var anim_name = "mordida_left" if _last_direction.x < 0 else "mordida_right"
 	$AnimationPlayer.play(anim_name)
 	
+	var bite_audio = AudioStreamPlayer2D.new()
+	bite_audio.stream = _bite_audio_stream
+	add_child(bite_audio)
+	bite_audio.play()
+	bite_audio.finished.connect(bite_audio.queue_free)
+	
 	await $AnimationPlayer.animation_finished
 	
 	if _is_biting:
@@ -562,9 +614,9 @@ func _spawn_blood_explosion(pos: Vector2) -> void:
 	var blood = CPUParticles2D.new()
 	blood.emitting = false
 	blood.one_shot = true
-	blood.explosiveness = 0.9
-	blood.amount = 50
-	blood.lifetime = 0.6
+	blood.explosiveness = 0.2 # Lower explosiveness so it sprays over time instead of all at once
+	blood.amount = 150 # Much more blood!
+	blood.lifetime = 1.6 # Lasts much longer
 	blood.direction = Vector2.UP
 	blood.spread = 180.0
 	blood.gravity = Vector2(0, 300) # Falls down quickly
@@ -580,18 +632,25 @@ func _spawn_blood_explosion(pos: Vector2) -> void:
 	blood.emitting = true
 	
 	# Remove os particulas depois que acabarem
-	var timer = get_tree().create_timer(1.0)
+	var timer = get_tree().create_timer(3.0)
 	timer.timeout.connect(blood.queue_free)
 
 func _attack() -> void:
-
+	# Ajusta a direção da garra
 	if Input.is_action_just_pressed("attack") and not _is_attacking:
 		_attack_timer.start()
 		_is_attacking = true
 		$garra_player/hand.start_attack()
-		# Escala a garra visualmente com o alcance usando a nova propriedade visual_scale
+		
+		var audio = AudioStreamPlayer2D.new()
+		audio.stream = _attack_audio_stream
+		get_parent().add_child(audio)
+		audio.global_position = global_position
+		audio.play()
+		audio.finished.connect(audio.queue_free)
+		
 		$garra_player/hand.visual_scale = 1.0 * attack_range_multiplier
-	
+		
 	if _is_attacking:
 		# Aumenta a velocidade de projeção proporcionalmente ao alcance para não parecer "lento"
 		var projection_speed = 350.0 * attack_range_multiplier
@@ -626,6 +685,13 @@ func take_damage(amount: float) -> void:
 	if is_immortal or _is_dashing: return
 	
 	if amount > 0:
+		var audio = AudioStreamPlayer2D.new()
+		audio.stream = _player_damage_audio_streams.pick_random()
+		get_parent().add_child(audio)
+		audio.global_position = global_position
+		audio.play()
+		audio.finished.connect(audio.queue_free)
+		
 		var indicator = damage_indicator_scene.instantiate()
 		get_parent().add_child(indicator)
 		indicator.global_position = global_position + Vector2(0, -20)
@@ -690,13 +756,15 @@ func _animate() -> void:
 		$Sprite2D.flip_h = false
 		$Sprite2D.flip_v = _dash_direction.x < 0
 		$garra_player.visible = false
-		_walk_audio.stop()
+		_stop_walk_audio()
+		if _walk_particles: _walk_particles.emitting = false
 	elif _is_biting:
 		if $Sprite2D.rotation != 0:
 			$Sprite2D.rotation = 0
 		if $Sprite2D.flip_v:
 			$Sprite2D.flip_v = false
-		_walk_audio.stop()
+		_stop_walk_audio()
+		if _walk_particles: _walk_particles.emitting = false
 	else:
 		if $Sprite2D.rotation != 0:
 			$Sprite2D.rotation = 0
@@ -707,11 +775,26 @@ func _animate() -> void:
 		
 		if velocity.length() > 5:
 			_state_machine.travel("walk")
-			if not _walk_audio.playing:
-				_walk_audio.play()
+			_play_walk_audio()
+			if _walk_particles: _walk_particles.emitting = true
 		else:
 			_state_machine.travel("idle")
-			_walk_audio.stop()
+			_stop_walk_audio()
+			if _walk_particles: _walk_particles.emitting = false
+
+func _play_walk_audio() -> void:
+	if _walk_fade_tween and _walk_fade_tween.is_valid():
+		_walk_fade_tween.kill()
+	if _walk_audio:
+		_walk_audio.volume_db = _base_walk_volume
+		if not _walk_audio.playing:
+			_walk_audio.play()
+
+func _stop_walk_audio() -> void:
+	if _walk_audio and _walk_audio.playing and not (_walk_fade_tween and _walk_fade_tween.is_valid()):
+		_walk_fade_tween = create_tween()
+		_walk_fade_tween.tween_property(_walk_audio, "volume_db", -40.0, 0.25).set_trans(Tween.TRANS_LINEAR)
+		_walk_fade_tween.tween_callback(_walk_audio.stop)
 
 func _on_dash_timer_timeout() -> void:
 	_is_dashing = false

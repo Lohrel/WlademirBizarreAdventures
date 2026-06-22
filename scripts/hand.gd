@@ -113,9 +113,6 @@ func _physics_process(_delta: float) -> void:
 func start_attack() -> void:
 	distancia = 0
 	_already_hit_areas.clear()
-	if _attack_audio:
-		_attack_audio.stop()
-		_attack_audio.play()
 	if hitbox:
 		hitbox.monitoring = true
 		hitbox.monitorable = true

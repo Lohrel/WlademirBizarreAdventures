@@ -26,6 +26,21 @@ func _ready():
 	# Cria a luz de tiro (muzzle flash)
 	_setup_muzzle_light()
 
+var _damage_audio_streams = [
+	preload("res://assets/sounds/PlayerTakesDamage1.wav"),
+	preload("res://assets/sounds/PlayerTakesDamage2.wav")
+]
+
+func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_strength: float = 300.0, is_crit: bool = false):
+	if amount > 0:
+		var audio = AudioStreamPlayer2D.new()
+		audio.stream = _damage_audio_streams.pick_random()
+		get_parent().add_child(audio)
+		audio.global_position = global_position
+		audio.play()
+		audio.finished.connect(audio.queue_free)
+	super.take_damage(amount, source_pos, knockback_strength, is_crit)
+
 func _setup_muzzle_light():
 	_muzzle_light = PointLight2D.new()
 	_muzzle_light.color = Color(1.0, 0.8, 0.4) # Cor de pólvora/faísca
