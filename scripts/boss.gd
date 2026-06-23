@@ -94,7 +94,11 @@ func _perform_throw_attack(box: RigidBody2D):
 	# 2. Arremessa em direção ao jogador
 	if is_instance_valid(box) and player:
 		var dir = (player.global_position - box.global_position).normalized()
-		box.throw(dir, 3500.0, attack_damage * 1.5)
+		var speed = 3500.0
+		# Verifica se é um pilar (pelo script ou nome) para jogar com metade da velocidade
+		if box.has_method("setup_torch") or box.name.begins_with("Pillar"):
+			speed = 1750.0
+		box.throw(dir, speed, attack_damage * 1.5)
 	
 	attack_timer.start()
 	current_state = State.AGGRESSIVE

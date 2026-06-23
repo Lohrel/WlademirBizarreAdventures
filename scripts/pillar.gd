@@ -1,4 +1,7 @@
-extends StaticBody2D
+extends RigidBody2D
+
+var is_thrown = false
+var throw_damage = 25.0
 
 @onready var torch = $Torch
 @onready var torch_light = $Torch/TorchLight
@@ -46,6 +49,10 @@ func setup_torch(is_on_top: bool):
 	torch_particles.position = Vector2.ZERO
 
 func _ready():
+	contact_monitor = true
+	max_contacts_reported = 1
+	body_entered.connect(_on_body_entered)
+	
 	# Garante que o som comece desligado (será ligado no setup_torch se necessário)
 	if torch_audio:
 		torch_audio.stop()
@@ -68,3 +75,27 @@ func _ready():
 	torch_light.shadow_enabled = true
 	torch_light.shadow_filter = 1
 	torch_light.shadow_filter_smooth = 2.0
+
+func throw(direction: Vector2, speed: float, damage: float):
+	is_thrown = true
+	throw_damage = damage
+	freeze = false
+	apply_central_impulse(direction * speed)
+	get_tree().create_timer(2.0).timeout.connect(func(): if is_instance_valid(self): is_thrown = false)
+
+func take_damage(_amount: float, _source_pos: Vector2 = Vector2.ZERO, _knockback: float = 0.0):
+	destroy()
+
+func destroy():
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.2)
+	tween.tween_property(self, "scale", Vector2.ZERO, 0.2)
+	tween.finished.connect(queue_free)
+
+func _on_body_entered(body: Node):
+	if is_thrown:
+		if body.is_in_group("player") and body.has_method("take_damage"):
+			body.take_damage(throw_damage)
+			destroy()
+		elif not body.is_in_group("boss"):
+			destroy()
