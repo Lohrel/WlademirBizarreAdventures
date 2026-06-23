@@ -408,9 +408,13 @@ func _spawn_or_reset_player() -> void:
 	
 	# Redefine a posição interna do CharacterBody2D
 	if player_node.has_node("player"):
-		player_node.get_node("player").position = Vector2.ZERO
-		# Garante que o jogador esteja visível (caso tenha vindo de uma transição de nível)
-		player_node.get_node("player").modulate.a = 1.0
+		var p_char = player_node.get_node("player")
+		p_char.position = Vector2.ZERO
+		# Garante que o jogador e o sprite estejam visíveis (caso venham de uma transição de nível)
+		p_char.modulate.a = 1.0
+		var sprite = p_char.get_node_or_null("Sprite2D")
+		if sprite:
+			sprite.modulate.a = 1.0
 		
 	# Avisa a câmera para dar "snap" e evitar o deslizamento inicial
 	var cam = get_node_or_null("Camera2D")

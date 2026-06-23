@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://da2ef0pyjl6rx" path="res://scripts/bandido_faca.gd" id="1_bandido_faca_script"]
 [ext_resource type="Texture2D" uid="uid://ccsil8hoxohrx" path="res://assets/sprites/bandido_faca/bandido_faca_spritesheet.png" id="2_bandido_faca_sprite"]
-[ext_resource type="AudioStream" uid="uid://dhbs3id3s2yeh" path="res://assets/sounds/Ataque inimigo sm.wav" id="3_ataque"]
+[ext_resource type="AudioStream" uid="uid://c20qfgonf2o8e" path="res://assets/sounds/Ataque inimigo sm.wav" id="3_ataque"]
 
 [sub_resource type="Animation" id="Animation_qco4w"]
 length = 0.001

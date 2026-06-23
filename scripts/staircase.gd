@@ -13,9 +13,12 @@ func _ready() -> void:
 	interaction_label.visible = false
 	add_to_group("staircase")
 
+var is_transitioning: bool = false
+
 func _input(event: InputEvent) -> void:
-	if is_player_near:
+	if is_player_near and not is_transitioning:
 		if event.is_action_pressed("interact") or (event is InputEventKey and event.pressed and event.keycode == KEY_E):
+			is_transitioning = true
 			_go_to_next_level()
 
 func _go_to_next_level() -> void:

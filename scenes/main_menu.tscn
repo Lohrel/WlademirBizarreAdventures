@@ -1,0 +1,58 @@
+[gd_scene format=3 uid="uid://bd7de3gkxbr1e"]
+
+[ext_resource type="Script" uid="uid://bhs8f8ii7fiqu" path="res://scripts/main_menu.gd" id="1_main_menu"]
+[ext_resource type="FontFile" uid="uid://dnlegs1bi0b88" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_font"]
+[ext_resource type="PackedScene" uid="uid://c8l7p8m4n5p2x" path="res://scenes/background_night.tscn" id="3_bg"]
+
+[node name="MainMenu" type="Control" unique_id=1716678688]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_main_menu")
+
+[node name="BackgroundNight" parent="." unique_id=1991101511 instance=ExtResource("3_bg")]
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=2137050017]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -100.0
+offset_right = 250.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="Title" type="Label" parent="VBoxContainer" unique_id=1659692886]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 24
+text = "Wlademir Adventures"
+horizontal_alignment = 1
+
+[node name="PlayButton" type="Button" parent="VBoxContainer" unique_id=422793227]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "Play"
+
+[node name="QuitButton" type="Button" parent="VBoxContainer" unique_id=1454016250]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 16
+text = "Quit"
+
+[connection signal="pressed" from="VBoxContainer/PlayButton" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
