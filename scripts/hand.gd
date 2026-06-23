@@ -70,7 +70,7 @@ func _physics_process(_delta: float) -> void:
 		# Usa move_and_collide para impedir que a caixa atravesse paredes
 		# Movemos a caixa a uma velocidade restrita constante (drag físico real)
 		var current_pos = _grabbed_box.global_position
-		var smooth_pos = current_pos.move_toward(desired_pos, 150.0 * _delta)
+		var smooth_pos = current_pos.move_toward(desired_pos, 80.0 * _delta)
 		var motion = smooth_pos - current_pos
 		var collision = _grabbed_box.move_and_collide(motion)
 		
