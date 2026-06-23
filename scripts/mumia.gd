@@ -28,8 +28,11 @@ func take_damage(amount: float, source_pos: Vector2 = Vector2.ZERO, knockback_st
 		audio.finished.connect(audio.queue_free)
 	super.take_damage(amount, source_pos, knockback_strength, is_crit)
 	
-	# Aumenta o alcance de detecção
-	var detection_shape = detection_area.get_node("CollisionShape2D")
+	# Aumenta o alcance de detecção (deferido para evitar erro da física do Godot)
+	call_deferred("_increase_detection_range")
+
+func _increase_detection_range():
+	var detection_shape = detection_area.get_node_or_null("CollisionShape2D")
 	if detection_shape and detection_shape.shape:
 		detection_shape.shape = detection_shape.shape.duplicate()
 		if detection_shape.shape is CircleShape2D:

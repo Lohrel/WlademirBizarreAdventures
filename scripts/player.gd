@@ -64,6 +64,9 @@ var _is_attacking: bool = false
 var _is_biting: bool = false
 var _can_bite: bool = true
 var _grabbed_enemy: Node2D = null
+var _is_spawning: bool = false
+var _is_dead: bool = false
+var _spawn_particles: CPUParticles2D = null
 var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
@@ -144,6 +147,26 @@ var base_life_steal: float
 var base_knockback_strength: float
 
 func _ready() -> void:
+	_is_spawning = true
+	if _animation_tree:
+		_animation_tree.active = false
+	if has_node("AnimationPlayer"):
+		$AnimationPlayer.animation_finished.connect(_on_spawn_animation_finished)
+		$AnimationPlayer.play("spawn")
+		
+		# Cria partículas da animação de spawn
+		_spawn_particles = CPUParticles2D.new()
+		_spawn_particles.amount = 60
+		_spawn_particles.lifetime = 0.6
+		_spawn_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_SPHERE
+		_spawn_particles.emission_sphere_radius = 40.0
+		_spawn_particles.gravity = Vector2(0, -40)
+		_spawn_particles.scale_amount_min = 2.0
+		_spawn_particles.scale_amount_max = 5.0
+		_spawn_particles.color = Color.BLACK
+		_spawn_particles.z_index = -1 # Atrás do jogador
+		add_child(_spawn_particles)
+		
 	if _walk_audio: _base_walk_volume = _walk_audio.volume_db
 	
 	if has_node("DashSmoke"):
@@ -297,6 +320,9 @@ func _update_equipment_slot_ui(slot_name: String, slot_enum: int) -> void:
 				slot_node.color = Color(1, 1, 1, 0.2) # Cinza claro transparente quando vazio
 
 func _physics_process(delta: float) -> void:
+	if _is_spawning:
+		return
+		
 	_handle_movement()
 	_handle_combat()
 	_handle_environment(delta)
@@ -732,6 +758,28 @@ func apply_poison(total_damage: float, duration: float) -> void:
 		restore_tween.tween_property($Sprite2D, "modulate", Color(1, 1, 1), 0.2)
 
 func _die() -> void:
+	if _is_dead: return
+	_is_dead = true
+	
+	set_physics_process(false)
+	$CollisionShape2D.set_deferred("disabled", true)
+	
+	if _animation_tree:
+		_animation_tree.active = false
+		
+	var hand = get_node_or_null("garra_player/hand")
+	if hand:
+		hand.set_physics_process(false)
+		hand.set_process(false)
+		
+	var garra_anim = get_node_or_null("garra_player/AnimationPlayer")
+	if garra_anim:
+		garra_anim.play("died")
+		
+	if has_node("AnimationPlayer"):
+		$AnimationPlayer.play("died")
+		await $AnimationPlayer.animation_finished
+		
 	var ds = death_screen_scene.instantiate()
 	get_tree().root.add_child(ds)
 
@@ -830,3 +878,15 @@ func _spawn_debug_item(item: Equipment) -> void:
 	drop.equipment_data = item
 	get_parent().add_child(drop)
 	drop.global_position = global_position + Vector2(randf_range(-20, 20), randf_range(-20, 20))
+
+func _on_spawn_animation_finished(anim_name: String) -> void:
+	if anim_name == "spawn":
+		_is_spawning = false
+		if _animation_tree:
+			_animation_tree.active = true
+		if is_instance_valid(_spawn_particles):
+			_spawn_particles.emitting = false
+			get_tree().create_timer(_spawn_particles.lifetime).timeout.connect(_spawn_particles.queue_free)
+			_spawn_particles = null
+		if $AnimationPlayer.animation_finished.is_connected(_on_spawn_animation_finished):
+			$AnimationPlayer.animation_finished.disconnect(_on_spawn_animation_finished)
