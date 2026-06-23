@@ -1,12 +1,12 @@
 [gd_scene format=3 uid="uid://c6f3y4p7v6q2v"]
 
-[ext_resource type="Script" uid="uid://ccj7oy32ruj4u" path="res://scripts/death_screen.gd" id="1_death"]
-[ext_resource type="FontFile" uid="uid://c811ifpjnkod6" path="res://assets/fonts/Melted Monster.ttf" id="2_mqh5l"]
+[ext_resource type="Script" uid="uid://twmnvq5tncqg" path="res://scripts/death_screen.gd" id="1_death"]
+[ext_resource type="FontFile" uid="uid://dnlegs1bi0b88" path="res://assets/fonts/PressStart2P-Regular.ttf" id="2_mqh5l"]
 [ext_resource type="Texture2D" uid="uid://brdp4tuo5pr0i" path="res://assets/sprites/botão.png" id="3_7ns25"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_Death"]
 font = ExtResource("2_mqh5l")
-font_size = 48
+font_size = 32
 font_color = Color(0.68235296, 0, 0.11764706, 1)
 outline_size = 10
 outline_color = Color(0, 0, 0, 1)
@@ -57,12 +57,12 @@ label_settings = SubResource("LabelSettings_Death")
 horizontal_alignment = 1
 
 [node name="Botão" type="Sprite2D" parent="Control/VBoxContainer" unique_id=1576076932]
-position = Vector2(99, 101.5)
+position = Vector2(127, 72)
 scale = Vector2(0.6, 1)
 texture = ExtResource("3_7ns25")
 
 [node name="Botão2" type="Sprite2D" parent="Control/VBoxContainer" unique_id=1130962839]
-position = Vector2(99, 161.5)
+position = Vector2(128, 131)
 scale = Vector2(0.6, 1)
 texture = ExtResource("3_7ns25")
 
@@ -71,6 +71,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_mqh5l")
+theme_override_font_sizes/font_size = 16
 text = "RESTART"
 flat = true
 
@@ -79,6 +81,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 40)
 layout_mode = 2
 size_flags_horizontal = 4
+theme_override_fonts/font = ExtResource("2_mqh5l")
+theme_override_font_sizes/font_size = 16
 text = "QUIT"
 flat = true
 

@@ -10,9 +10,11 @@ func _ready():
 	# Começa com suavização desligada para o snap inicial ser instantâneo
 	position_smoothing_enabled = false
 
+var _shake_decay = 20.0
+
 func _process(delta):
 	if _shake_amount > 0:
-		_shake_amount = move_toward(_shake_amount, 0, delta * 20.0)
+		_shake_amount = move_toward(_shake_amount, 0, delta * _shake_decay)
 		offset = Vector2(randf_range(-_shake_amount, _shake_amount), randf_range(-_shake_amount, _shake_amount))
 	else:
 		offset = Vector2.ZERO
@@ -40,5 +42,6 @@ func snap_to_player():
 		await get_tree().process_frame
 		position_smoothing_enabled = true
 
-func shake(amount: float):
+func shake(amount: float, decay_rate: float = 20.0):
 	_shake_amount = amount
+	_shake_decay = decay_rate

@@ -67,6 +67,7 @@ var _grabbed_enemy: Node2D = null
 var _is_spawning: bool = false
 var _is_dead: bool = false
 var _spawn_particles: CPUParticles2D = null
+var _dirt_particles: CPUParticles2D = null
 var _current_room: Node2D = null
 var _in_sunlight: bool = false
 var is_immortal: bool = false
@@ -170,6 +171,31 @@ func _ready() -> void:
 		_spawn_particles.color = Color.BLACK
 		_spawn_particles.z_index = -1 # Atrás do jogador
 		add_child(_spawn_particles)
+		
+		# Cria partículas de terra para simular o caixão saindo do chão
+		_dirt_particles = CPUParticles2D.new()
+		_dirt_particles.amount = 40
+		_dirt_particles.lifetime = 0.5
+		_dirt_particles.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+		_dirt_particles.emission_rect_extents = Vector2(25.0, 5.0)
+		_dirt_particles.direction = Vector2(0, -1)
+		_dirt_particles.spread = 45.0
+		_dirt_particles.gravity = Vector2(0, 400) # Cai de volta no chão
+		_dirt_particles.initial_velocity_min = 120.0
+		_dirt_particles.initial_velocity_max = 200.0
+		_dirt_particles.scale_amount_min = 2.0
+		_dirt_particles.scale_amount_max = 4.0
+		_dirt_particles.color = Color("5c4033") # Cor de terra (marrom escuro)
+		_dirt_particles.z_index = -2 # Atrás das partículas pretas
+		_dirt_particles.position = Vector2(0, 20) # Começa na base do caixão
+		add_child(_dirt_particles)
+		
+		# Shake da tela diferido (para garantir que a câmera já está ativa no Viewport)
+		var trigger_shake = func():
+			var cam = get_viewport().get_camera_2d()
+			if cam and cam.has_method("shake"):
+				cam.shake(8.0, 13.3) # 8.0 amount, 13.3 decay = ~0.6 seconds duration
+		get_tree().create_timer(0.1).timeout.connect(trigger_shake)
 		
 	if _walk_audio: _base_walk_volume = _walk_audio.volume_db
 	
@@ -897,5 +923,9 @@ func _on_spawn_animation_finished(anim_name: String) -> void:
 			_spawn_particles.emitting = false
 			get_tree().create_timer(_spawn_particles.lifetime).timeout.connect(_spawn_particles.queue_free)
 			_spawn_particles = null
+		if is_instance_valid(_dirt_particles):
+			_dirt_particles.emitting = false
+			get_tree().create_timer(_dirt_particles.lifetime).timeout.connect(_dirt_particles.queue_free)
+			_dirt_particles = null
 		if $AnimationPlayer.animation_finished.is_connected(_on_spawn_animation_finished):
 			$AnimationPlayer.animation_finished.disconnect(_on_spawn_animation_finished)
