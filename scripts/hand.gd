@@ -67,8 +67,11 @@ func _physics_process(_delta: float) -> void:
 			var dir_to_target = (target_pos - player.global_position).normalized()
 			desired_pos = player.global_position + dir_to_target * max_grab_distance
 			
-		# Usa move_and_collide para impedir que a caixa atravesse paredes e empurre os inimigos sem atravessá-los
-		var motion = desired_pos - _grabbed_box.global_position
+		# Usa move_and_collide para impedir que a caixa atravesse paredes
+		# Movemos a caixa a uma velocidade restrita constante (drag físico real)
+		var current_pos = _grabbed_box.global_position
+		var smooth_pos = current_pos.move_toward(desired_pos, 150.0 * _delta)
+		var motion = smooth_pos - current_pos
 		var collision = _grabbed_box.move_and_collide(motion)
 		
 		if collision:

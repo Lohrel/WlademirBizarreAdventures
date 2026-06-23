@@ -15,12 +15,25 @@ func setup_torch(is_on_top: bool):
 	torch.z_index = 13
 	
 	# Adiciona uma segunda luz abaixo do pilar (Sul) para espelhar a luz de cima (Norte)
-	var bottom_light = torch_light.duplicate()
+	var bottom_light = PointLight2D.new()
+	bottom_light.texture = torch_light.texture
+	bottom_light.color = torch_light.color
+	bottom_light.energy = torch_light.energy
+	bottom_light.shadow_enabled = torch_light.shadow_enabled
+	bottom_light.shadow_filter = torch_light.shadow_filter
+	bottom_light.shadow_filter_smooth = torch_light.shadow_filter_smooth
+	bottom_light.texture_scale = torch_light.texture_scale
+	bottom_light.blend_mode = torch_light.blend_mode
 	add_child(bottom_light)
 	bottom_light.position = Vector2(0, 45)
 	
 	# Adiciona uma terceira luz exatamente na tocha (-45) para iluminar apenas o pilar
-	var pillar_light = torch_light.duplicate()
+	var pillar_light = PointLight2D.new()
+	pillar_light.texture = torch_light.texture
+	pillar_light.color = torch_light.color
+	pillar_light.energy = torch_light.energy
+	pillar_light.texture_scale = torch_light.texture_scale
+	pillar_light.blend_mode = torch_light.blend_mode
 	add_child(pillar_light)
 	pillar_light.position = Vector2(0, -45)
 	pillar_light.shadow_enabled = false

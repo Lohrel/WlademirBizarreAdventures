@@ -66,8 +66,8 @@ func generate_new_level() -> void:
 	
 	# 1. Limpeza Robusta: Deleta tudo que não for o Jogador, Câmera ou Background
 	if map_container:
+		map_container.name = "OldMapContainer"
 		map_container.queue_free()
-		remove_child(map_container)
 		map_container = null
 	
 	# Fallback para garantir que nada sobrou (especialmente nós orfãos com nomes Room ou @Room)

@@ -37,7 +37,7 @@ func _go_to_next_level() -> void:
 					tween_s.tween_property(sprite, "modulate:a", 0.0, 0.5)
 		
 		await get_tree().create_timer(0.6).timeout
-		gen.generate_new_level()
+		gen.call_deferred("generate_new_level")
 
 func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player") or body.name.to_lower() == "player":

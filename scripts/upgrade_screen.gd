@@ -70,7 +70,7 @@ func _on_upgrade_selected(index: int) -> void:
 	# Retoma o jogo e gera o próximo nível
 	get_tree().paused = false
 	if level_generator:
-		level_generator.generate_new_level()
+		level_generator.call_deferred("generate_new_level")
 	
 	# Libera o CanvasLayer
 	get_parent().queue_free()
