@@ -148,8 +148,12 @@ var base_knockback_strength: float
 
 func _ready() -> void:
 	_is_spawning = true
+
+	$garra_player.visible = false
+
 	if _animation_tree:
 		_animation_tree.active = false
+
 	if has_node("AnimationPlayer"):
 		$AnimationPlayer.animation_finished.connect(_on_spawn_animation_finished)
 		$AnimationPlayer.play("spawn")
@@ -882,8 +886,13 @@ func _spawn_debug_item(item: Equipment) -> void:
 func _on_spawn_animation_finished(anim_name: String) -> void:
 	if anim_name == "spawn":
 		_is_spawning = false
+
+		$garra_player.visible = true
+
 		if _animation_tree:
 			_animation_tree.active = true
+
+		# resto do código...
 		if is_instance_valid(_spawn_particles):
 			_spawn_particles.emitting = false
 			get_tree().create_timer(_spawn_particles.lifetime).timeout.connect(_spawn_particles.queue_free)

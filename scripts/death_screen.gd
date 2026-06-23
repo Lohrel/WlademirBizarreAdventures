@@ -6,6 +6,8 @@ extends Control
 # --- Ciclo de Vida ---
 
 func _ready() -> void:
+	
+
 	# Garante que a interação funcione enquanto o jogo está pausado
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	get_tree().paused = true

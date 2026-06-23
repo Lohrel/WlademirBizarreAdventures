@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c4gxk13xwaei3"]
 
-[ext_resource type="Script" uid="uid://dr7uirbkrsx8g" path="res://scripts/level_generator.gd" id="1_eyghq"]
+[ext_resource type="Script" uid="uid://bkbtl6d2s22sg" path="res://scripts/level_generator.gd" id="1_eyghq"]
 [ext_resource type="PackedScene" uid="uid://dq7vkqodlkx7a" path="res://scenes/room.tscn" id="2_ss8ix"]
 [ext_resource type="PackedScene" uid="uid://bls2nwi65cm7k" path="res://scenes/player.tscn" id="3_4rulu"]
 [ext_resource type="PackedScene" uid="uid://b8o720cqn7as0" path="res://scenes/boss.tscn" id="4_boss"]

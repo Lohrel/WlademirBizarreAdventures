@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bls2nwi65cm7k"]
 
-[ext_resource type="Script" uid="uid://cac2kl2sm412e" path="res://scripts/player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://sdrhgid82yrq" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="PackedScene" uid="uid://ctt3ybxltjmat" path="res://scenes/garra_player.tscn" id="3_qhqgy"]
 [ext_resource type="Texture2D" uid="uid://bfr4uisor6es0" path="res://assets/sprites/player/vampiro_spritesheet_teste.png" id="3_tuyoq"]
 [ext_resource type="PackedScene" uid="uid://c8y8q8u4n8p4x" path="res://scenes/hud.tscn" id="4_hud"]
@@ -292,6 +292,18 @@ tracks/0/keys = {
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
 "update": 1,
 "values": [27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 38]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Sprite2D:flip_h")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [true]
 }
 
 [sub_resource type="Animation" id="Animation_qlg0r"]
